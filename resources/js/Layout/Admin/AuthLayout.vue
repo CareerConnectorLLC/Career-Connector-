@@ -20,15 +20,12 @@
                 </div>
             </div>
             <!-- /Left Text -->
-
             <slot/>
         </div>
     </div>
 </template>
 
 <script setup>
-
-
 </script>
 
 <style scoped>

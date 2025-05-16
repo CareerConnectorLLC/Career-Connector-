@@ -34,7 +34,6 @@
             </li>
             <li class="dropdown-notifications-list">
               <ul class="list-group list-group-flush notification-panel">
-
               </ul>
             </li>
             <li class="dropdown-menu-footer border-top">
@@ -45,13 +44,10 @@
             </li>
           </ul>
         </li>
-
-
-
         <li class="nav-item navbar-dropdown dropdown-user dropdown">
           <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
             <div class="avatar avatar-online">
-              <img :src="user.profile_photo_url" alt class="rounded-circle" />
+              <img src="/public/admin_assets/assets/img/avatars/16.png" alt class="rounded-circle" />
             </div>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
@@ -60,7 +56,12 @@
               <div class="d-flex">
                 <div class="flex-shrink-0 me-3">
                   <div class="avatar avatar-online">
-                    <img :src="user.profile_photo_url" alt class="h-auto rounded-circle" />
+                    <template v-if="user.profile_photo_url">
+                      <img :src="user.profile_photo_url" alt class="h-auto rounded-circle" />
+                    </template>
+                    <template v-else>
+                      <img src="/public/admin_assets/assets/img/avatars/16.png" alt class="h-auto rounded-circle" />
+                    </template>
                   </div>
                 </div>
                 <div class="flex-grow-1">
@@ -96,20 +97,8 @@
             </li>
           </ul>
         </li>
-
-
-
       </ul>
     </div>
-    <!-- Search Small Screens -->
-    <!-- <div class="navbar-search-wrapper search-input-wrapper d-none">
-      <input
-        type="text"
-        class="form-control search-input container-xxl border-0"
-        placeholder="Search..."
-        aria-label="Search..." />
-      <i class="ti ti-x ti-sm search-toggler cursor-pointer"></i>
-    </div> -->
   </nav>
   <Toast position="bottom-right" group="br" />
 </template>
@@ -117,17 +106,11 @@
 
 
 <script setup>
-  import { router, usePage } from '@inertiajs/vue3'
-  import { ref, onMounted, computed, onUnmounted } from 'vue';
-  import Toast from 'primevue/toast';
+import { router, usePage } from '@inertiajs/vue3'
+import { ref, onMounted, computed, onUnmounted } from 'vue';
+import Toast from 'primevue/toast';
 
-    const signOut = () => {
-        // router.visit(route('admin.logout'),{
-        //     method: 'post',
-        // });
-    }
-   const user = computed(() => usePage().props.auth.user);
-
+const user = computed(() => usePage().props.auth.user);
 
 const title = ref("");
 onMounted(() => {
@@ -138,42 +121,42 @@ onMounted(() => {
 
 
 const toggleMobileMenu = () => {
-    document.documentElement.classList.toggle('layout-menu-expanded');
-    // document.documentElement.classList.toggle('layout-menu-expanded');
-    const layoutMenu = document.getElementById("layout-menu");
-    if (layoutMenu) {
-        layoutMenu.style.zIndex = '9999'; // Set desired z-index value
-    }
+  document.documentElement.classList.toggle('layout-menu-expanded');
+  // document.documentElement.classList.toggle('layout-menu-expanded');
+  const layoutMenu = document.getElementById("layout-menu");
+  if (layoutMenu) {
+    layoutMenu.style.zIndex = '9999'; // Set desired z-index value
+  }
 };
 
 
 </script>
 <style scoped>
+.notification-panel {
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+@media (max-width: 576px) {
   .notification-panel {
-    max-height: 15rem;
-    overflow-y: auto;
+    max-height: 31vh;
   }
+}
 
-  @media (max-width: 576px) {
-    .notification-panel {
-      max-height: 31vh;
-    }
-  }
+.notification-panel::-webkit-scrollbar {
+  width: 8px;
+}
 
-  .notification-panel::-webkit-scrollbar {
-    width: 8px;
-  }
+.notification-panel::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
 
-  .notification-panel::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 4px;
-  }
+.notification-panel::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
 
-  .notification-panel::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
-  }
-
-  .notification-panel::-webkit-scrollbar-track {
-    background-color: #f1f1f1;
-  }
+.notification-panel::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
 </style>

@@ -22,19 +22,15 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 
-// Route::get('/admin/login', [AuthController::class, 'index'] )->name('login');
 Route::prefix('admin')->name('admin.')->group(function() {
     Route::redirect('/', 'admin/login');
     Route::middleware(['guest'])->group(function () {
         Route::get('/login', [AuthController::class, 'index'] )->name('login');
         Route::post('/login', [AuthController::class, 'login'] )->name('login-process');
-
         Route::get("/forgot-password", [AuthController::class, 'forgotPasswordIndex'])->name('forgot-password.index');
         Route::get("/otp-validate", [AuthController::class, 'forgotPasswordStore'])->name('forgot-password.store');
-
         Route::match(['get', 'post'], '/forgot-password', [AuthController::class, 'forgotPasswordIndex'])->name('forgot-password.index');
         Route::match(['get', 'post'], "/otp-validate", [AuthController::class, 'forgotPasswordStore'])->name('forgot-password.otp-validation');
-
         Route::match(['get', 'post'], "/reset-password", [AuthController::class, 'resetPassword'])->name('forgot-password.reset-password');
 
     });
@@ -118,7 +114,6 @@ Route::prefix('admin')->name('admin.')->group(function() {
         Route::post('/location/store', [LocationManagementController::class, 'store'])->name('location.store');
         Route::get('/location/{id}/edit', [LocationManagementController::class, 'edit'])->name('location.edit');
         Route::post('/location/{id}/delete', [LocationManagementController::class, 'remove'])->name('location.delete');
-
         Route::match(['get', 'post'], '/booking/list', [BookingManagementController::class, 'index'])->name('booking.list');
         
         Route::match(['get', 'post'], '/inquiry/list', [InquiryManagementController::class, 'index'])->name('inquiry.list');
@@ -127,10 +122,43 @@ Route::prefix('admin')->name('admin.')->group(function() {
 
         Route::get('/site-setting', [SiteSettingController::class, 'index'])->name('site-setting.index');
         Route::post('/site-setting/update', [SiteSettingController::class, 'update'])->name('site-setting.update');
-
-
     });
 });
 
-Route::get('/', function () {return Inertia::render('Frontend/Welcome');})->name('frontend');
 
+Route::name('frontend.')->group(function() {
+    Route::middleware(['guest'])->group(function () {
+        Route::get('/', fn () => Inertia::render('Frontend/Home'))->name('home');
+        Route::match(['get', 'post'], '/contact-us', \App\Http\Controllers\Frontend\ContactUsController::class)->name('contact');
+        Route::resource('blog', \App\Http\Controllers\Frontend\BlogController::class)->only(['index', 'show']);
+        Route::get('/login', [\App\Http\Controllers\Frontend\AuthController::class, 'index'])->name('login');
+        Route::get('/register', fn () => Inertia::render('Frontend/Register'));
+        Route::get('/forgot-password', fn () => Inertia::render('Frontend/ForgotPassword'));
+        Route::get('/reset-password', fn () => Inertia::render('Frontend/ResetPassword'))->name('password.reset');
+        Route::get('/verify-email', fn () => Inertia::render('Frontend/VerifyMail'))->name('mail.verify');
+        Route::post('/login', [\App\Http\Controllers\Frontend\AuthController::class, 'login'])->name('login');
+        Route::post('/register', [\App\Http\Controllers\Frontend\AuthController::class, 'registration'])->name('registration');
+        Route::post('/forgot-password', [\App\Http\Controllers\Frontend\AuthController::class, 'forgotPassword']);
+        Route::post('/verify-email', [\App\Http\Controllers\Frontend\AuthController::class, 'verifyMail']);
+        Route::post('/reset-password', [\App\Http\Controllers\Frontend\AuthController::class, 'submitResetPasswordForm'])->name('reset.password.post');
+        Route::post('/resend-otp', [\App\Http\Controllers\Frontend\AuthController::class, 'resendOtpCode'])->name('otp.resend');
+    });
+    
+    Route::middleware(['auth'])->group(function () {
+        Route::middleware(['is-customer'])->group(function () {
+            Route::get('/client-dashboard', fn () => Inertia::render('Frontend/ClientDashboard'))->name('client.dashboard');
+            Route::get('/client-profile', [\App\Http\Controllers\Frontend\Customer\ProfileController::class, 'index'])->name('client.profile');
+            Route::post('/client-profile', [\App\Http\Controllers\Frontend\Customer\ProfileController::class, 'store'])->name('client.profile.store');
+        });
+
+        Route::middleware(['is-provider'])->group(function () {
+            Route::get('/provider-dashboard', fn () => Inertia::render('Frontend/ProviderDashboard'))->name('provider.dashboard');
+            Route::get('/provider-profile', [\App\Http\Controllers\Frontend\Provider\ProfileController::class, 'index'])->name('provider.profile');
+            Route::post('/provider-profile', [\App\Http\Controllers\Frontend\Provider\ProfileController::class, 'index'])->name('provider.profile.store');
+        });
+
+        Route::post('/change-password', [\App\Http\Controllers\Frontend\AuthController::class, 'changePassword']);
+        Route::post('/logout', [\App\Http\Controllers\Frontend\AuthController::class, 'logout'])->name('logout');
+    });
+    Route::get('/site-settings', \App\Http\Controllers\Frontend\SettingsController::class)->name('site.settings');
+});

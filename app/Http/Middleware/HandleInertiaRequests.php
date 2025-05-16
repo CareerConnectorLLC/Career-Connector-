@@ -41,9 +41,10 @@ class HandleInertiaRequests extends Middleware
             'auth'=>[
                 'user'=> [
                     'full_name'=>auth()->user()->full_name ?? null,
-                    // 'profile_photo'=>  isset(auth()->user()->profile_photo_path) ? URL::route('image', ['path' => auth()->user()->profile_photo_path, 'w' => 80, 'h' => 80, 'fit' => 'stretch']) : null,
                     'profile_photo_url'=>  isset(auth()->user()->profile_photo_url) ? auth()->user()->profile_photo_url : null,
                     'email'=>  isset(auth()->user()->email) ? auth()->user()->email : null,
+                    'phone'=>  isset(auth()->user()->phone) ? auth()->user()->phone : null,
+                    'location'=>  isset(auth()->user()->location) ? auth()->user()->location : null,
                   ]
                 ],
                 'flash' => [

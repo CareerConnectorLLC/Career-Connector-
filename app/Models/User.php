@@ -4,21 +4,21 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Observers\UserObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use App\Traits\HasProfilePhoto;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Observers\UserObserver;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 #[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasProfilePhoto;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -38,7 +38,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'active' => 'string',
     ];
-
 
     /**
      * The attributes that should be hidden for serialization.
@@ -84,9 +83,19 @@ class User extends Authenticatable
         return "{$this->first_name} {$this->middle_name} {$this->last_name}";
     }
 
+    public function getProfilePhotoUrlAttribute()
+    {
+        return ($this->profile_photo_path) ? asset('/storage/' . $this->profile_photo_path) : null;
+    }
+
     public function clientBookings()
     {
         return $this->hasMany(Booking::class, 'client_id');
+    }
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class);
     }
 
     public function providerBookings()
@@ -116,30 +125,6 @@ class User extends Authenticatable
         })->unique('id'); // Remove duplicates by category id
     }
     
-
-    /* Filter */
-    // public function scopeFilter($query, array $filters)
-    // {
-    //     if (isset($filters['global']) && $filters['global'] != '') {
-    //         $query->when(isset($filters['global']), function ($query) use ($filters) {
-    //             $searchTerm = trim($filters['global']);
-    //             $query->where(function ($query) use ($searchTerm) {
-    //                 $nameParts = explode(' ', $searchTerm);
-    //                 foreach ($nameParts as $part) {
-    //                     $query->orWhere('first_name', 'like', '%' . trim($part) . '%')
-    //                         ->orWhere('middle_name', 'like', '%' . trim($part) . '%')
-    //                         ->orWhere('last_name', 'like', '%' . trim($part) . '%');
-    //                 }
-    //                 $query->orWhere('email', 'like', '%' . $searchTerm . '%');
-    //             });
-    //         });
-    //     }
-
-    //     $query->when(isset($filters['active']) ?? null, function ($query, $search) use ($filters) {
-    //         $query->where('active', $filters['active']);
-    //     });
-    // }
-
     public function scopeFilter($query, array $filters)
     {
         foreach ($filters as $filter) {
@@ -203,17 +188,14 @@ class User extends Authenticatable
                         break;
                 }
 
-
                 // Handle multiple values with whereIn()
                 // if (count($value) > 1) {
                 //     $query->whereIn($column, $value);
                 // } else {
                 //     $query->where($column, $value[0]);
-                // }
-                
+                // }                
             }
         }
-        // dd($query->toSql());
         return $query;
     }
 
@@ -228,7 +210,7 @@ class User extends Authenticatable
         });
     }
 
-        /**
+    /**
      * Apply filters for relationships like technologies and departments.
      */
     protected function applyRelationshipFilter($query, string $relation, $searchText)

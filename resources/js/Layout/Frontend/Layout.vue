@@ -1,24 +1,64 @@
 <template>
     <Toast />
-    <Header/>
-    <Sidebar/>
+    <template v-if="isAuthPage">
+        <Header />
+    </template>
 
-    <slot/>
-    <Footer/>
-
+    <slot />
+    
+    <template v-if="isAuthPage">
+        <Footer />
+    </template>
 </template>
 
 <script setup>
-    import Toast from 'primevue/toast';
-    import { onMounted, onBeforeUnmount, ref } from 'vue';
-    import { usePage, router } from "@inertiajs/vue3";
-    import Header from './Header.vue';
-    import Sidebar from './Sidebar.vue';
-    import Footer from './Footer.vue';
+import Toast from 'primevue/toast';
+import { computed } from 'vue';
+import { usePage } from "@inertiajs/vue3";
+import Header from './Header.vue';
+import Footer from './Footer.vue';
 
+const page = usePage()
 
+const isAuthPage = computed(() => {
+    let paths = [
+        '/',
+        '/blog',
+        '/blog/*',
+        '/blog?*',
+        '/contact-us',
+    ]
+    return matchesPath(page.url, paths)
+})
 
+function matchesPath(pageUrl, paths) {
+    for (let path of paths) {
+        if (path.includes('?*')) {
+            // Case where path expects optional query params
+            const basePath = path.replace('?*', '');
+            if (pageUrl === basePath || pageUrl.startsWith(basePath + '?')) {
+                return true;
+            }
+        } else if (path.includes('*')) {
+            // Case where path includes wildcard for sub-paths
+            const basePath = path.replace('*', '');
+            if (pageUrl.startsWith(basePath)) {
+                return true;
+            }
+        } else {
+            // Exact path match
+            if (pageUrl === path) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 </script>
-<style scoped>
 
+<style>
+    @import "bootstrap/dist/css/bootstrap.min.css";
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/splidejs/4.1.4/css/splide.min.css');
+    @import "../../../../public/frontend_assets/style.css";
 </style>

@@ -2,13 +2,14 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between">
             <div class="card-title mb-0">
-              <h5 class="mb-0">Service Provider List</h5>
-              <small class="text-muted">{{ store.pagination.total}} Service Provider</small>
+                <h5 class="mb-0">Service Provider List</h5>
+                <small class="text-muted">{{ store.pagination.total }} Service Provider</small>
             </div>
             <div class="dropdown">
-              <Link :href="route('admin.service-providers.create')" class="btn rounded-pill btn-outline-primary waves-effect">+ Add Service Provider</Link>
+                <Link :href="route('admin.service-providers.create')"
+                    class="btn rounded-pill btn-outline-primary waves-effect">+ Add Service Provider</Link>
             </div>
-          </div>
+        </div>
         <div class="card-body">
             <DataTable :value="store.list" lazy showGridlines @page="store.onPage" @sort="store.onSort"
                 tableStyle="min-width: 50rem" :totalRecords="store.pagination.total" :rows="store.pagination.per_page"
@@ -18,16 +19,6 @@
                 <template #header>
                     <div class="d-flex justify-content-between align-items-end">
                         <div class="d-flex gap-2 align-items-end">
-                            <!--
-                        <button
-                            class="btn btn-xs btn-outline-primary waves-effect d-flex align-items-center justify-content-between"
-                            @click="store.filterModelVisible = true">
-                            <Icon icon="bx:filter-alt" width="18" height="18" />
-                            <span class="mx-2">Filter
-                                ({{ Object.values(store.filters).filter(value => (value !== null && value !=='')).length}})
-                            </span>
-                        </button>
-                         -->
                             <div class="d-flex flex-column">
                                 <label for="">Filter by Status</label>
                                 <Select v-model="filters.status" :options="status" optionLabel="name"
@@ -56,13 +47,15 @@
                     </div>
                 </template>
 
-
-                <Column field="full_name" header="Name" sortable >
+                <Column field="full_name" header="Name" sortable>
                     <template #body="slotData">
                         <div class="d-flex flex-wrap">
                             <div class="avatar me-3">
-                                <img :alt="slotData.data.full_name" :src="slotData.data.profile_photo_url"
-                                    class="rounded-circle">
+                                <template v-if="slotData.data.profile_photo_url">
+                                    <img :alt="slotData.data.full_name" :src="slotData.data.profile_photo_url"
+                                        class="rounded-circle">
+                                </template>
+                                <img v-else src="/public/admin_assets/assets/img/avatars/16.png" class="rounded-circle">
                             </div>
                             <div>
                                 <h6 class="mb-0">
@@ -70,7 +63,7 @@
                                     {{ slotData.data.full_name }}
                                     </Link>
                                 </h6>
-                                <small>Member since {{dayjs(slotData.data.created_at).format('MMM D, YYYY')}} </small>
+                                <small>Member since {{ dayjs(slotData.data.created_at).format('MMM D, YYYY') }} </small>
                             </div>
                         </div>
                     </template>
@@ -78,9 +71,12 @@
                 <Column field="email" header="Email" sortable />
                 <Column field="phone" header="Phone" sortable />
                 <Column field="active" header="Status" sortable>
-                    <template #body="slotData"><span @click="confirmChangeStatus(slotData.data.id)" class="badge cursor-pointer" 
-                        :class="{'bg-label-danger': (slotData.data.active != 1) , 'bg-label-success': (slotData.data.active == 1)}">
-                        {{(slotData.data.active == 1) ? 'Active' : 'Suspended'}}</span></template>
+                    <template #body="slotData"><span @click="confirmChangeStatus(slotData.data.id)"
+                            class="badge cursor-pointer"
+                            :class="{ 'bg-label-danger': (slotData.data.active != 1), 'bg-label-success': (slotData.data.active == 1) }">
+                            {{ (slotData.data.active == 1) ? 'Active' : 'Suspended' }}
+                        </span>
+                    </template>
                 </Column>
                 <Column header="Action" appendTo>
                     <template #body="slotData">
@@ -90,13 +86,17 @@
                                 <i class="ti ti-dots-vertical"></i>
                             </button>
                             <div class="dropdown-menu">
-                                <Link class="dropdown-item" :href="route('admin.service-providers.show', slotData.data.id)"><i class="ti ti-eye me-1"></i> View Details</Link>
-                                <Link class="dropdown-item" :href="route('admin.service-providers.edit', slotData.data.id)"><i class="ti ti-edit me-1"></i> Edit</Link>
-                                <button class="dropdown-item" @click="confirmDelete(slotData.data.id)"><i class="ti ti-trash me-1"></i>Delete</button>
+                                <Link class="dropdown-item"
+                                    :href="route('admin.service-providers.show', slotData.data.id)"><i
+                                    class="ti ti-eye me-1"></i> View Details</Link>
+                                <Link class="dropdown-item"
+                                    :href="route('admin.service-providers.edit', slotData.data.id)"><i
+                                    class="ti ti-edit me-1"></i> Edit</Link>
+                                <button class="dropdown-item" @click="confirmDelete(slotData.data.id)"><i
+                                        class="ti ti-trash me-1"></i>Delete</button>
                             </div>
                         </div>
                     </template>
-
                 </Column>
                 <template #empty>
                     <div class="d-flex justify-content-center align-items-center">
@@ -106,11 +106,9 @@
                         </div>
                     </div>
                 </template>
-
             </DataTable>
         </div>
     </div>
-
 
     <Drawer v-model:visible="store.filterModelVisible" header="Filter" position="right">
         <form class="dt_adv_search" method="POST">
@@ -119,7 +117,10 @@
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label">User Status</label>
-                            <Select v-model="store.filters.active" showClear :options="[{name : 'Active', value: 1}, {name : 'Inactive', value: 0}]" optionLabel="name" optionValue="value" placeholder="User Status" class="form-control p-0" />
+                            <Select v-model="store.filters.active" showClear
+                                :options="[{ name: 'Active', value: 1 }, { name: 'Inactive', value: 0 }]"
+                                optionLabel="name" optionValue="value" placeholder="User Status"
+                                class="form-control p-0" />
                         </div>
                     </div>
                 </div>
@@ -137,93 +138,91 @@
             </div>
         </form>
     </Drawer>
-    <!-- <ConfirmDialog /> -->
-
 </template>
 
 <script setup>
-    import { ref, onMounted, reactive, nextTick } from 'vue';
-    import { useServiceProviderStore } from '@/Stores/ServiceProviderStore';
-    import { useConfirm } from "primevue/useconfirm";
-    import { useToast } from "primevue/usetoast";
-    import Button from 'primevue/button';
+import { ref, onMounted, reactive, nextTick } from 'vue';
+import { useServiceProviderStore } from '@/Stores/ServiceProviderStore';
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import Button from 'primevue/button';
 
-    import dayjs from "dayjs";
+import dayjs from "dayjs";
 
-    const store = useServiceProviderStore();
-    const confirm = useConfirm();
-    const toast = useToast();
-    const searchValue = ref('');
-    const status = [
-        {
-            name: 'Active',
-            value: 1,
-        },
-        {
-            name: 'Suspended',
-            value: 0,
-        }
+const store = useServiceProviderStore();
+const confirm = useConfirm();
+const toast = useToast();
+const searchValue = ref('');
+const status = [
+    {
+        name: 'Active',
+        value: 1,
+    },
+    {
+        name: 'Suspended',
+        value: 0,
+    }
 
-    ];
-    const filters = reactive({
-        name: '',
-        status: null,
-        dates: []
-    })
+];
+const filters = reactive({
+    name: '',
+    status: null,
+    dates: []
+})
 
 
-    onMounted(() => {
-        nextTick(() => {
-            emit.emit('pageName', 'Service Provider Management', [{ title: 'Service Providers', routeName: "" }]);
-        });
-        store.getServiceProviders();
+onMounted(() => {
+    nextTick(() => {
+        emit.emit('pageName', 'Service Provider Management', [{ title: 'Service Providers', routeName: "" }]);
     });
+    store.getServiceProviders();
+});
 
-    const confirmDelete = (id) => {
-        confirm.require({
-            group: 'headless',
-            message: 'Are you sure you want to delete?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            rejectProps: {
-                label: 'Cancel',
-                severity: 'secondary',
-                outlined: true
-            },
-            acceptProps: {
-                label: 'Yes'
-            },
-            accept: () => {
-                store.deleteServiceProvider(id);
-            },
-            reject: () => {
-            }
-        });
-    };
+const confirmDelete = (id) => {
+    confirm.require({
+        group: 'headless',
+        message: 'Are you sure you want to delete?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Yes'
+        },
+        accept: () => {
+            store.deleteServiceProvider(id);
+        },
+        reject: () => {
+        }
+    });
+};
 
-    const confirmChangeStatus = (id) => {
-        confirm.require({
-            group: 'headless',
-            message: 'Are you sure you want to Change Status?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            rejectProps: {
-                label: 'Cancel',
-                severity: 'secondary',
-                outlined: true
-            },
-            acceptProps: {
-                label: 'Yes'
-            },
-            accept: () => {
-                store.changeStatus(id);
-            },
-            reject: () => {
-            }
-        });
-    };
+const confirmChangeStatus = (id) => {
+    confirm.require({
+        group: 'headless',
+        message: 'Are you sure you want to Change Status?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Yes'
+        },
+        accept: () => {
+            store.changeStatus(id);
+        },
+        reject: () => {
+        }
+    });
+};
 
-    function applyFilters() {
+function applyFilters() {
     if (filters.status !== null) {
         const index = store?.filters.findIndex((obj) => obj.column === 'active');
         console.log(index);

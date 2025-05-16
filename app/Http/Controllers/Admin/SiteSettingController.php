@@ -24,12 +24,11 @@ class SiteSettingController extends Controller
 
     public function update(Request $request)
     {   
-        // dd($request->all());
         $regex = '/^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:?#[\]@!$&\'()*+,;=]*)?$/i';
         $request->validate([
             'address'                   => 'required|string',
             'phone'                     => 'required|digits_between:10,15',
-            'email'                     => 'required|email:rfc,dns',
+            'email'                     => 'required|email:rfc,dns|regex:/^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
             'social_handles'            => 'required',
             'social_handles.*.platform' => 'required',
             'social_handles.*.url'      => ['required','regex:'.$regex],

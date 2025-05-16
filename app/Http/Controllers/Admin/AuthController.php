@@ -24,6 +24,7 @@ class AuthController extends Controller
             return $e->getMessage();
         }
     }
+    
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -40,7 +41,6 @@ class AuthController extends Controller
                 ->withProperties(['ip' => $request->ip(), 'browser' => $request->header('User-Agent')])
                 ->log('Successful');
                 return redirect()->route('admin.dashboard');
-                // return Inertia::location(route('admin.dashboard'));
             } else {
                 activity('auth-log')
                 ->withProperties(['email' => $request->email, 'ip' => $request->ip(), 'browser' => $request->header('User-Agent')])
@@ -92,8 +92,6 @@ class AuthController extends Controller
 
             $data['code'] = $token;
 
-            // dd($get_user);
-
             try {
                 Mail::to($request->email)->send(new SendOTPMail($token));
             } catch (\Exception $e) {
@@ -107,6 +105,7 @@ class AuthController extends Controller
 
         return Inertia::render('Auth/admin/ForgotPassword');
     }
+
     public function forgotPasswordStore(Request $request)
     {
         if ($request->isMethod('post')) {
@@ -133,6 +132,7 @@ class AuthController extends Controller
 
         return inertia('Auth/admin/OtpVerification')->with('email', session()->get('forgot_password_email'));
     }
+
     public function resetPassword(Request $request)
     {
         if ($request->isMethod('post')) {

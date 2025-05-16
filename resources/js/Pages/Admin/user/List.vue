@@ -3,7 +3,7 @@
         <div class="card-header d-flex justify-content-between">
             <div class="card-title mb-0">
                 <h5 class="mb-0">Client List</h5>
-                <small class="text-muted">{{ store.pagination.total}} Client</small>
+                <small class="text-muted">{{ store.pagination.total }} Client</small>
             </div>
             <div class="dropdown">
                 <Link :href="route('admin.users.create')" class="btn rounded-pill btn-outline-primary waves-effect">+
@@ -19,16 +19,6 @@
                 <template #header>
                     <div class="d-flex justify-content-between align-items-end">
                         <div class="d-flex gap-2 align-items-end">
-                            <!--
-                        <button
-                            class="btn btn-xs btn-outline-primary waves-effect d-flex align-items-center justify-content-between"
-                            @click="store.filterModelVisible = true">
-                            <Icon icon="bx:filter-alt" width="18" height="18" />
-                            <span class="mx-2">Filter
-                                ({{ Object.values(store.filters).filter(value => (value !== null && value !=='')).length}})
-                            </span>
-                        </button>
-                         -->
                             <div class="d-flex flex-column">
                                 <label for="">Filter by Status</label>
                                 <Select v-model="filters.status" :options="status" optionLabel="name"
@@ -56,13 +46,15 @@
                     </div>
                 </template>
 
-
                 <Column field="full_name" header="Name" sortable>
                     <template #body="slotData">
                         <div class="d-flex flex-wrap">
                             <div class="avatar me-3">
-                                <img :alt="slotData.data.full_name" :src="slotData.data.profile_photo_url"
-                                    class="rounded-circle">
+                                <template v-if="slotData.data.profile_photo_url">
+                                    <img :alt="slotData.data.full_name" :src="slotData.data.profile_photo_url"
+                                        class="rounded-circle">
+                                </template>
+                                <img v-else src="/public/admin_assets/assets/img/avatars/16.png" alt="" class="rounded-circle">
                             </div>
                             <div>
                                 <h6 class="mb-0">
@@ -70,7 +62,7 @@
                                     {{ slotData.data.full_name }}
                                     </Link>
                                 </h6>
-                                <small>Member since {{dayjs(slotData.data.created_at).format('MMM D, YYYY')}} </small>
+                                <small>Member since {{ dayjs(slotData.data.created_at).format('MMM D, YYYY') }} </small>
                             </div>
                         </div>
                     </template>
@@ -78,10 +70,14 @@
                 <Column field="email" header="Email" sortable />
                 <Column field="phone" header="Phone" sortable />
                 <Column field="active" header="Status" sortable>
-                    <template #body="slotData"><span @click="confirmChangeStatus(slotData.data.id)"
+                    <template #body="slotData">
+                        <span @click="confirmChangeStatus(slotData.data.id)"
                             class="badge cursor-pointer"
-                            :class="{'bg-label-danger': (slotData.data.active != 1) , 'bg-label-success': (slotData.data.active == 1)}">{{(slotData.data.active
-                            == 1) ? 'Active' : 'Suspended'}}</span></template>
+                            :class="{ 'bg-label-danger': (slotData.data.active != 1), 'bg-label-success': (slotData.data.active == 1) }">{{
+                                (slotData.data.active
+                                    == 1) ? 'Active' : 'Suspended' }}
+                        </span>
+                    </template>
                 </Column>
                 <Column header="Action" appendTo>
                     <template #body="slotData">
@@ -91,7 +87,8 @@
                                 <i class="ti ti-dots-vertical"></i>
                             </button>
                             <div class="dropdown-menu">
-                                <Link class="dropdown-item" :href="route('admin.users.show', slotData.data.id)"><i class="ti ti-eye me-1"></i> View Details</Link>
+                                <Link class="dropdown-item" :href="route('admin.users.show', slotData.data.id)"><i
+                                    class="ti ti-eye me-1"></i> View Details</Link>
                                 <Link class="dropdown-item" :href="route('admin.users.edit', slotData.data.id)"><i
                                     class="ti ti-edit me-1"></i> Edit</Link>
                                 <button class="dropdown-item" @click="confirmDelete(slotData.data.id)"><i
@@ -109,7 +106,6 @@
                         </div>
                     </div>
                 </template>
-
             </DataTable>
         </div>
     </div>
@@ -123,7 +119,7 @@
                         <div class="col-12">
                             <label class="form-label">User Status</label>
                             <Select v-model="store.filters.active" showClear
-                                :options="[{name : 'Active', value: 1}, {name : 'Inactive', value: 0}]"
+                                :options="[{ name: 'Active', value: 1 }, { name: 'Inactive', value: 0 }]"
                                 optionLabel="name" optionValue="value" placeholder="User Status"
                                 class="form-control p-0" />
                         </div>
@@ -148,86 +144,86 @@
 </template>
 
 <script setup>
-    import { ref, onMounted, nextTick, reactive } from 'vue';
-    import {useUserStore} from '@/Stores/UserStore.js'
-    import DatePicker from 'primevue/datepicker';
-    import { useConfirm } from "primevue/useconfirm";
-    import { useToast } from "primevue/usetoast";
-    import Select from 'primevue/select';
-    import dayjs from "dayjs";
+import { ref, onMounted, nextTick, reactive } from 'vue';
+import { useUserStore } from '@/Stores/UserStore.js'
+import DatePicker from 'primevue/datepicker';
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import Select from 'primevue/select';
+import dayjs from "dayjs";
 
 
-    const store = useUserStore();
-    const confirm = useConfirm();
-    const toast = useToast();
-    const searchValue = ref('');
-    const status = [
-        {
-            name: 'Active',
-            value: 1,
-        },
-        {
-            name: 'Suspended',
-            value: 0,
-        }
+const store = useUserStore();
+const confirm = useConfirm();
+const toast = useToast();
+const searchValue = ref('');
+const status = [
+    {
+        name: 'Active',
+        value: 1,
+    },
+    {
+        name: 'Suspended',
+        value: 0,
+    }
 
-    ];
-    const filters = reactive({
-        name: '',
-        status: null,
-        dates: []
-    })
+];
+const filters = reactive({
+    name: '',
+    status: null,
+    dates: []
+})
 
-    onMounted(() => {
-        nextTick(() => {
-            emit.emit('pageName', 'Client Management', [{ title: 'Clients', routeName: "" }]);
-        });
-        store.getUsers();
+onMounted(() => {
+    nextTick(() => {
+        emit.emit('pageName', 'Client Management', [{ title: 'Clients', routeName: "" }]);
     });
+    store.getUsers();
+});
 
-    const confirmDelete = (id) => {
-        confirm.require({
-            group: 'headless',
-            message: 'Are you sure you want to delete?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            rejectProps: {
-                label: 'Cancel',
-                severity: 'secondary',
-                outlined: true
-            },
-            acceptProps: {
-                label: 'Yes'
-            },
-            accept: () => {
-                store.deleteUser(id);
-            },
-            reject: () => {
-            }
-        });
-    };
+const confirmDelete = (id) => {
+    confirm.require({
+        group: 'headless',
+        message: 'Are you sure you want to delete?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Yes'
+        },
+        accept: () => {
+            store.deleteUser(id);
+        },
+        reject: () => {
+        }
+    });
+};
 
-    const confirmChangeStatus = (id) => {
-        confirm.require({
-            group: 'headless',
-            message: 'Are you sure you want to Change Status?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            rejectProps: {
-                label: 'Cancel',
-                severity: 'secondary',
-                outlined: true
-            },
-            acceptProps: {
-                label: 'Yes'
-            },
-            accept: () => {
-                store.changeStatus(id);
-            },
-            reject: () => {
-            }
-        });
-    };
+const confirmChangeStatus = (id) => {
+    confirm.require({
+        group: 'headless',
+        message: 'Are you sure you want to Change Status?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Yes'
+        },
+        accept: () => {
+            store.changeStatus(id);
+        },
+        reject: () => {
+        }
+    });
+};
 
 function applyFilters() {
     if (filters.status !== null) {

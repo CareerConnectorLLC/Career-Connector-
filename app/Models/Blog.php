@@ -2,23 +2,52 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Blog extends Model
 {   
     use HasSlug;
+
     protected $guarded = [];
+
+    protected $appends = [
+        'teaser',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'datetime:M d, Y',
+            'active' => 'boolean',
+        ];
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    protected function getTeaserAttribute()
+    {
+        return \Str::substr($this->text_content, 0,100);
+    }
+
+    protected function ImageUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => (!is_null($value)) ? asset('storage/'.$value) : null
+        );
+    }
 
     public function getSlugOptions(): SlugOptions
     {
-        return SlugOptions::create()
-            ->generateSlugsFrom('title')
-            ->saveSlugsTo('slug');
+        return SlugOptions::create()->generateSlugsFrom('title')->saveSlugsTo('slug');
     }
-    // Define many-to-many relationship with BlogCategory
+    
     public function category()
     {
         return $this->belongsTo(BlogCategory::class, 'blog_category_id');
@@ -29,7 +58,6 @@ class Blog extends Model
         return $this->belongsTo(User::class);
     }
 
-    /* Filtering */
     public function scopeFilter($query, array $filters)
     {
         if (isset($filters['global']) && $filters['global'] != '') {
@@ -42,7 +70,6 @@ class Blog extends Model
                         $query->where('first_name', 'like', '%' . trim($part) . '%')
                         ->orWhere('last_name', 'like', '%' . trim($part) . '%');
                     }
-                    // $query->orWhere('answer', 'like', '%' . $searchTerm . '%');
                 })->orWhereHas('category', function ($query) use ($nameParts) {
                     foreach ($nameParts as $part) {
                         $query->where('name', 'like', '%' . trim($part) . '%');
@@ -54,11 +81,9 @@ class Blog extends Model
                     }
                 });
             });
-
         }
     }
 
-    /* Ordering */
     public function scopeOrdering($query, array $filters)
     {
         if (isset($filters['fieldName'])) {
@@ -77,8 +102,6 @@ class Blog extends Model
                     $query->orderBy('title', $filters['shortBy']);
                     break;
             }
-        }
-        
-        
+        }        
     }
 }

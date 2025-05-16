@@ -30,10 +30,12 @@ class Guest
         // }
         if (Auth::check()) {
             if (Auth::user()->hasRole("SUPER-ADMIN")) {
-                return redirect()->route("admin.dashboard");
-            }elseif (Auth::user()->hasRole("USER")) {
-                return redirect()->route("frontend.index");
-            }else {
+                return redirect()->route('admin.dashboard');
+            } elseif (Auth::user()->hasRole("USER")) {
+                return redirect()->route('frontend.client.dashboard');
+            } elseif (Auth::user()->hasRole("SERVICE-PROVIDER")) {
+                return redirect()->route('frontend.provider.dashboard');
+            } else {
                 Auth::logout();
                 return abort(403);
             }

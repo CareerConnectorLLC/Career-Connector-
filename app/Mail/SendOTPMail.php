@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 class SendOTPMail extends Mailable
 {
     use Queueable, SerializesModels;
+    
     protected $otp;
     /**
      * Create a new message instance.
@@ -19,7 +20,6 @@ class SendOTPMail extends Mailable
     public function __construct($otp)
     {
         $this->otp = $otp;
-        // dd($otp);
     }
 
     /**

@@ -1,11 +1,7 @@
 <x-mail::message>
 # Introduction
 
-The OTP is {{ $otp }}.
-
-<x-mail::button :url="''">
-Button Text
-</x-mail::button>
+Use the code to verify your email<br/> **{{ $otp }}**.
 
 Thanks,<br>
 {{ config('app.name') }}
