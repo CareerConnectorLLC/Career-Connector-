@@ -5,6 +5,7 @@ import ProfileDropdown from "../../components/frontend/provider/ProfileDropdown.
 import ProviderSidebar from "../../components/frontend/provider/SideNavigation.vue";
 import FancyBoxModal from "../../components/frontend/FancyBoxModal.vue";
 import ChangePasswordForm from "../../components/frontend/ChangePasswordForm.vue";
+import ProfileUpdateForm from "../../components/frontend/ProfileUpdateForm.vue";
 
 const page = usePage()
 const user = computed(() => page.props.user)
@@ -13,8 +14,10 @@ onMounted(() => {
     $("[data-fancybox]").fancybox({
         touch: false,
         hideOnOverlayClick: false,
-        onCancel: function () {
-            console.log('closed')
+        afterClose: function () {
+            if (document.querySelector('.errorMsg').innerText != '') {
+                document.querySelector('.errorMsg').innerText = ''
+            }
         }
     })
 })
@@ -75,7 +78,7 @@ const hideModal = () => {
                                                         src="/public/frontend_assets/images/my-profile-image.png"
                                                         alt="profile-image">
                                                 </figure>
-                                                <h3>{{ user.full_name }}</h3>
+                                                <h3>{{ user.name }}</h3>
                                                 <a data-fancybox="" data-src="#change-passpord" class="outline-btn"
                                                     href="#url">Change password</a>
                                             </div>
@@ -108,7 +111,6 @@ const hideModal = () => {
                                                     </li>
                                                     <li>
                                                         <div class="profile-info-wrap">
-                                                            {{ user.profile_photo_url }}
                                                             <figure>
                                                                 <img src="/public/frontend_assets/images/location-green.svg"
                                                                     alt="location">
@@ -127,9 +129,7 @@ const hideModal = () => {
                                                             </figure>
                                                             <div class="profile-info-cont">
                                                                 <h4>Date of birth</h4>
-                                                                <p>
-                                                                    Jan 16, 1997
-                                                                </p>
+                                                                <p v-text="(user.profile) ? user.profile.date_of_birth : ''"></p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -914,84 +914,10 @@ const hideModal = () => {
                     </form>
                 </div>
 
-                <div class="change-passpord for-select2" id="edit-profile" style="display: none;">
-                    <h2>Edit my profile</h2>
-                    <p>Lorem ipsum dolor sit amet</p>
-                    <form class="login-form provider">
-                        <div class="form-input">
-                            <label>Name</label>
-                            <input class="user" type="text" placeholder="David D’suza">
-                        </div>
-                        <div class="form-input">
-                            <label>Email</label>
-                            <input type="email" placeholder="david.d’suza@example.com">
-                        </div>
-                        <div class="form-input">
-                            <label>Address</label>
-                            <input class="location" type="text"
-                                placeholder="2972 Westheimer Rd. Santa Ana, Illinois 85486">
-                        </div>
-                        <div class="form-input">
-                            <label>Phone Number</label>
-                            <input class="phone" type="tel" placeholder="(406) 555-0120">
-                        </div>
-
-                        <div class="form-input">
-                            <div class="form-input-row row">
-                                <div class="col-md-6 form-input-col">
-                                    <div class="form-input">
-                                        <label>Date of birth</label>
-                                        <div class="form-input-inner">
-                                            <input type="text" placeholder="Select" class="datepicker hasDatepicker"
-                                                id="dp1747126313131">
-                                            <span>
-                                                <img src="/public/frontend_assets/images/calendar.svg" alt="calendar">
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 form-input-col">
-                                    <div class="form-input">
-                                        <label>Experience</label>
-                                        <select>
-                                            <option>5 - 7 years</option>
-                                            <option>7 - 9 years</option>
-                                            <option>9 - 11 years</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-input">
-                            <label>Expertise</label>
-                            <select class="form-select-multi select2-hidden-accessible"
-                                data-placeholder="Select Expertise" multiple="" data-select2-id="1" tabindex="-1"
-                                aria-hidden="true">
-                                <option>Plumbing</option>
-                                <option>Bathroom cleaning</option>
-                                <option>Plumbing</option>
-                                <option>Bathroom cleaning</option>
-                            </select>
-                        </div>
-
-                        <div class="form-input">
-                            <label>Certifications</label>
-                            <select class="form-select-multi select2-hidden-accessible"
-                                data-placeholder="Select Certifications" multiple="" data-select2-id="3" tabindex="-1"
-                                aria-hidden="true">
-                                <option>Customer service</option>
-                                <option>Trouble shoot</option>
-                                <option>Customer service</option>
-                                <option>Trouble shoot</option>
-                            </select>
-                        </div>
-
-                        <div class="form-input">
-                            <button type="submit">Save</button>
-                        </div>
-                    </form>
-                </div>
+                <!-- Profile Edit Modal -->
+                <FancyBoxModal heading="Edit Profile" id="edit-profile" caption="Some caption text for development.">
+                    <ProfileUpdateForm :user="user" :url="$page.url" v-on:profile-update-success="hideModal" />
+                </FancyBoxModal>
 
                 <div class="change-passpord for-select2" id="add-service" style="display: none;">
                     <h2>Add new service</h2>

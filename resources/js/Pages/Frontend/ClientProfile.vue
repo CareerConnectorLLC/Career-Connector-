@@ -202,7 +202,7 @@ const hideModal = () => {
 
             <!-- Profile Edit Modal -->
             <FancyBoxModal heading="Edit Profile" id="edit-profile" caption="Some caption text for development.">
-                <ProfileUpdateForm :user="user" v-on:profile-update-success="hideModal" />
+                <ProfileUpdateForm :user="user" :url="$page.url" v-on:profile-update-success="hideModal" />
             </FancyBoxModal>
         </div>
         <div class="top-left-shape">

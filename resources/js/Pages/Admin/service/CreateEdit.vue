@@ -79,7 +79,6 @@ onMounted(() => {
         ];
 
         emit.emit('pageName', pageName, breadcrumbs);
-        console.log(store);
     });
     store.service = props.service ? props.service : null;
     store.setFormData();

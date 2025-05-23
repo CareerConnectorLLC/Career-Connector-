@@ -88,13 +88,10 @@ export const useServiceStore = defineStore("serviceStore", {
                 .then((response) => {
                     this.form = { ...FormModel };
                     router.visit(response.data.redirectURL);
-                    console.log(response.data);
                 })
                 .catch((error) => {
                     if (error.status == 422) {
-                        console.log(error.response);
                         this.form.errors = error.response.data.errors;
-                        console.log(this.form.errors);
                     }
                 });
         },
@@ -114,7 +111,6 @@ export const useServiceStore = defineStore("serviceStore", {
                 .then((response) => {
                     this.form = { ...FormModel };
                     router.visit(response.data.redirectURL);
-                    console.log(response.data);
                 })
                 .catch((error) => {
                     if (error.status == 422) {

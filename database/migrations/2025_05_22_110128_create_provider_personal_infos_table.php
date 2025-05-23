@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('provider_personal_infos', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->index();
-            $table->string('slug')->unique()->nullable();
-            $table->text('description')->nullable();
-            $table->string('image_url')->nullable();
-            $table->boolean('active')->default(1);
+            $table->foreignId('provider_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
+            $table->tinyInteger('exp_year')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('provider_personal_infos');
     }
 };

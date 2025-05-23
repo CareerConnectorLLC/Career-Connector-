@@ -24,8 +24,8 @@ class ProfileController extends Controller
     {
         $validatedData = $request->validate([
             'name' => [
-                'required',
-                'string'
+                Rule::requiredIf(fn () => $request->has('mode') && $request->mode != 'onboarding'),
+                'string',
             ],
             'email' => [
                 'required',
@@ -38,7 +38,7 @@ class ProfileController extends Controller
                 'string'
             ],
             'phone' => [
-                'required',
+                Rule::requiredIf(fn () => $request->has('mode') && $request->mode != 'onboarding'),
                 'numeric',
                 Rule::unique('users')->ignore(auth()->id()),
             ],
@@ -79,13 +79,15 @@ class ProfileController extends Controller
             $filePath = \Storage::putFile('profile', $file, 'public');
         }
 
-        $request->user()->update([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'phone' => $validatedData['phone'],
-            'location' => $validatedData['location'],
-            'profile_photo_path' => $filePath,
-        ]);
+        if (!$request->has('mode')) {
+            $request->user()->update([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'phone' => $validatedData['phone'],
+                'location' => $validatedData['location'],
+                'profile_photo_path' => $filePath,
+            ]);
+        }
 
         UserProfile::updateOrCreate(
             ['user_id' => auth()->id()],
@@ -96,5 +98,9 @@ class ProfileController extends Controller
                 'date_of_birth' => now()->parse($validatedData['date_of_birth'])->format('Y-m-d')
             ]
         );
+
+        if ($request->has('mode')) {
+            return to_route('frontend.onboard.client.payment.info');
+        }
     }
 }

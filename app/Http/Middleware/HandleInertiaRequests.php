@@ -40,11 +40,11 @@ class HandleInertiaRequests extends Middleware
             'appUrl'=>config('app.url'),
             'auth'=>[
                 'user'=> [
-                    'full_name'=>auth()->user()->full_name ?? null,
-                    'profile_photo_url'=>  isset(auth()->user()->profile_photo_url) ? auth()->user()->profile_photo_url : null,
-                    'email'=>  isset(auth()->user()->email) ? auth()->user()->email : null,
-                    'phone'=>  isset(auth()->user()->phone) ? auth()->user()->phone : null,
-                    'location'=>  isset(auth()->user()->location) ? auth()->user()->location : null,
+                    'name' => auth()->user()->name ?? null,
+                    'profile_photo_url' => isset(auth()->user()->profile_photo_url) ? auth()->user()->profile_photo_url : null,
+                    'email' => isset(auth()->user()->email) ? auth()->user()->email : null,
+                    'phone' => isset(auth()->user()->phone) ? auth()->user()->phone : null,
+                    'location' => isset(auth()->user()->location) ? auth()->user()->location : null,
                   ]
                 ],
                 'flash' => [

@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Models\Service;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Models\Service;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use PhpParser\Node\Stmt\Return_;
 use PhpParser\Node\Stmt\TryCatch;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class ServiceManagementController extends Controller
@@ -29,13 +30,12 @@ class ServiceManagementController extends Controller
     {
         try {
             if ($request->isMethod('post')) {
-                return  $this->getServiceProvidersList($request);
+                return $this->getServiceProvidersList($request);
             } else {
                 return Inertia::render('Admin/service/List');
             }
 
         } catch (\Exception $e) {
-
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             return back()->with('error', 'Server error');
         }
@@ -51,7 +51,7 @@ class ServiceManagementController extends Controller
 
             $filter = isset($request->filters) ? $request->filters : [];
 
-            $service_providers = Service::with(['category', 'expertises'])
+            $service_providers = Service::with(['category'])
             ->filter($filter)
             ->ordering($sortBy)
             ->orderBy('id','desc')
@@ -81,12 +81,12 @@ class ServiceManagementController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'          => 'required',
-            'description'   => 'required',
-            'category_id'   => 'required',
-            'image'         => 'required'
+            'name'          => ['required', 'unique:services'],
+            'description'   => 'nullable',
+            'category_id'   => ['required', 'exists:categories,id'],
+            'image'         => 'nullable'
         ],[
-            'category_id.required'       =>  'You must choose a category'
+            'category_id.required' => 'You must choose a category'
         ]);
 
         try {
@@ -124,10 +124,10 @@ class ServiceManagementController extends Controller
     public function update(Request $request, string $id)
     {   
         $request->validate([
-            'name'          =>  'required',
-            'description'   =>  'required',
-            'category_id'   =>  'required',
-            'image'         =>  ''
+            'name'          =>  ['required', Rule::unique('services')->ignore($id)],
+            'description'   =>  'nullable',
+            'category_id'   =>  ['required', 'exists:categories,id'],
+            'image'         =>  'nullable'
         ]);
 
         try {
@@ -143,14 +143,9 @@ class ServiceManagementController extends Controller
                 $service->image_url = $request->file('image')->store('image', 'public');
             }            
 
-            if(!$request->file('image')){
-                Storage::disk('public')->delete($service->image_url);
-                $service->image_url = null;
-            }
-
             $service->update();
             DB::commit();
-
+            return response()->json(['redirectUrl' => route('admin.service.list')] , 200);
         } catch (\Exception $e) {
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
 

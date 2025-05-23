@@ -13,6 +13,10 @@ const props = defineProps({
     user: {
         type: Object,
         required: true
+    },
+    url: {
+        type: String,
+        required: true
     }
 })
 
@@ -36,7 +40,7 @@ onMounted(() => {
 })
 
 const form = useForm({
-    name: props.user.full_name,
+    name: props.user.name,
     email: props.user.email,
     location: props.user.location,
     phone: props.user.phone,
@@ -48,7 +52,7 @@ const form = useForm({
 })
 
 const updateProfile = () => {
-    form.post(`/client-profile`, {
+    form.post(`${props.url}`, {
         preserveScroll: true,
         onSuccess: () => {
             emit('profile-update-success')
@@ -140,7 +144,7 @@ const removeImage = () => {
                         <select v-model="form.country">
                             <option>Select</option>
                             <option value="United States">USA</option>
-                            <option value="United Kingdom">UK</option>
+                            <option value="Britain">Britain</option>
                         </select>
                         <small class="text-danger" v-if="form.errors.country">{{ form.errors.country }}</small>
                     </div>
@@ -152,6 +156,8 @@ const removeImage = () => {
                             <option>Select</option>
                             <option value="New York">New York</option>
                             <option value="Washington">Washington</option>
+                            <option value="New Jersey">New Jersey</option>
+                            <option value="Oklahoma">Oklahoma</option>
                             <option value="London">London</option>
                         </select>
                         <small class="text-danger" v-if="form.errors.state">{{ form.errors.state }}</small>

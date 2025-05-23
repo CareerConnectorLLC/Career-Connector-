@@ -11,10 +11,6 @@ import { createInertiaApp,Link,Head, usePage } from '@inertiajs/vue3';
 import VueApexCharts from "vue3-apexcharts";
 import { Icon } from "@iconify/vue";
 
-// import AdminLayout from './Layout/Admin/Layout.vue';
-// import AdminAuthLayout from './Layout/Admin/AuthLayout.vue';
-// import FrontendLayout from './Layout/Frontend/Layout.vue';
-
 const AdminLayout = defineAsyncComponent(() =>
     import("./Layout/Admin/Layout.vue")
 );
@@ -36,9 +32,6 @@ const custom = definePreset(Aura, {
     semantic: {
         colorScheme: {
             light: {
-                // surface: {
-                //     0: 'rgba(247,247,247,1)',
-                // },
                 primary: {
                     50: '#e3f0fb',
                     100: '#d1e5f7',

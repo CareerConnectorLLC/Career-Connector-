@@ -146,19 +146,30 @@ Route::name('frontend.')->group(function() {
     
     Route::middleware(['auth'])->group(function () {
         Route::middleware(['is-customer'])->group(function () {
+            Route::prefix('/onboarding')->name('onboard.')->group(function () {
+                Route::inertia('/client-personal-info', 'Frontend/onboarding/client/PersonalInfo')->name('client.info');
+                Route::inertia('/client-payment-info', 'Frontend/onboarding/client/PaymentInfo')->name('client.payment.info');
+            });
+
             Route::get('/client-dashboard', fn () => Inertia::render('Frontend/ClientDashboard'))->name('client.dashboard');
-            Route::get('/client-profile', [\App\Http\Controllers\Frontend\Customer\ProfileController::class, 'index'])->name('client.profile');
-            Route::post('/client-profile', [\App\Http\Controllers\Frontend\Customer\ProfileController::class, 'store'])->name('client.profile.store');
+            Route::resource('/client-profile', \App\Http\Controllers\Frontend\Customer\ProfileController::class)->only('index', 'store');
         });
 
         Route::middleware(['is-provider'])->group(function () {
+            Route::prefix('/onboarding')->name('onboard.')->group(function () {
+                Route::resource('/provider-personal-info', \App\Http\Controllers\Frontend\Provider\Onboard\PersonalInfoController::class)->only('index', 'store');
+                Route::resource('/provider-service-details', \App\Http\Controllers\Frontend\Provider\Onboard\ServiceDetailController::class)->only('index', 'store');
+                Route::resource('/provider-document-upload', \App\Http\Controllers\Frontend\Provider\Onboard\DocUploadController::class)->only('index', 'store');
+                Route::get('/service-category', \App\Http\Controllers\Frontend\Provider\OnboardingController::class);
+            });
+            
             Route::get('/provider-dashboard', fn () => Inertia::render('Frontend/ProviderDashboard'))->name('provider.dashboard');
-            Route::get('/provider-profile', [\App\Http\Controllers\Frontend\Provider\ProfileController::class, 'index'])->name('provider.profile');
-            Route::post('/provider-profile', [\App\Http\Controllers\Frontend\Provider\ProfileController::class, 'index'])->name('provider.profile.store');
+            Route::resource('/provider-profile', \App\Http\Controllers\Frontend\Provider\ProfileController::class)->only('index', 'store');
         });
 
         Route::post('/change-password', [\App\Http\Controllers\Frontend\AuthController::class, 'changePassword']);
         Route::post('/logout', [\App\Http\Controllers\Frontend\AuthController::class, 'logout'])->name('logout');
     });
+    
     Route::get('/site-settings', \App\Http\Controllers\Frontend\SettingsController::class)->name('site.settings');
 });

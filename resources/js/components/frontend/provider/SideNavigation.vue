@@ -78,12 +78,12 @@ const signout = () => {
                             </a>
                         </li>
                         <li :class="{ 'active': $page.url.startsWith('/provider-profile') }">
-                            <a href="">
+                            <Link href="/provider-profile">
                                 <figure>
                                     <img src="/public/frontend_assets/images/provider-img-4.svg" alt="user">
                                 </figure>
                                 <span>My Profile</span>
-                            </a>
+                            </Link>
                         </li>
                         <li>
                             <a href="" @click.prevent="signout">

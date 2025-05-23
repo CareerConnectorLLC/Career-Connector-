@@ -117,6 +117,24 @@
           </li>
         </ul>
       </li>
+      <li class="menu-item" :class="{ 'open': $page.url.startsWith('/admin/service/') }">
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+          <Icon icon="material-symbols-light:service-toolbox" width="24" height="24" class="menu-icon" />
+          <div data-i18n="Dashboards">Services</div>
+        </a>
+        <ul class="menu-sub">
+          <li class="menu-item" :class="{ 'active': $page.url.startsWith('/admin/service/list') }">
+            <Link :href="route('admin.service.list')" class="menu-link">
+            <div data-i18n="List">List</div>
+            </Link>
+          </li>
+          <li class="menu-item" :class="{ 'active': $page.url.startsWith('/admin/service/create') }">
+            <Link :href="route('admin.service.create')" class="menu-link">
+            <div>Create</div>
+            </Link>
+          </li>
+        </ul>
+      </li>
       <li class="menu-item" :class="{ 'open': $page.url.startsWith('/admin/inquiry/') }">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
           <Icon icon="ix:inquiry-mail" width="21" height="21" class="menu-icon" />

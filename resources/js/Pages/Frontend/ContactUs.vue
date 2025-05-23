@@ -104,7 +104,7 @@ const handleSubmit = () => {
                                 <ul class="footer-social">
                                     <li v-for="(social, index) in socialHandles" :key="index">
                                         <Link :href="social.url">
-                                            <img :src="social.icon" :alt="social.platform">
+                                            <img :src="social.icon_url" :alt="social.platform">
                                         </Link>
                                     </li>
                                 </ul>
@@ -114,7 +114,7 @@ const handleSubmit = () => {
                     <div class="col-lg-6 contct-col-right">
                         <div class="contact-form-card">
                             
-                            <!-- Session Flash Message Section -->
+                            <!-- Session flash message section start -->
                             <template v-if="$page.props.flash.success">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     {{ $page.props.flash.success }}
@@ -122,6 +122,7 @@ const handleSubmit = () => {
                                         aria-label="Close"></button>
                                 </div>
                             </template>
+                            <!-- Session flash message section end -->
 
                             <h4 class="h2-title">Send us a message</h4>
                             <div class="conatact-form-inner">

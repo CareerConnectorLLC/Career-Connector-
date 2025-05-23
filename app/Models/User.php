@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -30,7 +31,6 @@ class User extends Authenticatable
     protected $appends = [
         'role_names',
         'profile_photo_url',
-        'full_name',
         'role_permission'
     ];
 
@@ -70,6 +70,7 @@ class User extends Authenticatable
             return collect([]);
         }
     }
+    
     public function getRolePermissionAttribute()
     {
         if ($this->roles()->exists())
@@ -78,19 +79,29 @@ class User extends Authenticatable
             return 0;
     }
 
-    public function getFullNameAttribute()
-    {
-        return "{$this->first_name} {$this->middle_name} {$this->last_name}";
-    }
-
     public function getProfilePhotoUrlAttribute()
     {
         return ($this->profile_photo_path) ? asset('/storage/' . $this->profile_photo_path) : null;
     }
 
-    public function clientBookings()
+    public function clientBookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'client_id');
+    }
+
+    public function providerPersonalInfos(): HasMany
+    {
+        return $this->hasMany(ProviderPersonalInfo::class, 'provider_id');
+    }
+
+    public function providerServiceDetails(): HasMany
+    {
+        return $this->hasMany(ProviderServiceDetail::class, 'provider_id');
+    }
+
+    public function providerDocuments(): HasMany
+    {
+        return $this->hasMany(ProviderDocument::class, 'provider_id');
     }
 
     public function profile(): HasOne
@@ -98,31 +109,14 @@ class User extends Authenticatable
         return $this->hasOne(UserProfile::class);
     }
 
-    public function providerBookings()
+    public function providerBookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'provider_id');
     }
 
-    public function services()
+    public function services(): HasMany
     {
-        return $this->belongsToMany(Service::class, 'provider_services', 'user_id', 'service_id');
-    }
-
-    public function expertises()
-    {
-        return $this->hasManyThrough(Expertise::class, ExpertiseProvider::class, 'user_id', 'id', 'id', 'expertise_id');
-    }
-
-    public function availabilities()
-    {
-        return $this->hasMany(Availability::class);
-    }
-
-    public function categories()
-    {
-        return $this->services->map(function ($service) {
-            return $service->category; // Access the category for each service
-        })->unique('id'); // Remove duplicates by category id
+        return $this->hasMany(Service::class);
     }
     
     public function scopeFilter($query, array $filters)
@@ -187,18 +181,10 @@ class User extends Authenticatable
                         }
                         break;
                 }
-
-                // Handle multiple values with whereIn()
-                // if (count($value) > 1) {
-                //     $query->whereIn($column, $value);
-                // } else {
-                //     $query->where($column, $value[0]);
-                // }                
             }
         }
         return $query;
     }
-
 
     public function scopeOrdering($query, array $filters)
     {
@@ -258,6 +244,5 @@ class User extends Authenticatable
                 });
                 break;
         }
-
     }
 }

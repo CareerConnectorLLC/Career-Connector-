@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name')->index();
-            $table->string('middle_name')->nullable();
-            $table->string('last_name')->nullable();
+            $table->string('name')->index();
             $table->string('email')->index()->unique();
             $table->string('password');
             $table->string('phone')->index()->nullable()->unique();
@@ -28,7 +26,6 @@ return new class extends Migration
             $table->string('device_token')->nullable();
             $table->string('device_type')->nullable();
             $table->boolean('active')->index()->default(true);
-            $table->string('name')->nullable();
             $table->string('social_provider')->nullable();
             $table->string('social_provider_id')->nullable()->unique();
             $table->rememberToken();

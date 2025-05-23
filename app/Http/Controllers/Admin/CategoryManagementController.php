@@ -68,7 +68,7 @@ class CategoryManagementController extends Controller
         $request->validate([
             'name'          => 'required',
             'description'   => 'required',
-            'image'         => 'required',
+            'image'         => 'nullable',
             'active'        => 'required'
         ],[
             'active.required'   => 'You must choose a status'
@@ -112,7 +112,7 @@ class CategoryManagementController extends Controller
         $request->validate([
             'name'          => 'required',
             'description'   => 'required',
-            'image'         => 'required',
+            'image'         => 'nullable',
             'active'        => 'required'
         ],[
             'active.required'   => 'You must choose a status'

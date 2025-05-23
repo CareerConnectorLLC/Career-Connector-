@@ -78,12 +78,8 @@ class AuthController extends Controller
             'accept_terms.accepted' => 'Please accept the terms and conditions',
         ]);
 
-        $name = explode(' ', $data['name']);
-
         $user = User::create([
-            'first_name' => $name[0],
-            'middle_name' => $name[1] ?? null,
-            'last_name' => $name[2] ?? null,
+            'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
             'location' => $data['location'],
@@ -178,9 +174,9 @@ class AuthController extends Controller
         session()->forget('user_id');
 
         if (in_array('USER', $roleNames)) {
-            return to_route('frontend.client.dashboard');
+            return to_route('frontend.onboard.client.info');
         } else {
-            return to_route('frontend.provider.dashboard');
+            return to_route('frontend.onboard.provider-personal-info.index');
         }
     }
 

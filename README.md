@@ -1,6 +1,6 @@
 # Laravel 11 Setup (JS)
 
-## General Guidelines 
+## General Guideliness 
 1. Follow **consistent casing** across different languages and files.
 2. Use meaningful and descriptive names for variables, functions, and files.
 3. Avoid abbreviations unless they are well-understood (e.g., `URL`, `ID`).

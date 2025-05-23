@@ -20,7 +20,7 @@ const showDropdown = ref(false)
                 <figure v-else><img src="/public/frontend_assets/images/devid.png" alt="devid"></figure>
             </div>
             <div class="dashboard-profile-cont">
-                <span>{{ user.full_name }}</span>
+                <span>{{ user.name }}</span>
             </div>
         </div>
         <div class="dashboard-profile-dropdown">
