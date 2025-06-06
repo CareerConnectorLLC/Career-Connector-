@@ -49,7 +49,7 @@ const handleSubmit = () => {
                             </div>
 
                             <div class="form-input">
-                                <button type="submit">Next</button>
+                                <button type="submit" :disabled="form.processing">Next</button>
                             </div>
 
                             <div class="form-input">

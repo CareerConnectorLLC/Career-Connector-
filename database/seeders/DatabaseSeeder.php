@@ -28,5 +28,8 @@ class DatabaseSeeder extends Seeder
         $this->call(\Database\Seeders\BlogSeeder::class);
         $this->call(\Database\Seeders\CategorySeeder::class);
         $this->call(\Database\Seeders\ServiceSeeder::class);
+        $this->call(\Database\Seeders\SiteSettingSeeder::class);
+        $this->call(\Database\Seeders\ProviderServiceDetailSeeder::class);
+        $this->call(\Database\Seeders\ProviderAvailabilitySeeder::class);
     }
 }

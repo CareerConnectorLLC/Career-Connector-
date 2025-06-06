@@ -21,7 +21,7 @@ const pageLinks = computed(() => {
             </li>
             <template v-for="link in pageLinks" :key="link.label">
                 <li>
-                    <Link :class="{ 'active': link.active }" :href="link.url">{{ link.label }}</Link>
+                    <Link :class="{ 'active': link.active }" :href="link.url" preserve-scroll preserve-state>{{ link.label }}</Link>
                 </li>
             </template>
             <li class="next" v-if="pagination.current_page !== pagination.last_page">

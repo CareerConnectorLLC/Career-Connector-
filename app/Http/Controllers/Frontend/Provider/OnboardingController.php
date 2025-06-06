@@ -15,10 +15,21 @@ class OnboardingController extends Controller
         $services = [];
 
         if ($request->has('category_id')) {
-            $services = Service::select('id','name')
+            $services = Category::select('id','name')
+                ->with('services', fn ($q) => $q->select('id','name','category_id')->where('active', true))
                 ->where('active', true)
-                ->whereIn('category_id', $request->category_id)
-                ->get();
+                ->whereIn('id', $request->category_id)
+                ->get()
+                ->map(function ($category) {
+                    return [
+                        'category_name' => $category->name,
+                        'category_id' => $category->id,
+                        'items' => $category->services->map(fn ($service) => [
+                            'id' => $service->id,
+                            'name' => $service->name
+                        ])
+                    ];
+                });
         }
 
         return response()->json([

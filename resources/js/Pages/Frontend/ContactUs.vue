@@ -75,7 +75,7 @@ const handleSubmit = () => {
                                         </figure>
                                         <div class="info-details">
                                             <h3>Address</h3>
-                                            <p v-text="settings.address ?? ''"></p>
+                                            <p v-text="settings?.address ?? ''"></p>
                                         </div>
                                     </li>
                                     <li>
@@ -84,7 +84,7 @@ const handleSubmit = () => {
                                         </figure>
                                         <div class="info-details">
                                             <h3>Phone</h3>
-                                            <a href="" v-text="settings.phone ?? ''"></a>
+                                            <a href="" v-text="settings?.phone ?? ''"></a>
                                         </div>
                                     </li>
                                     <li>
@@ -93,7 +93,7 @@ const handleSubmit = () => {
                                         </figure>
                                         <div class="info-details">
                                             <h3>Email</h3>
-                                            <a href="" v-text="settings.email ?? ''"></a>
+                                            <a href="" v-text="settings?.email ?? ''"></a>
                                         </div>
                                     </li>
                                 </ul>
@@ -103,9 +103,9 @@ const handleSubmit = () => {
                                 <h4>Follow us on:</h4>
                                 <ul class="footer-social">
                                     <li v-for="(social, index) in socialHandles" :key="index">
-                                        <Link :href="social.url">
+                                        <a :href="social.url" target="_blank">
                                             <img :src="social.icon_url" :alt="social.platform">
-                                        </Link>
+                                        </a>
                                     </li>
                                 </ul>
                             </div>

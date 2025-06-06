@@ -36,15 +36,17 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            'appName'=>config('app.name'),
-            'appUrl'=>config('app.url'),
-            'auth'=>[
+            'appName' => config('app.name'),
+            'appUrl' => config('app.url'),
+            'is_auth' => auth()->check(),
+            'auth' => [
                 'user'=> [
                     'name' => auth()->user()->name ?? null,
                     'profile_photo_url' => isset(auth()->user()->profile_photo_url) ? auth()->user()->profile_photo_url : null,
                     'email' => isset(auth()->user()->email) ? auth()->user()->email : null,
                     'phone' => isset(auth()->user()->phone) ? auth()->user()->phone : null,
                     'location' => isset(auth()->user()->location) ? auth()->user()->location : null,
+                    'role' => auth()->user()?->roleNames[0]
                   ]
                 ],
                 'flash' => [
@@ -53,8 +55,8 @@ class HandleInertiaRequests extends Middleware
                     'info' => fn() => $request->session()->get('info'),
                     'warning' => fn() => $request->session()->get('warning'),
                 ],
-
-        ]);
+            ]
+        );
     }
 
     public function rootView(Request $request): string

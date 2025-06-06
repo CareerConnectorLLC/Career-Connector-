@@ -1,7 +1,7 @@
 <template>
     <Toast />
     <template v-if="isAuthPage">
-        <Header />
+        <Header :user="user" />
     </template>
 
     <slot />
@@ -19,6 +19,7 @@ import Header from './Header.vue';
 import Footer from './Footer.vue';
 
 const page = usePage()
+const user = computed(() => page.props.auth.user)
 
 const isAuthPage = computed(() => {
     let paths = [
@@ -27,6 +28,8 @@ const isAuthPage = computed(() => {
         '/blog/*',
         '/blog?*',
         '/contact-us',
+        '/provider-listing?*',
+        '/provider/*',
     ]
     return matchesPath(page.url, paths)
 })

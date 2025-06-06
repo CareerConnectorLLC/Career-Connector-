@@ -20,6 +20,7 @@
         <!-- bootstrap -->
 
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
+        <script src="https://js.stripe.com/v3/"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js" ></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/splidejs/4.1.4/js/splide.min.js"></script>

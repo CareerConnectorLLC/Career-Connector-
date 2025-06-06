@@ -14,12 +14,14 @@ class SendOTPMail extends Mailable
     use Queueable, SerializesModels;
     
     protected $otp;
+    protected $user;
     /**
      * Create a new message instance.
      */
-    public function __construct($otp)
+    public function __construct($otp, $user)
     {
         $this->otp = $otp;
+        $this->user = $user;
     }
 
     /**
@@ -38,9 +40,10 @@ class SendOTPMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.send-o-t-p-mail',
+            view: 'mail.send-o-t-p-mail',
             with: [
                 'otp' => $this->otp,
+                'name' => $this->user->name,
             ],
         );
     }

@@ -21,8 +21,8 @@
             <li style="display: none;">
               <a href="">About Us</a>
             </li>
-            <li style="display: none;">
-              <a href="">Find Service Provider</a>
+            <li :class="{ 'current-menu-item': $page.url === '/provider-listing' }">
+              <Link href="/provider-listing">Find Service Provider</Link>
             </li>
             <li :class="{ 'current-menu-item': $page.url.startsWith('/blog') }">
               <Link href="/blog">Blog</Link>
@@ -34,12 +34,19 @@
         </div>
         <div class="btn-wrap">
           <ul>
-            <li>
-              <Link class="primary-btn" href="/login">Log In</Link>
-            </li>
-            <li>
-              <Link class="secondary-btn" href="/register">Sign Up</Link>
-            </li>
+            <template v-if="!$page.props.is_auth">
+              <li>
+                <Link class="primary-btn" href="/login">Log In</Link>
+              </li>
+              <li>
+                <Link class="secondary-btn" href="/register">Sign Up</Link>
+              </li>
+            </template>
+            <template v-else>
+              <li>
+                <Link class="secondary-btn" :href="dashboardLink">Dashboard</Link>
+              </li>
+            </template>
           </ul>
         </div>
       </nav>
@@ -55,6 +62,13 @@
 
 
 <script setup>
+import { computed } from 'vue'
 import { Link } from '@inertiajs/vue3'
+const props = defineProps({
+  user: Object
+})
+
+const dashboardLink = computed(() => props.user && props.user.role === 'SERVICE-PROVIDER' ? `/provider-dashboard` : `/client-dashboard`)
 </script>
+
 <style scoped></style>

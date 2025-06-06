@@ -34,7 +34,7 @@ const form = useForm({
                             </div>
                         </template>
 
-                        <form @submit.prevent="form.post(`/verify-email`)">
+                        <form @submit.prevent="form.post(`/verify-email`, { replace: true })">
                             <div class="form-input otp-wrap">
                                 <label>Please enter the code</label>
                                 <div class="otp-input-group">
@@ -44,11 +44,11 @@ const form = useForm({
                             </div>
 
                             <div class="form-input">
-                                <p>Don’t receive the OTP <a href="" @click.prevent="form.post(`/resend-otp`)">Resend </a></p>
+                                <p>Don’t receive the OTP <a href="" class="resend-code" :class="{'disabled': form.processing}" @click.prevent="form.post(`/resend-otp`)">Resend </a></p>
                             </div>
 
                             <div class="form-input">
-                                <button type="submit">Next</button>
+                                <button type="submit" :disabled="form.processing">Next</button>
                             </div>
 
                             <div class="form-input">
@@ -84,3 +84,10 @@ const form = useForm({
         <img class="buttom-shaope" src="/public/frontend_assets/images/login-bottom-sahpe.svg" alt="bottom-shape">
     </section>
 </template>
+
+<style scoped>
+.resend-code.disabled{
+    pointer-events: none;
+    cursor: default;
+}
+</style>

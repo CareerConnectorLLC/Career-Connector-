@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend\Provider\Onboard;
 
+use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -14,7 +15,7 @@ class ServiceDetailController extends Controller
         $services = session('services');
 
         $serviceDetails = \DB::table('provider_service_details')
-            ->where('provider_id', auth()->id())
+            ->where('provider_id', session('user_onboard')['id'])
             ->whereIn('service_id', collect($services)->pluck('id')->toArray())
             ->get();
 
@@ -42,16 +43,22 @@ class ServiceDetailController extends Controller
             'description.*' => ['required', 'string'],
             'price' => ['required', 'array', 'min:1'],
             'price.*' => ['required', 'numeric'],
+        ], [
+            'location.*' => 'The location field is required',
+            'description.*' => 'The description field is required',
+            'price.*' => 'The price field is required'
         ]);
 
-        $details = $request->user()->providerServiceDetails;
+        $user = User::select('id','name')->find(session('user_onboard')['id']);
+        
+        $details = $user->providerServiceDetails;
 
         if ($details->count()) {
-            $request->user()->providerServiceDetails()->delete();
+            $user->providerServiceDetails()->delete();
         }
 
         foreach ($validatedData['location'] as $key => $value) {
-            $request->user()->providerServiceDetails()->create([
+            $user->providerServiceDetails()->create([
                 'service_id' => $key,
                 'location' => $value,
                 'description' => $validatedData['description'][$key],
@@ -59,6 +66,6 @@ class ServiceDetailController extends Controller
             ]);
         }
 
-        return to_route('frontend.onboard.provider-document-upload.index');
+        return to_route('frontend.onboard.provider.document-upload.index');
     }
 }

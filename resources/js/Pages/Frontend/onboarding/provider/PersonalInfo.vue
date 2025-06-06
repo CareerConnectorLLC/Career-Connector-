@@ -31,14 +31,23 @@ const categoryServices = ref([])
 
 onMounted(() => {
     if (personalData.value) {
-        form.category = personalData.value.category
+        form.category = formatCategoryIds(personalData.value.category)
         form.experience = personalData.value.experience
         form.services = personalData.value.services
     }
 })
 
 watch(
-    () => form.category, async (value) => {
+    () => form.category, async (value, oldValue) => {
+        if (personalData.value) {
+            if (oldValue && oldValue.length > value.length) {
+                let intersection = oldValue.filter(element => !value.includes(element))[0]
+                let category = categoryServices.value.find(i => i.category_id == intersection)
+                let serviceIds = category.items.map(i => i.id)
+                form.services = form.services.filter(s => !serviceIds.includes(s))
+            }
+        }
+        
         let apiUrl = fullApiUrl(value),
         response = await fetch(apiUrl),
         result = await response.json()
@@ -47,7 +56,7 @@ watch(
 )
 
 const fullApiUrl = (param) => {
-    const baseUrl = `${window.location.origin}/onboarding/service-category`;
+    const baseUrl = `${window.location.origin}/onboard/provider/service-category`;
     const url = new URL(baseUrl)
 
     if (!Array.isArray(param) && typeof param == 'object') {
@@ -60,6 +69,10 @@ const fullApiUrl = (param) => {
 
     return url.toString();
 }
+
+const formatCategoryIds = (params) => {
+    return Object.keys(params).map(item => params[item])
+}
 </script>
 
 <template>
@@ -69,7 +82,7 @@ const fullApiUrl = (param) => {
                 <h1 v-text="`Personal Information`"></h1>
                 <p v-text="`Lorem ipsum dolor sit amet consectetur adipisicing elit.`"></p>
             </div>
-            <form @submit.prevent="form.post(`/onboarding/provider-personal-info`)">
+            <form @submit.prevent="form.post(`/onboard/provider/personal-info`, { replace: true })">
                 <div class="form-input">
                     <label>Expertise</label>
                     <MultiSelect v-model="form.category" display="chip" :options="categories" optionValue="id"
@@ -86,13 +99,27 @@ const fullApiUrl = (param) => {
 
                 <div class="form-input">
                     <label>Available services</label>
-                    <MultiSelect display="chip" v-model="form.services" :options="categoryServices" optionValue="id"
-                        optionLabel="name" filter placeholder="Available services" class="w-100" />
-                    <small class="text-danger" v-if="form.errors.services" v-text="form.errors.services"></small>
+                    <MultiSelect
+                        display="chip"
+                        v-model="form.services"
+                        :options="categoryServices"
+                        optionValue="id"
+                        optionLabel="name"
+                        optionGroupLabel="category_name"
+                        optionGroupChildren="items"
+                        filter
+                        placeholder="Available services"
+                        class="w-100"
+                    >
+                    <template #optiongroup="slotProps">
+                        <p>{{ slotProps.option.category_name }}</p>
+                    </template>
+                    </MultiSelect>
+                    <small class="text-danger" v-if="form.errors.services" v-html="form.errors.services"></small>
                 </div>
 
                 <div class="form-input">
-                    <button type="submit">Next</button>
+                    <button type="submit" :disabled="form.processing">Next</button>
                 </div>
             </form>
         </div>

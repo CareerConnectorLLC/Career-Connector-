@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest' => Guest::class,
             'is-customer' => CustomerMiddleware::class,
             'is-provider' => ProviderMiddleware::class,
+            'onboarding' => \App\Http\Middleware\OnboardMiddleware::class,
         ]);
         $middleware->redirectGuestsTo(function () {
             if (request()->is('admin/*')) {

@@ -21,7 +21,7 @@ const signout = () => {
                 <div class="menu-wrap">
                     <ul>
                         <li :class="{ 'active': $page.url.startsWith('/client-dashboard') }">
-                            <Link href="/client-dashboard">
+                            <Link href="/">
                                 <figure>
                                     <img src="/public/frontend_assets/images/dashboard-icon.svg" alt="dashboard-icon">
                                 </figure>

@@ -7780,9 +7780,11 @@ opacity: 0.5;
   }
 
   .file-upload-container img {
-    max-width: 150px;
     display: none;
     border-radius: 5px;
+    max-height: 100px;
+    width: auto;
+    object-fit: contain;
   }
 
   .file-upload-container input {
@@ -9328,6 +9330,10 @@ padding: 25px;
 
 .login-col-innner .form-input p a:hover{
     color: var(--btnPrimary);
+}
+
+.p-multiselect-label{ 
+    flex-wrap: wrap;
 }
 
 /* ========== responsive css =========== */

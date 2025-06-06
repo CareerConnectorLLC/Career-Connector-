@@ -3,10 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\SiteSetting;
-use Faker\Factory as Factory;
-
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class SiteSettingSeeder extends Seeder
 {
@@ -15,35 +13,29 @@ class SiteSettingSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = Factory::create();
+        $socialHandles = collect([
+            [
+                'platform' => 'facebook',
+                'icon' => 'facebook',
+                'url' => 'https://facebook.com',
+            ],
+            [
+                'platform' => 'instagram',
+                'icon' => 'instagram',
+                'url' => 'https://instagram.com',
+            ],
+            [
+                'platform' => 'linkedin',
+                'icon' => 'linkedin',
+                'url' => 'https://linkedin.com',
+            ],
+        ]);
+        
         SiteSetting::create([
-            'address' => '2972 Westheimer Rd. Santa Ana, Illinois 85486',
-            'phone' => '(406) 555-0120',
-            'email' => 'sara.cruz@example.com',
-                        'social_handles' => json_encode([
-                [
-                    'platform' => 'facebook',
-                    'url' => 'https://www.facebook.com/',
-                    'icon' => 'https://www.facebook.com/',
-                ],
-                [
-                    'platform' => 'X',  // Formerly known as Twitter
-                    'url' => 'https://x.com/',
-                    'icon' => 'https://x.com/',
-                ],
-                [
-                    'platform' => 'instagram',
-                    'url' => 'https://www.instagram.com/',
-                    'icon' => 'https://www.instagram.com/',
-                ],
-                [
-                    'platform' => 'LinkdIn',
-                    'url' => 'https://www.linkedin.com/',
-                    'icon' => 'https://www.linkedin.com/',
-                ],
-            ]),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'address' => '789 Pine Ln, Villagetown, USA',
+            'phone' => '+1-555-111-2222',
+            'email' => 'sales@example.com',
+            'social_handles' => $socialHandles->toJson(),
         ]);
     }
 }

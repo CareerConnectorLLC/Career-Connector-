@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend\Provider\Onboard;
 
+use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,7 +16,7 @@ class DocUploadController extends Controller
         $services = session('services');
 
         $documents = \DB::table('provider_documents')
-            ->where('provider_id', auth()->id())
+            ->where('provider_id', session('user_onboard')['id'])
             ->get();
 
         if ($documents->count()) {
@@ -33,13 +34,30 @@ class DocUploadController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $servicesInSession = $request->session()->get('services');
+
+        $rules = [
             'image' => ['required', 'array', 'min:1'],
-            'image.*' => ['required', 'image'],
-        ]);
+        ];
+
+        $messages = [];
+
+        foreach ($servicesInSession as $key => $service) {
+            $serviceId = $service['id'];
+            $serviceName = $service['name'];
+
+            $rules["image.{$serviceId}"] = ['required', 'image'];
+            
+            $messages["image.{$serviceId}.required"] = "Document for ${serviceName} is required";
+            $messages["image.{$serviceId}.image"] = "Document format for ${serviceName} must be in jpg or png";
+        }
+
+        $validatedData = $request->validate($rules, $messages);
+
+        $user = User::select('id','name')->find(session('user_onboard')['id']);
 
         $documents = \DB::table('provider_documents')
-            ->where('provider_id', auth()->id())
+            ->where('provider_id', session('user_onboard')['id'])
             ->get();
 
         if ($documents->count()) {
@@ -47,20 +65,19 @@ class DocUploadController extends Controller
                 unlink(storage_path('/app/public/'.$value->file_path));
             }
 
-            $request->user()->providerDocuments()->delete();
+            $user->providerDocuments()->delete();
         }
 
         foreach ($validatedData['image'] as $key => $value) {
             $file = $validatedData['image'][$key];
-            $filePath = \Storage::putFile('onboard/provider/'.auth()->id(), $file, 'public');
+            $filePath = \Storage::putFile('onboard/provider/'.$user->id, $file, 'public');
             
-            $request->user()->providerDocuments()->create([
+            $user->providerDocuments()->create([
                 'service_id' => $key,
                 'file_path' => $filePath,
             ]);
         }
 
-        session()->forget('services');
-        return to_route('frontend.provider.dashboard');
+        return to_route('frontend.onboard.provider.availability.index');
     }
 }

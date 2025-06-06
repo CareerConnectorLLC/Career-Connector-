@@ -49,7 +49,7 @@ const form = useForm({
                 </div>
             </div>
             <div class="form-input">
-                <button type="submit">Submit</button>
+                <button type="submit" :disabled="form.processing">Submit</button>
             </div>
             <div class="form-input">
                 <p>Back to <Link href="/login">Login</Link></p>

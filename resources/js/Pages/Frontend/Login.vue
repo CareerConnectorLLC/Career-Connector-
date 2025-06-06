@@ -24,6 +24,12 @@ const form = useForm({
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </template>
+        <template v-if="$page.props.flash.warning">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ $page.props.flash.warning }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </template>
 
         <template v-if="$page.props.flash.success">
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -32,7 +38,7 @@ const form = useForm({
             </div>
         </template>
 
-        <form @submit.prevent="form.post('login')">
+        <form @submit.prevent="form.post('login', { replace: true })">
             <div class="form-input">
                 <label>Email address</label>
                 <input type="email" v-model="form.email" placeholder="Enter email address">
@@ -60,7 +66,7 @@ const form = useForm({
             </div>
 
             <div class="form-input">
-                <button type="submit">Login now</button>
+                <button type="submit" :disabled="form.processing">Login now</button>
             </div>
 
             <div class="form-input">

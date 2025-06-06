@@ -11,10 +11,9 @@
                                 </Link>
                                 <ul class="footer-social" v-if="settings && socialHandles.length">
                                     <li v-for="(social, index) in socialHandles" :key="index">
-                                        <Link :href="social.url"
-                                            target="_blank">
+                                        <a :href="social.url" target="_blank">
                                             <img :src="social.icon_url" :alt="social.platform">
-                                        </Link>
+                                        </a>
                                     </li>
                                 </ul>
                             </div>

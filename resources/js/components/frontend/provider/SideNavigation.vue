@@ -14,7 +14,7 @@ const signout = () => {
             </button>
             <div class="dashboard-card">
                 <div class="dashboard-logo-wrap">
-                    <Link class="dashboard-logo" href="/provider-dashboard">
+                    <Link class="dashboard-logo" href="/">
                         <img src="/public/frontend_assets/images/dashboard-logo.png" alt="dashboard-logo">
                     </Link>
                 </div>

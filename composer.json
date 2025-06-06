@@ -18,6 +18,7 @@
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-permission": "^6.13",
         "spatie/laravel-sluggable": "^3.7",
+        "stripe/stripe-php": "^17.2",
         "tightenco/ziggy": "^2.5"
     },
     "require-dev": {

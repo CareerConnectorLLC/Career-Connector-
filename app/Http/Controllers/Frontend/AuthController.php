@@ -37,6 +37,13 @@ class AuthController extends Controller
                 Inertia::clearHistory();
                 session()->flash('error', 'Your email is not verified');
                 return back();
+            } elseif (!Auth::user()->active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                Inertia::clearHistory();
+                session()->flash('warning', 'Your account is not verified');
+                return back();
             }
             
             $roleNames = Auth::user()->role_names->toArray();
@@ -54,6 +61,8 @@ class AuthController extends Controller
 
     public function registration(Request $request)
     {
+        $stripeId = null;
+        
         $data = $request->validate([
             'name' => ['required', 'string'],
             'email' => [
@@ -78,12 +87,23 @@ class AuthController extends Controller
             'accept_terms.accepted' => 'Please accept the terms and conditions',
         ]);
 
+        if ($request->input('user_role') == 'USER') {
+            $customer = app('stripe')->customers->create([
+                'name' => $data['name'],
+                'email' => $data['email']
+            ]);
+
+            $stripeId = $customer->id;
+        }
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
             'location' => $data['location'],
             'password' => \Hash::make($data['password']),
+            'stripe_id' => $stripeId,
+            'active' => false,
         ]);
 
         $user->assignRole($request->input('user_role'));
@@ -99,7 +119,7 @@ class AuthController extends Controller
 
         session()->put('user_id', $user->id);
 
-        \Mail::to($user->email)->send(new \App\Mail\SendOTPMail($code));
+        \Mail::to($user->email)->send(new \App\Mail\SendOTPMail($code, $user));
         return to_route('frontend.mail.verify');
     }
 
@@ -146,7 +166,7 @@ class AuthController extends Controller
         
         \DB::table('users_email_verify')->where('user_id', session('user_id'))->update(['code' => $code]);
 
-        \Mail::to($user->email)->send(new \App\Mail\SendOTPMail($code));
+        \Mail::to($user->email)->send(new \App\Mail\SendOTPMail($code, $user));
 
         session()->flash('success', 'OTP has been send to your email address.');     
     }
@@ -163,21 +183,22 @@ class AuthController extends Controller
 
         $user = User::find($verifyData->user_id);
 
-        $user->update(['email_verified_at' => now()]);
-    
-        Auth::login($user);
+        $roleNames = $user->role_names->toArray();
 
-        $roleNames = Auth::user()->role_names->toArray();
+        $user->update(['email_verified_at' => now()]);
 
         \DB::table('users_email_verify')->where(['code' => $validatedData['code']])->delete();
 
         session()->forget('user_id');
 
         if (in_array('USER', $roleNames)) {
-            return to_route('frontend.onboard.client.info');
+            session()->put('user_onboard', ['id' => $user->id, 'role' => 'USER']);
+            return to_route('frontend.onboard.client.personal-info.index');
         } else {
-            return to_route('frontend.onboard.provider-personal-info.index');
+            session()->put('user_onboard', ['id' => $user->id, 'role' => 'SERVICE-PROVIDER']);
+            return to_route('frontend.onboard.provider.personal-info.index');
         }
+
     }
 
     public function logout(Request $request)

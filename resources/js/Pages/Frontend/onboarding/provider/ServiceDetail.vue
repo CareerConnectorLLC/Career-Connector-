@@ -39,7 +39,7 @@ services.value.forEach(service => {
                 <h1 v-text="`Services details`"></h1>
                 <p v-text="`Lorem ipsum dolor sit amet, consectetur adipisicing.`"></p>
             </div>
-            <form @submit.prevent="form.post(`/onboarding/provider-service-details`)">
+            <form @submit.prevent="form.post(`/onboard/provider/service-details`, { replace: true })">
                 <template v-for="(service, index) in services" :key="service.id">
                     <h2>{{ service.name }}</h2>
                     <div class="form-input">
@@ -61,11 +61,11 @@ services.value.forEach(service => {
                     </div>
                 </template>
                 <div class="form-input">
-                    <button type="submit">Next</button>
+                    <button type="submit" :disabled="form.processing">Next</button>
                 </div>
             </form>
             <div class="btn-wrapper">
-                <Link class="back-btn" href="/onboarding/provider-personal-info">Back</Link>
+                <Link class="back-btn" href="/onboard/provider/personal-info">Back</Link>
             </div>
         </div>
     </Onboarding>

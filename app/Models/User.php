@@ -114,6 +114,11 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'provider_id');
     }
 
+    public function availability(): HasOne
+    {
+        return $this->hasOne(ProviderAvailability::class, 'provider_id');
+    }
+
     public function services(): HasMany
     {
         return $this->hasMany(Service::class);

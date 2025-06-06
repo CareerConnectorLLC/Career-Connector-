@@ -56,7 +56,7 @@ const userTypeSelect = (param) => {
                             </ul>
                         </div>
 
-                        <form @submit.prevent="form.post('/register')">
+                        <form @submit.prevent="form.post('/register', { replace: true })">
                             <div class="form-input">
                                 <label>Name</label>
                                 <input v-model="form.name" class="user" type="text" placeholder="Enter name">
@@ -109,7 +109,7 @@ const userTypeSelect = (param) => {
                             </div>
 
                             <div class="form-input">
-                                <button type="submit">Sign up now</button>
+                                <button type="submit" :disabled="form.processing">Sign up now</button>
                             </div>
 
                             <div class="form-input">

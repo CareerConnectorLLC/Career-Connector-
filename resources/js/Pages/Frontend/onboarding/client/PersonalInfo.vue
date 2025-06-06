@@ -5,11 +5,11 @@ import Datepicker from 'vanillajs-datepicker/Datepicker'
 import ClientOnboardLayout from '../../../../components/frontend/customer/OnboardLayout.vue'
 
 const page = usePage()
-const user = computed(() => page.props.auth.user)
+const user = computed(() => page.props.user)
 const datePicker = useTemplateRef('datePicker')
 
 const form = useForm({
-    location: null,
+    location: user.value.location,
     email: user.value.email,
     country: null,
     state: null,
@@ -19,7 +19,7 @@ const form = useForm({
 })
 
 onMounted(() => {
-    const datepicker = new Datepicker(datePicker.value)
+    const datepicker = new Datepicker(datePicker.value, { maxDate: new Date() })
 
     datePicker.value.addEventListener('changeDate', (e) => {
         let date = e.detail.date
@@ -31,7 +31,7 @@ onMounted(() => {
 <template>
     <ClientOnboardLayout heading="Personal information"
         caption="Lorem ipsum dolor sit amet, consectetur adipiscing elit">
-        <form @submit.prevent="form.post(`/client-profile`)">
+        <form @submit.prevent="form.post(`/onboard/client/personal-info`, { replace: true })">
             <div class="form-input">
                 <label>Address</label>
                 <input v-model="form.location" class="location" type="text" placeholder="Enter address">
@@ -86,7 +86,7 @@ onMounted(() => {
                 </div>
             </div>
             <div class="form-input">
-                <button type="submit">Next</button>
+                <button type="submit" :disabled="form.processing">Next</button>
             </div>
         </form>
     </ClientOnboardLayout>

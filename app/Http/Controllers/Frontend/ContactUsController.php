@@ -44,10 +44,10 @@ class ContactUsController extends Controller
             session()->flash('success', 'Your message has been send successfully!'); 
         }
 
-        $site_settings = SiteSetting::find(1);
+        $site_settings = SiteSetting::get();
 
         return Inertia::render('Frontend/ContactUs', [
-            'site_settings' => $site_settings
+            'site_settings' => $site_settings->last()
         ]);
     }
 }

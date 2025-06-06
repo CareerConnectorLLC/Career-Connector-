@@ -1,17 +1,33 @@
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, ref, onUnmounted } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import ProfileDropdown from "../../components/frontend/provider/ProfileDropdown.vue";
 import SideNavigation from "../../components/frontend/provider/SideNavigation.vue";
 
 const page = usePage()
+const scrollY = ref(0);
+const isFixed = ref(false);
+
+onMounted(() => {
+    window.addEventListener('scroll', handleScroll);
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
+
 const user = computed(() => page.props.auth.user)
+
+function handleScroll() {
+    scrollY.value = window.scrollY;
+    isFixed.value = scrollY.value > 0;
+}
 </script>
 
 <template>
     <div class="dashboard-sec">
         <div class="dashboard-container">
-            <div class="dashboard-head">
+            <div class="dashboard-head" :class="{'fixed': isFixed}">
                 <button class="dashboard-toggler">
                     <span class="stick"></span>
                 </button>

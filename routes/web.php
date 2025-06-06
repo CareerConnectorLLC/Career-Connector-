@@ -127,10 +127,13 @@ Route::prefix('admin')->name('admin.')->group(function() {
 
 
 Route::name('frontend.')->group(function() {
+    Route::get('/', fn () => Inertia::render('Frontend/Home'))->name('home');
+    Route::resource('blog', \App\Http\Controllers\Frontend\BlogController::class)->only(['index', 'show']);
+    Route::match(['get', 'post'], '/contact-us', \App\Http\Controllers\Frontend\ContactUsController::class)->name('contact');
+    Route::get('/provider-listing', \App\Http\Controllers\Frontend\ProviderListingController::class)->name('provider.listing');
+    Route::get('/provider/{id}', \App\Http\Controllers\Frontend\ProviderShowController::class)->name('provider.details');
+    
     Route::middleware(['guest'])->group(function () {
-        Route::get('/', fn () => Inertia::render('Frontend/Home'))->name('home');
-        Route::match(['get', 'post'], '/contact-us', \App\Http\Controllers\Frontend\ContactUsController::class)->name('contact');
-        Route::resource('blog', \App\Http\Controllers\Frontend\BlogController::class)->only(['index', 'show']);
         Route::get('/login', [\App\Http\Controllers\Frontend\AuthController::class, 'index'])->name('login');
         Route::get('/register', fn () => Inertia::render('Frontend/Register'));
         Route::get('/forgot-password', fn () => Inertia::render('Frontend/ForgotPassword'));
@@ -142,27 +145,32 @@ Route::name('frontend.')->group(function() {
         Route::post('/verify-email', [\App\Http\Controllers\Frontend\AuthController::class, 'verifyMail']);
         Route::post('/reset-password', [\App\Http\Controllers\Frontend\AuthController::class, 'submitResetPasswordForm'])->name('reset.password.post');
         Route::post('/resend-otp', [\App\Http\Controllers\Frontend\AuthController::class, 'resendOtpCode'])->name('otp.resend');
+
+        Route::prefix('/onboard')->name('onboard.')->group(function () {
+            Route::prefix('/client')->name('client.')->middleware('onboarding:USER')->group(function () {
+                Route::resource('/personal-info', \App\Http\Controllers\Frontend\Customer\Onboard\PersonalInfoController::class)->only('index', 'store');
+                Route::resource('/payment-info', \App\Http\Controllers\Frontend\Customer\Onboard\PaymentInfoController::class)->only('index', 'store');
+            });
+
+            Route::prefix('/provider')->name('provider.')->middleware('onboarding:SERVICE-PROVIDER')->group(function () {
+                Route::resource('/personal-info', \App\Http\Controllers\Frontend\Provider\Onboard\PersonalInfoController::class)->only('index', 'store');
+                Route::resource('/service-details', \App\Http\Controllers\Frontend\Provider\Onboard\ServiceDetailController::class)->only('index', 'store');
+                Route::resource('/document-upload', \App\Http\Controllers\Frontend\Provider\Onboard\DocUploadController::class)->only('index', 'store');
+                Route::resource('/availability', \App\Http\Controllers\Frontend\Provider\Onboard\AvailabilityController::class)->only('index', 'store');
+                Route::get('/service-category', \App\Http\Controllers\Frontend\Provider\OnboardingController::class);
+            });
+            
+            Route::inertia('/thank-you', 'Frontend/onboarding/OnboardSuccess')->name('success.page');
+        });
     });
     
     Route::middleware(['auth'])->group(function () {
         Route::middleware(['is-customer'])->group(function () {
-            Route::prefix('/onboarding')->name('onboard.')->group(function () {
-                Route::inertia('/client-personal-info', 'Frontend/onboarding/client/PersonalInfo')->name('client.info');
-                Route::inertia('/client-payment-info', 'Frontend/onboarding/client/PaymentInfo')->name('client.payment.info');
-            });
-
             Route::get('/client-dashboard', fn () => Inertia::render('Frontend/ClientDashboard'))->name('client.dashboard');
             Route::resource('/client-profile', \App\Http\Controllers\Frontend\Customer\ProfileController::class)->only('index', 'store');
         });
 
         Route::middleware(['is-provider'])->group(function () {
-            Route::prefix('/onboarding')->name('onboard.')->group(function () {
-                Route::resource('/provider-personal-info', \App\Http\Controllers\Frontend\Provider\Onboard\PersonalInfoController::class)->only('index', 'store');
-                Route::resource('/provider-service-details', \App\Http\Controllers\Frontend\Provider\Onboard\ServiceDetailController::class)->only('index', 'store');
-                Route::resource('/provider-document-upload', \App\Http\Controllers\Frontend\Provider\Onboard\DocUploadController::class)->only('index', 'store');
-                Route::get('/service-category', \App\Http\Controllers\Frontend\Provider\OnboardingController::class);
-            });
-            
             Route::get('/provider-dashboard', fn () => Inertia::render('Frontend/ProviderDashboard'))->name('provider.dashboard');
             Route::resource('/provider-profile', \App\Http\Controllers\Frontend\Provider\ProfileController::class)->only('index', 'store');
         });
@@ -173,3 +181,5 @@ Route::name('frontend.')->group(function() {
     
     Route::get('/site-settings', \App\Http\Controllers\Frontend\SettingsController::class)->name('site.settings');
 });
+
+Route::view('/mail-test', 'mail.send-o-t-p-mail');

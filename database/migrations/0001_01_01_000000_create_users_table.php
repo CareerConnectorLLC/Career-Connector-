@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('device_token')->nullable();
             $table->string('device_type')->nullable();
             $table->boolean('active')->index()->default(true);
+            $table->string('stripe_id', 150)->nullable();
             $table->string('social_provider')->nullable();
             $table->string('social_provider_id')->nullable()->unique();
             $table->rememberToken();

@@ -68,7 +68,7 @@ const urlToFile = async (url, key) => {
                 <h1 v-text="`Upload documents`"></h1>
                 <p v-text="`Lorem ipsum dolor, sit amet consectetur adipisicing.`"></p>
             </div>
-            <form @submit.prevent="form.post(`/onboarding/provider-document-upload`)">
+            <form @submit.prevent="form.post(`/onboard/provider/document-upload`, { replace: true })">
                 <h2>Certifications &amp; documentation</h2>
                 <template v-for="(service, index) in services" :key="service.id">
                     <div class="form-input">
@@ -89,11 +89,12 @@ const urlToFile = async (url, key) => {
                     </div>
                 </template>
                 <div class="form-input">
-                    <button type="submit">Next</button>
+                    <button type="submit" :disabled="form.processing">Next</button>
                 </div>
             </form>
             <div class="btn-wrapper">
-                <Link class="back-btn" href="/onboarding/provider-service-details">Back</Link>
+                <Link class="back-btn float-start" href="/onboard/provider/service-details">Back</Link>
+                <Link href="/onboard/provider/availability" class="back-btn float-end">Skip</Link>
             </div>
         </div>
     </Onboarding>

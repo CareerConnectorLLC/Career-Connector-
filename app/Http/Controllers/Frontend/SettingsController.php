@@ -13,10 +13,10 @@ class SettingsController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $site_settings = SiteSetting::find(1);
+        $site_settings = SiteSetting::get();
 
         return response()->json([
-            'settings' => $site_settings
+            'settings' => $site_settings->last()
         ]);
     }
 }
