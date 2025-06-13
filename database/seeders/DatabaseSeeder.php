@@ -15,14 +15,30 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(\Database\Seeders\RoleSeeder::class);
 
-        $user = User::create([
+        $user_a = User::create([
             'name' => "Administrator",
             'email' => "admin@admin.com",
             'password' => "admin@01",
             'active' => true
         ]);
 
-        $user->assignRole('SUPER-ADMIN');
+        $user_b = User::create([
+            'name' => "Nyah Jones",
+            'email' => "olson.jocelyn@example.org",
+            'password' => "password",
+            'active' => true
+        ]);
+
+        $user_c = User::create([
+            'name' => "Brice Friesen",
+            'email' => "norma.little@example.com",
+            'password' => "password",
+            'active' => true
+        ]);
+
+        $user_a->assignRole('SUPER-ADMIN');
+        $user_b->assignRole('USER');
+        $user_c->assignRole('SERVICE-PROVIDER');
 
         $this->call(\Database\Seeders\UserSeeder::class);
         $this->call(\Database\Seeders\BlogSeeder::class);

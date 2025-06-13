@@ -35,7 +35,7 @@ class AvailabilityController extends Controller
 
         $user = User::select('id','name')->find(session('user_onboard')['id']);
 
-        $timings = collect($request->input('timings'))->toJson();
+        $timings = collect($request->input('timings'))->map(fn ($item) => count($item) ? $item : null)->toJson();
 
         $user->availability()->create([
             'timings' => $timings
