@@ -10,6 +10,8 @@ import { definePreset } from '@primevue/themes'
 import { createInertiaApp,Link,Head, usePage } from '@inertiajs/vue3';
 import VueApexCharts from "vue3-apexcharts";
 import { Icon } from "@iconify/vue";
+import ClickOutside from "./ClickOutsideDirective";
+import { createHead } from '@vueuse/head';
 
 const AdminLayout = defineAsyncComponent(() =>
     import("./Layout/Admin/Layout.vue")
@@ -71,6 +73,7 @@ createInertiaApp({
         return page
       },
       setup({ el, App, props, plugin }) {
+        const head = createHead();
         createApp({ render: () => h(App, props) })
           .use(plugin)
           .use(pinia)
@@ -78,9 +81,11 @@ createInertiaApp({
           .use(ToastService)
           .use(ConfirmationService)
           .use(ZiggyVue)
+          .use(head)
           .component('Link',Link)
           .component('Head',Head)
           .component("Icon", Icon)
+          .directive('click-outside', ClickOutside)
           .use(PrimeVue,{
             theme: {
                 preset: custom,

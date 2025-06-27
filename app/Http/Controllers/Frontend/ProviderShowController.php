@@ -15,7 +15,7 @@ class ProviderShowController extends Controller
     public function __invoke(Request $request, $id)
     {
         $providerData = ProviderServiceDetail::with([
-            'provider:id,name',
+            'provider:id,name,profile_photo_path,location',
             'provider.availability',
             'service:id,name'
         ])->find($id);
@@ -24,7 +24,19 @@ class ProviderShowController extends Controller
 
         return Inertia::render('Frontend/ProviderShow', [
             'provider' => $providerData,
-            'timings' => $timings
+            'timings' => $timings,
+            'schedules' => $timings,
+            'has_payment_methods' => $this->hasPaymentMethods() ? true : false,
         ]);
+    }
+
+    private function hasPaymentMethods()
+    {
+        $paymentMethods = app('stripe')->customers->allPaymentMethods(
+            auth()->user()->stripe_id,
+            ['type' => 'card']
+        );
+
+        return !empty($paymentMethods->data);
     }
 }

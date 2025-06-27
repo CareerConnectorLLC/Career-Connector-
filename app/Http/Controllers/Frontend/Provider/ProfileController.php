@@ -3,19 +3,38 @@
 namespace App\Http\Controllers\Frontend\Provider;
 
 use Inertia\Inertia;
-use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Models\{Service,UserProfile};
 
 class ProfileController extends Controller
 {
     public function index(Request $request)
     {
-        $user = $request->user()->load('profile');
-        
+        $user = $request->user()->load([
+            'profile',
+            'providerServiceDetails.service',
+            'providerDocuments.service:id,name'
+        ]);
+
+        $services = $user->providerServiceDetails;
+        $documents = $user->providerDocuments;
+
+        if ($request->user()->stripe_id) {
+            $bank_accounts = app('stripe')->accounts->allExternalAccounts(
+                $request->user()->stripe_id, [
+                    'object' => 'bank_account'
+                ]
+            );
+        }
+
         return Inertia::render('Frontend/ProviderProfile', [
-            'user' => $user
+            'user' => $user,
+            'services' => $services,
+            'bank_accounts' => $bank_accounts->data ?? [],
+            'all_services' => Service::select(['id','name'])->get(),
+            'documents' => $documents,
         ]);
     }
 

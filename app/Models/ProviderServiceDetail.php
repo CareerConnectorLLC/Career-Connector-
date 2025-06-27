@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -14,8 +15,12 @@ class ProviderServiceDetail extends Model
         'service_id',
         'location',
         'description',
-        'price'
+        'price',
+        'provider_id',
+        'image_path'
     ];
+
+    protected $appends = ['file_path'];
 
     public function provider(): BelongsTo
     {
@@ -25,5 +30,10 @@ class ProviderServiceDetail extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function getFilePathAttribute()
+    {
+        return (!is_null($this->image_path)) ? asset('storage/' . $this->image_path) : null;
     }
 }

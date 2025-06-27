@@ -1,11 +1,24 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
+import { useHead } from '@vueuse/head';
 import BlogListItem from '../../../components/frontend/BlogListItem.vue'
 import Pagination from '../../../components/frontend/Pagination.vue'
 defineProps({
     posts: Object
 })
 
+const page = usePage()
+
+useHead({
+    title: page.props.seo?.title ?? page.props.site_title,
+    meta: [
+        { name: 'description', content: page.props.seo?.description || "" },
+        { name: 'keywords', content: page.props.seo?.keywords || "" }
+    ],
+    link: [
+        { rel: 'canonical', href: page.props.seo?.canonical_url || page.url }
+    ]
+})
 </script>
 
 <template>

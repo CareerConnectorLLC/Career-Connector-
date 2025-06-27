@@ -1,5 +1,22 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { useHead } from '@vueuse/head';
+import { Link, usePage } from '@inertiajs/vue3'
+import BannerSearch from '../../components/frontend/BannerSearch.vue'
+
+const page = usePage()
+const services = page.props.services
+
+useHead({
+    title: page.props.seo?.title ?? page.props.site_title,
+    meta: [
+        { name: 'description', content: page.props.seo?.description || "" },
+        { name: 'keywords', content: page.props.seo?.keywords || "" }
+    ],
+    link: [
+        { rel: 'canonical', href: page.props.seo?.canonical_url || page.url }
+    ]
+})
 </script>
 
 <template>
@@ -14,27 +31,7 @@ import { Link } from '@inertiajs/vue3'
                         labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.
                     </p>
                     <div class="banner-serach-wrap">
-                        <form>
-                            <div class="form-wrapper">
-                                <div class="search-col">
-                                    <input type="text" class="search" placeholder="Search for Service category">
-                                </div>
-                                <div class="search-col">
-                                    <input type="text" placeholder="Location">
-                                </div>
-                                <div class="search-col">
-                                    <select>
-                                        <option>Price range</option>
-                                        <option>$100</option>
-                                        <option>$500</option>
-                                        <option>$1000</option>
-                                    </select>
-                                </div>
-                                <div class="search-col">
-                                    <input type="submit" value="search">
-                                </div>
-                            </div>
-                        </form>
+                        <BannerSearch :serviceCategories="services" />
                     </div>
 
                     <div class="banner-image-1">
@@ -57,7 +54,6 @@ import { Link } from '@inertiajs/vue3'
                     alt="banner-left-blur-shape">
                 <img class="right-blur-shape" src="/public/frontend_assets/images/banner-top-blur-shape.png"
                     alt="banner-top-blur-shape">
-
             </div>
         </div>
     </section>

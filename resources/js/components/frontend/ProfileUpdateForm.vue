@@ -1,9 +1,9 @@
 <script setup>
-import { useTemplateRef, onMounted } from 'vue'
+import { useTemplateRef, onMounted, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import Datepicker from 'vanillajs-datepicker/Datepicker'
 
-const emit = defineEmits(['profile-update-success'])
+const emit = defineEmits(['profile-update-success', 'profile-pic-selected'])
 const previewImg = useTemplateRef('previewImg')
 const datePicker = useTemplateRef('datePicker')
 const removeBtn = useTemplateRef('removeBtn')
@@ -17,7 +17,8 @@ const props = defineProps({
     url: {
         type: String,
         required: true
-    }
+    },
+    fileSelected: Boolean,
 })
 
 onMounted(() => {
@@ -38,6 +39,14 @@ onMounted(() => {
         previewImg.value.src = props.user.profile_photo_url
     }
 })
+
+watch(
+    () => props.fileSelected, (value) => {
+        if (!value) {
+            removeImage()
+        }
+    }
+)
 
 const form = useForm({
     name: props.user.name,
@@ -85,6 +94,7 @@ const imageChosen = (event) => {
             form.profile_pic = file
         }
         reader.readAsDataURL(file);
+        emit('profile-pic-selected')
     }
 }
 

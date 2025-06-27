@@ -1,13 +1,64 @@
 <script setup>
-import { computed, onMounted } from "vue";
-import { router, usePage } from "@inertiajs/vue3";
+import { computed, onMounted, ref } from "vue";
+import { router, usePage, useForm } from "@inertiajs/vue3";
 import ProfileDropdown from "../../components/frontend/customer/ProfileDropdown.vue";
 import FancyBoxModal from "../../components/frontend/FancyBoxModal.vue";
 import ChangePasswordForm from "../../components/frontend/ChangePasswordForm.vue";
 import ProfileUpdateForm from "../../components/frontend/ProfileUpdateForm.vue";
+import ManageCardForm from "../../components/frontend/ManageCardForm.vue";
 import CustomerSidebar from "../../components/frontend/customer/LeftSidebar.vue";
+import CardInfo from "../../components/frontend/customer/CardInfo.vue";
+
+const stripe = ref(null)
+const cardError = ref(null)
+
+const page = usePage()
+
+const form = useForm({
+    paymentMethodId: null,
+})
+
+const user = computed(() => page.props.user)
+const cards = computed(() => page.props.savedCards)
+const clientSecret = computed(() => page.props.client_secret)
 
 onMounted(() => {
+    stripe.value = Stripe(page.props.stripe_key)
+    const elements = stripe.value.elements();
+    const cardElement = elements.create('card');
+    const cardForm = document.querySelector('#card-form')
+    cardElement.mount('#card-element');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromParam = urlParams.get('from');
+    
+    cardForm.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const { paymentMethod, error } = await stripe.value.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+            billing_details: {
+                name: user.value.name,
+                email: user.value.email,
+                phone: user.value.phone,
+            }
+        })
+
+        if (error) {
+            cardError.value = error
+        } else {
+            form.paymentMethodId = paymentMethod.id           
+            form.post(`/save-card`, {
+                onSuccess: page => {
+                    $.fancybox.close()
+                    if (fromParam) {
+                        router.visit(fromParam)
+                    }
+                }
+            })
+        }
+    })    
+
     $("[data-fancybox]").fancybox({
         touch: false,
         hideOnOverlayClick: false,
@@ -15,16 +66,26 @@ onMounted(() => {
             if (document.querySelector('.errorMsg').innerText != '') {
                 document.querySelector('.errorMsg').innerText = ''
             }
+
+            if (cardError.value) {
+                cardError.value = null
+            }
+
+            router.reload()
         }
     })
 })
 
-const page = usePage()
-
-const user = computed(() => page.props.user)
-
 const hideModal = () => {
     $.fancybox.close()
+}
+
+const deleteCard = (param) => {
+    router.delete(`/remove-card/${param}`, {
+        onSuccess: page => {
+            console.log(`Deleted successfully`)
+        }
+    })
 }
 </script>
 
@@ -93,7 +154,7 @@ const hideModal = () => {
                                                 <img src="/public/frontend_assets/images/my-profile-image.png"
                                                     alt="profile-image">
                                             </figure>
-                                            <h3>{{ user.full_name }}</h3>
+                                            <h3>{{ user.name }}</h3>
                                             <a data-fancybox="" data-src="#change-passpord" class="outline-btn"
                                                 href="#url">Change password</a>
                                         </div>
@@ -157,38 +218,7 @@ const hideModal = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="my-profile-right">
-                                <div class="card-info">
-                                    <div class="card-info-head">
-                                        <h3>Card details</h3>
-                                        <a class="primary-btn" href="#url">Add card</a>
-                                    </div>
-
-                                    <div class="online-card">
-                                        <div class="card-cont">
-                                            <h4>John Doe</h4>
-                                            <p>XXXX XXXX XXXX 4569</p>
-                                        </div>
-
-                                        <div class="online-card-details">
-                                            <div class="card-cont">
-                                                <h4>Expiry date</h4>
-                                                <p>XX / XX</p>
-                                            </div>
-                                            <div class="card-cont">
-                                                <h4>CVV</h4>
-                                                <p>000</p>
-                                            </div>
-                                        </div>
-                                        <a class="delete-btn" href="#url"><img
-                                                src="/public/frontend_assets/images/trash.svg" alt="trash"></a>
-
-                                        <figure class="card-type"><img
-                                                src="/public/frontend_assets/images/card-type.svg" alt="card-type">
-                                        </figure>
-                                    </div>
-                                </div>
-                            </div>
+                            <CardInfo :cards="cards" v-on:remove-card="deleteCard" />
                         </div>
                     </div>
                 </div>
@@ -203,6 +233,11 @@ const hideModal = () => {
             <!-- Profile Edit Modal -->
             <FancyBoxModal heading="Edit Profile" id="edit-profile" caption="Some caption text for development.">
                 <ProfileUpdateForm :user="user" :url="$page.url" v-on:profile-update-success="hideModal" />
+            </FancyBoxModal>
+
+            <!-- Card Info Modal -->
+            <FancyBoxModal heading="Manage Card" id="manage-card" caption="Add a new credit card.">
+                <ManageCardForm :user="user" id="card-element" :cardError="cardError"/>
             </FancyBoxModal>
         </div>
         <div class="top-left-shape">

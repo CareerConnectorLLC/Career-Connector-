@@ -14,21 +14,21 @@ const signout = () => {
             </button>
             <div class="dashboard-card">
                 <div class="dashboard-logo-wrap">
-                    <Link class="dashboard-logo" href="/client-dashboard">
+                    <Link class="dashboard-logo" href="/">
                         <img src="/public/frontend_assets/images/dashboard-logo.png" alt="dashboard-logo">
                     </Link>
                 </div>
                 <div class="menu-wrap">
                     <ul>
                         <li :class="{ 'active': $page.url.startsWith('/client-dashboard') }">
-                            <Link href="/">
+                            <Link href="/client-dashboard">
                                 <figure>
                                     <img src="/public/frontend_assets/images/dashboard-icon.svg" alt="dashboard-icon">
                                 </figure>
                                 <span>Dashboard</span>
                             </Link>
                         </li>
-                        <li>
+                        <li class="d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/message-notif.svg" alt="message-notif">
@@ -36,7 +36,7 @@ const signout = () => {
                                 <span>Messaging</span>
                             </a>
                         </li>
-                        <li>
+                        <li class="d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/document.svg" alt="document">
@@ -44,7 +44,7 @@ const signout = () => {
                                 <span>Bookings</span>
                             </a>
                         </li>
-                        <li>
+                        <li class="d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/wallet-minus.svg" alt="wallet">

@@ -104,6 +104,11 @@ class User extends Authenticatable
         return $this->hasMany(ProviderDocument::class, 'provider_id');
     }
 
+    public function bankDetails(): HasMany
+    {
+        return $this->hasMany(ProviderBankDetail::class, 'provider_id');
+    }
+
     public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);

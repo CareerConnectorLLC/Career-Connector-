@@ -16,24 +16,28 @@ class PaymentInfoController extends Controller
         )->find(
             $request->session()->get('user_onboard')['id']
         );
-
-        $paymentIntent = app('stripe')->setupIntents->create([
-            'customer' => $user->stripe_id,
-            'payment_method_types' => ['card'],
-        ]);
         
         return Inertia::render('Frontend/onboarding/client/PaymentInfo', [
             'user' => $user,
-            'client_secret' => $paymentIntent->client_secret,
             'stripe_key' => env('STRIPE_KEY'),
         ]);
     }
 
     public function store(Request $request)
     {
-        app('stripe')->paymentMethods->attach(
-            $request->input('payment_method_id'),
-            ['customer' => $request->stripe_id],
+        
+        $user = User::find($request->session()->get('user_onboard')['id']);
+
+        $stripeCustomerId = $user->stripe_id;
+
+        $paymentMethod = app('stripe')->paymentMethods->attach(
+            $request->payment_method_id,
+            ['customer' => $stripeCustomerId]
+        );
+        
+        app('stripe')->customers->update(
+            $stripeCustomerId,
+            ['invoice_settings' => ['default_payment_method' => $paymentMethod->id]]
         );
 
         $request->session()->forget('user_onboard');

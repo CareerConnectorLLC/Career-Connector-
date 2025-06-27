@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Frontend;
 
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-use App\Models\{Service,ProviderServiceDetail};
 use App\Http\Controllers\Controller;
+use App\Models\{Service,ProviderServiceDetail,SeoSetting};
 
 class ProviderListingController extends Controller
 {
@@ -21,7 +21,7 @@ class ProviderListingController extends Controller
         $providersQuery = ProviderServiceDetail::query();
 
         $providersQuery->with([
-            'provider:id,name',
+            'provider:id,name,profile_photo_path',
             'service:id,name'
         ]);
 
@@ -40,6 +40,8 @@ class ProviderListingController extends Controller
             'providers' => $serviceProviders,
             'service_ids' => $request->get('services') ?? [],
             'pricing' => $request->get('price') ?? 0,
+            'seo' => SeoSetting::where('page_identifier', 'provider_listing_page')->first()?->toArray(),
+            'site_title' => config('app.name'),
         ]);
     }
 }

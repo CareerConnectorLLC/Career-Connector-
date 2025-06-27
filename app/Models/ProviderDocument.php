@@ -9,8 +9,11 @@ class ProviderDocument extends Model
 {
     protected $fillable = [
         'service_id',
-        'file_path'
+        'file_path',
+        'provider_id',
     ];
+
+    protected $appends = ['document_url'];
 
     public function provider(): BelongsTo
     {
@@ -20,5 +23,10 @@ class ProviderDocument extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function getDocumentUrlAttribute()
+    {
+        return ($this->file_path) ? asset('/storage/' . $this->file_path) : null;
     }
 }

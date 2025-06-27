@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Models\Blog;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Models\{Blog,SeoSetting};
 use App\Http\Controllers\Controller;
 
 class BlogController extends Controller
@@ -12,9 +12,12 @@ class BlogController extends Controller
     public function index()
     {
         $posts = Blog::with('category:id,name')->where('active', true)->latest()->paginate(5);
+
+        $seoSetting = SeoSetting::where('page_identifier', 'welcome_page')->first();
         
         return Inertia::render('Frontend/blog/List', [
-            'posts' => $posts
+            'posts' => $posts,
+            'seo' => $seoSetting?->toArray(),
         ]);
     }
 
@@ -33,7 +36,8 @@ class BlogController extends Controller
 
         return Inertia::render('Frontend/blog/Show', [
             'post' => $blog,
-            'related_posts' => $relatedPosts
+            'related_posts' => $relatedPosts,
+            'site_title' => config('app.name'),
         ]);
     }
 }

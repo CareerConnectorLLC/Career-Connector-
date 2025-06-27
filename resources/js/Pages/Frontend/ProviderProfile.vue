@@ -1,36 +1,183 @@
 <script setup>
-import { computed, onMounted } from "vue";
-import { usePage } from "@inertiajs/vue3";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { usePage, useForm, router } from "@inertiajs/vue3";
+
 import ProfileDropdown from "../../components/frontend/provider/ProfileDropdown.vue";
 import ProviderSidebar from "../../components/frontend/provider/SideNavigation.vue";
 import FancyBoxModal from "../../components/frontend/FancyBoxModal.vue";
 import ChangePasswordForm from "../../components/frontend/ChangePasswordForm.vue";
 import ProfileUpdateForm from "../../components/frontend/ProfileUpdateForm.vue";
+import BankDetails from "../../components/frontend/provider/BankDetails.vue";
+import BankAccountForm from "../../components/frontend/provider/BankAccountForm.vue";
+import MyServices from "../../components/frontend/provider/MyServices.vue";
+import MyFiles from "../../components/frontend/provider/MyFiles.vue";
+import NewServiceItem from "../../components/frontend/provider/NewServiceItem.vue";
+import DocUploadForm from "../../components/frontend/provider/DocUploadForm.vue";
 
 const page = usePage()
+const form = useForm()
+const accountData = ref(null)
+const myServices = ref([])
 const user = computed(() => page.props.user)
+const services = computed(() => page.props.services)
+const bankAccounts = computed(() => page.props.bank_accounts)
+const allServices = computed(() => page.props.all_services)
+const documents = computed(() => page.props.documents)
+const remainingServices = ref([])
+const serviceSingleItem = ref(null)
+const docSingleItem = ref(null)
+const docFileSelected = ref(false)
+const providerServices = ref([])
+const modalIsShown = ref(false)
+
+const scrollY = ref(0);
+const isFixed = ref(false);
+
+watch(
+    () => services.value, (newValue) => {
+        myServices.value = newValue.map(s => s.service.name)
+    }
+)
 
 onMounted(() => {
+    window.addEventListener('scroll', handleScroll);
+
+    const myServiceIds = services.value.map(s => s.service.id)
+
     $("[data-fancybox]").fancybox({
         touch: false,
         hideOnOverlayClick: false,
-        afterClose: function () {
-            if (document.querySelector('.errorMsg').innerText != '') {
-                document.querySelector('.errorMsg').innerText = ''
+        afterClose: function (instance, current, e) {
+            if (['#upload-document', '#add-service', '#add-account', '#edit-profile'].includes(current.src)) {
+                docFileSelected.value = false
+                modalIsShown.value = true
+
+                setTimeout(() => {
+                    modalIsShown.value = false
+                }, 1000);
             }
+        }
+    })
+
+    $('.provider-service-slider').slick({
+        dots: true,
+        infinite: true,
+        speed: 300,
+        slidesToShow: 2,
+        slidesToScroll: 1,
+        arrows: false,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 1,
+                }
+            }
+        ]
+    });
+
+    myServices.value = services.value.map(s => s.service.name)
+
+    providerServices.value = services.value.map(s => {
+        return {
+            id: s.service.id,
+            name: s.service.name
         }
     })
 })
 
-const hideModal = () => {
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
+
+const hideModal = (param = null) => {
     $.fancybox.close()
+    
+    if (param && param.isBank) {
+        router.reload({ only: ['bank_accounts'] })
+    }
+}
+
+const showModal = (data) => {
+    accountData.value = data
+    $.fancybox.open({
+        src: '#add-account',
+        type: 'inline',
+        opts: {
+            touch: false,
+            hideOnOverlayClick: false,
+            afterClose: function (instance, current) {
+                accountData.value = null
+            }
+        }
+    })
+}
+
+function openServiceEditModal(param) {
+    serviceSingleItem.value = param
+    $.fancybox.open({
+        src: '#add-service',
+        type: 'inline',
+        opts: {
+            touch: false,
+            hideOnOverlayClick: false,
+            afterClose: function (instance, current) {
+                modalIsShown.value = true
+                serviceSingleItem.value = null
+
+                setTimeout(() => {
+                    modalIsShown.value = false
+                }, 1000);
+            }
+        }
+    })
+}
+
+function handleScroll() {
+    scrollY.value = window.scrollY;
+    isFixed.value = scrollY.value > 0;
+}
+
+function removeItem(param) {
+    form.delete(`/service-details/${param}`)
+}
+
+function setDocFile() {
+    docFileSelected.value = true    
+}
+
+function getDocSingle(param) {
+    docSingleItem.value = param
+    $.fancybox.open({
+        src: '#upload-document',
+        type: 'inline',
+        opts: {
+            touch: false,
+            hideOnOverlayClick: false,
+            afterClose: function (instance, current) {
+                modalIsShown.value = true
+                docSingleItem.value = null
+
+                setTimeout(() => {
+                    modalIsShown.value = false
+                }, 1000);
+            }
+        }
+    })
 }
 </script>
 
 <template>
     <div class="dashboard-sec">
         <div class="dashboard-container">
-            <div class="dashboard-head">
+            <div class="dashboard-head" :class="{'fixed': isFixed}">
                 <button class="dashboard-toggler">
                     <span class="stick"></span>
                 </button>
@@ -52,7 +199,6 @@ const hideModal = () => {
                 </div>
             </div>
             <div class="dashboard-inner-wrap">
-
                 <!-- Left sidebar panel -->
                 <ProviderSidebar />
                 <!-- Left sidebar panel -->
@@ -129,7 +275,24 @@ const hideModal = () => {
                                                             </figure>
                                                             <div class="profile-info-cont">
                                                                 <h4>Date of birth</h4>
-                                                                <p v-text="(user.profile) ? user.profile.date_of_birth : ''"></p>
+                                                                <p
+                                                                    v-text="(user.profile) ? user.profile.date_of_birth : ''">
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="profile-info-wrap">
+                                                            <figure>
+                                                                <img src="/public/frontend_assets/images/briefcase.svg" alt="briefcase">
+                                                            </figure>
+                                                            <div class="profile-info-cont">
+                                                                <h4>Services ({{ myServices.length }})</h4>
+                                                                <div class="tag-list">
+                                                                    <template v-for="(service, index) in myServices" :key="index">
+                                                                        <span v-text="service"></span>
+                                                                    </template>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -139,822 +302,87 @@ const hideModal = () => {
                                     </div>
                                 </div>
                                 <div class="col-md-4 profile-col">
-                                    <div class="files-listing">
-                                        <div class="my-profile-head">
-                                            <h3>Files</h3>
-                                            <a data-fancybox="" data-src="#upload-document" class="primary-btn"
-                                                href="#url">Add new</a>
-                                        </div>
-
-                                        <ul>
-                                            <li>
-                                                <a href="#url">
-                                                    <figure>
-                                                        <img src="/public/frontend_assets/images/pdf.svg" alt="pdf">
-                                                    </figure>
-                                                    <div class="pdf-detsils">
-                                                        <div class="file-head">
-                                                            <p>Lorem Ipsum ....</p>
-                                                            <span>Aug 14, 25</span>
-                                                        </div>
-                                                        <p>
-                                                            230.84 MB
-                                                        </p>
-                                                    </div>
-                                                </a>
-                                                <div class="dot-option">
-                                                    <a class="notification-option-btn dropdown-toggle" href="#url"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span><img src="/public/frontend_assets/images/dots.svg"
-                                                                alt="dots"></span>
-                                                    </a>
-                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                        <ul>
-                                                            <li><a href="#url">My Profile 1</a></li>
-                                                            <li><a href="#url">My Profile 2</a></li>
-                                                            <li><a href="#url">My Profile 3</a></li>
-                                                            <li><a href="#url">My Profile 4</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <a href="#url">
-                                                    <figure><img src="/public/frontend_assets/images/pdf.svg" alt="pdf">
-                                                    </figure>
-                                                    <div class="pdf-detsils">
-                                                        <div class="file-head">
-                                                            <p>Lorem Ipsum ....</p>
-                                                            <span>Aug 14, 25</span>
-                                                        </div>
-                                                        <p>
-                                                            230.84 MB
-                                                        </p>
-                                                    </div>
-                                                </a>
-                                                <div class="dot-option">
-                                                    <a class="notification-option-btn dropdown-toggle" href="#url"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span><img src="/public/frontend_assets/images/dots.svg"
-                                                                alt="dots"></span>
-                                                    </a>
-                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                        <ul>
-                                                            <li><a href="#url">My Profile 1</a></li>
-                                                            <li><a href="#url">My Profile 2</a></li>
-                                                            <li><a href="#url">My Profile 3</a></li>
-                                                            <li><a href="#url">My Profile 4</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <a href="#url">
-                                                    <figure><img src="/public/frontend_assets/images/pdf.svg" alt="pdf">
-                                                    </figure>
-                                                    <div class="pdf-detsils">
-                                                        <div class="file-head">
-                                                            <p>Lorem Ipsum ....</p>
-                                                            <span>Aug 14, 25</span>
-                                                        </div>
-                                                        <p>
-                                                            230.84 MB
-                                                        </p>
-                                                    </div>
-                                                </a>
-                                                <div class="dot-option">
-                                                    <a class="notification-option-btn dropdown-toggle" href="#url"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span><img src="/public/frontend_assets/images/dots.svg"
-                                                                alt="dots"></span>
-                                                    </a>
-                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                        <ul>
-                                                            <li><a href="#url">My Profile 1</a></li>
-                                                            <li><a href="#url">My Profile 2</a></li>
-                                                            <li><a href="#url">My Profile 3</a></li>
-                                                            <li><a href="#url">My Profile 4</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <a href="#url">
-                                                    <figure><img src="/public/frontend_assets/images/pdf.svg" alt="pdf">
-                                                    </figure>
-                                                    <div class="pdf-detsils">
-                                                        <div class="file-head">
-                                                            <p>Lorem Ipsum ....</p>
-                                                            <span>Aug 14, 25</span>
-                                                        </div>
-                                                        <p>
-                                                            230.84 MB
-                                                        </p>
-                                                    </div>
-                                                </a>
-                                                <div class="dot-option">
-                                                    <a class="notification-option-btn dropdown-toggle" href="#url"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span><img src="/public/frontend_assets/images/dots.svg"
-                                                                alt="dots"></span>
-                                                    </a>
-                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                        <ul>
-                                                            <li><a href="#url">My Profile 1</a></li>
-                                                            <li><a href="#url">My Profile 2</a></li>
-                                                            <li><a href="#url">My Profile 3</a></li>
-                                                            <li><a href="#url">My Profile 4</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <a href="#url">
-                                                    <figure><img src="/public/frontend_assets/images/pdf.svg" alt="pdf">
-                                                    </figure>
-                                                    <div class="pdf-detsils">
-                                                        <div class="file-head">
-                                                            <p>Lorem Ipsum ....</p>
-                                                            <span>Aug 14, 25</span>
-                                                        </div>
-                                                        <p>
-                                                            230.84 MB
-                                                        </p>
-                                                    </div>
-                                                </a>
-                                                <div class="dot-option">
-                                                    <a class="notification-option-btn dropdown-toggle" href="#url"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span><img src="/public/frontend_assets/images/dots.svg"
-                                                                alt="dots"></span>
-                                                    </a>
-                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                        <ul>
-                                                            <li><a href="#url">My Profile 1</a></li>
-                                                            <li><a href="#url">My Profile 2</a></li>
-                                                            <li><a href="#url">My Profile 3</a></li>
-                                                            <li><a href="#url">My Profile 4</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    <MyFiles 
+                                        :docs="documents"
+                                        v-on:doc-selected="getDocSingle"
+                                    />
                                 </div>
-                                <div class="col-md-4 profile-col">
-                                    <div class="my-profile-card">
-                                        <div class="my-profile-head">
-                                            <h2>Account details</h2>
-                                            <a data-fancybox="" data-src="#add-account" class="primary-btn"
-                                                href="#url">Add new</a>
-                                        </div>
-
-                                        <div class="card-list">
-                                            <div class="online-card">
-                                                <div class="card-cont">
-                                                    <h4>Account No</h4>
-                                                    <p>XXXX XXXX XXXX 4569</p>
-                                                </div>
-                                                <div class="card-cont">
-                                                    <h4>Account Holder</h4>
-                                                    <p>Esther Howard</p>
-                                                </div>
-                                                <div class="card-cont">
-                                                    <h4>IFSC Code</h4>
-                                                    <p>5683GH&amp;K</p>
-                                                </div>
-                                                <div class="btn-list">
-                                                    <a class="edit-btn" href="#url"><img
-                                                            src="/public/frontend_assets/images/edit.svg"
-                                                            alt="edit"></a>
-                                                    <a class="delete-btn" href="#url"><img
-                                                            src="/public/frontend_assets/images/trash.svg"
-                                                            alt="trash"></a>
-                                                </div>
-
-                                            </div>
-                                            <div class="online-card">
-                                                <div class="card-cont">
-                                                    <h4>Account No</h4>
-                                                    <p>XXXX XXXX XXXX 4569</p>
-                                                </div>
-                                                <div class="card-cont">
-                                                    <h4>Account Holder</h4>
-                                                    <p>Esther Howard</p>
-                                                </div>
-                                                <div class="card-cont">
-                                                    <h4>IFSC Code</h4>
-                                                    <p>5683GH&amp;K</p>
-                                                </div>
-                                                <div class="btn-list">
-                                                    <a class="edit-btn" href="#url"><img
-                                                            src="/public/frontend_assets/images/edit.svg"
-                                                            alt="edit"></a>
-                                                    <a class="delete-btn" href="#url"><img
-                                                            src="/public/frontend_assets/images/trash.svg"
-                                                            alt="trash"></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 profile-col">
-                                    <div class="my-profile-card">
-                                        <div class="my-profile-head">
-                                            <h2>My services</h2>
-                                            <a data-fancybox="" data-src="#add-service" class="primary-btn"
-                                                href="#url">Add new</a>
-                                        </div>
-
-                                        <div
-                                            class="provider-service-slider slick-initialized slick-slider slick-dotted">
-                                            <div class="slick-list draggable">
-                                                <div class="slick-track"
-                                                    style="opacity: 1; width: 4970px; transform: translate3d(-994px, 0px, 0px);">
-                                                    <div class="provider-service-slide slick-slide slick-cloned"
-                                                        data-slick-index="-2" id="" aria-hidden="true" tabindex="-1"
-                                                        style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-01.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="-1">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4> <a href=""
-                                                                            tabindex="-1">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href=""
-                                                                    tabindex="-1">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="provider-service-slide slick-slide slick-cloned"
-                                                        data-slick-index="-1" id="" aria-hidden="true" tabindex="-1"
-                                                        style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-02.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="-1">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4> <a href=""
-                                                                            tabindex="-1">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href=""
-                                                                    tabindex="-1">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="provider-service-slide slick-slide slick-current slick-active"
-                                                        data-slick-index="0" aria-hidden="false" tabindex="0"
-                                                        role="tabpanel" id="slick-slide00"
-                                                        aria-describedby="slick-slide-control00" style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-01.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="0">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="0">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="0">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="0">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="0">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4> <a href=""
-                                                                            tabindex="0">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href=""
-                                                                    tabindex="0">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="provider-service-slide slick-slide slick-active"
-                                                        data-slick-index="1" aria-hidden="false" tabindex="0"
-                                                        role="tabpanel" id="slick-slide01"
-                                                        aria-describedby="slick-slide-control01" style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-02.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="0">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="0">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="0">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="0">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="0">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4> <a href=""
-                                                                            tabindex="0">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href=""
-                                                                    tabindex="0">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="provider-service-slide slick-slide" data-slick-index="2"
-                                                        aria-hidden="true" tabindex="-1" role="tabpanel"
-                                                        id="slick-slide02" aria-describedby="slick-slide-control02"
-                                                        style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-01.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="-1">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4> <a href=""
-                                                                            tabindex="-1">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href=""
-                                                                    tabindex="-1">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="provider-service-slide slick-slide" data-slick-index="3"
-                                                        aria-hidden="true" tabindex="-1" role="tabpanel"
-                                                        id="slick-slide03" aria-describedby="slick-slide-control03"
-                                                        style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-02.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="-1">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4> <a href=""
-                                                                            tabindex="-1">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href=""
-                                                                    tabindex="-1">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="provider-service-slide slick-slide slick-cloned"
-                                                        data-slick-index="4" id="" aria-hidden="true" tabindex="-1"
-                                                        style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-01.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="-1">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4> <a href=""
-                                                                            tabindex="-1">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href=""
-                                                                    tabindex="-1">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="provider-service-slide slick-slide slick-cloned"
-                                                        data-slick-index="5" id="" aria-hidden="true" tabindex="-1"
-                                                        style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-02.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="-1">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4> <a href=""
-                                                                            tabindex="-1">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href=""
-                                                                    tabindex="-1">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="provider-service-slide slick-slide slick-cloned"
-                                                        data-slick-index="6" id="" aria-hidden="true" tabindex="-1"
-                                                        style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-01.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="-1">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4> <a href=""
-                                                                            tabindex="-1">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href=""
-                                                                    tabindex="-1">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="provider-service-slide slick-slide slick-cloned"
-                                                        data-slick-index="7" id="" aria-hidden="true" tabindex="-1"
-                                                        style="width: 497px;">
-                                                        <div class="provider-service-card">
-                                                            <figure>
-                                                                <img src="/public/frontend_assets/images/provider-serive-image-02.png"
-                                                                    alt="provider-serive-image">
-                                                                <div class="dot-option">
-                                                                    <a class="notification-option-btn dropdown-toggle"
-                                                                        href="#url" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false" tabindex="-1">
-                                                                        <span><img
-                                                                                src="/public/frontend_assets/images/dots.svg"
-                                                                                alt="dots"></span>
-                                                                    </a>
-                                                                    <div class="dots-drop-dowm dropdown-menu">
-                                                                        <ul>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    1</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    2</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    3</a></li>
-                                                                            <li><a href="#url" tabindex="-1">My Profile
-                                                                                    4</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </figure>
-                                                            <div class="provider-service-cont">
-                                                                <div class="my-profile-head">
-                                                                    <h4>
-                                                                        <a href="" tabindex="-1">Service name goes here...</a>
-                                                                    </h4>
-                                                                    <p class="price">$40</p>
-                                                                </div>
-                                                                <p>
-                                                                    Pellentesque interdum felis quis dui euismod,
-                                                                    dignissim fermentum elit elementum. Mauris malesuada
-                                                                    eu mauris vel feugiat. Mauris vel fermentum purus.
-                                                                </p>
-                                                                <a class="booknow" href="" tabindex="-1">Read more</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <ul class="slick-dots" style="" role="tablist">
-                                                <li class="slick-active" role="presentation">
-                                                    <button type="button"
-                                                        role="tab" id="slick-slide-control00"
-                                                        aria-controls="slick-slide00" aria-label="1 of 2" tabindex="0"
-                                                        aria-selected="true">1
-                                                    </button>
-                                                </li>
-                                                <li role="presentation"><button type="button" role="tab"
-                                                        id="slick-slide-control01" aria-controls="slick-slide01"
-                                                        aria-label="2 of 2" tabindex="-1">2</button></li>
-                                                <li role="presentation"><button type="button" role="tab"
-                                                        id="slick-slide-control02" aria-controls="slick-slide02"
-                                                        aria-label="3 of 2" tabindex="-1">3</button></li>
-                                                <li role="presentation"><button type="button" role="tab"
-                                                        id="slick-slide-control03" aria-controls="slick-slide03"
-                                                        aria-label="4 of 2" tabindex="-1">4</button></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
+                                <BankDetails
+                                    :bankAccounts="bankAccounts"
+                                    :hasStripeId="user.stripe_id ? true : false"
+                                    v-on:account-data="showModal"
+                                />
+                                <!-- Provider Services -->
+                                <MyServices
+                                    :services="services"
+                                    v-on:delete-item="removeItem"
+                                    v-on:edit-item-selected="openServiceEditModal"
+                                />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Change Password Modal -->
-                <FancyBoxModal heading="Change Password" id="change-passpord"
-                    caption="Some caption text for development.">
+                <FancyBoxModal
+                    heading="Change Password"
+                    id="change-passpord"
+                    caption="Some caption text for development."
+                >
                     <ChangePasswordForm v-on:password-update-success="hideModal" />
                 </FancyBoxModal>
 
-                <div class="change-passpord" id="upload-document" style="display: none;">
-                    <h2>Upload new document</h2>
-                    <p>Lorem ipsum dolor sit amet</p>
-                    <form class="login-form">
-                        <div class="form-input">
-                            <label>Upload document</label>
-                            <div class="file-upload-container">
-                                <input type="file" accept="image/*">
-                                <div class="placeholder">
-                                    <img src="/public/frontend_assets/images/document-upload.svg" alt="Upload icon">
-                                    <span>Upload your document</span>
-                                </div>
-                                <img class="preview-img">
-                            </div>
-                        </div>
-                        <div class="form-input">
-                            <button type="submit">Save</button>
-                        </div>
-                    </form>
-                </div>
+                <!-- Document Upload Modal -->
+                <FancyBoxModal
+                    heading="Upload new document"
+                    id="upload-document"
+                    caption="Lorem ipsum dolor sit amet"
+                >
+                    <DocUploadForm
+                        :isShown="modalIsShown"
+                        :fileSelected="docFileSelected"
+                        :services="providerServices"
+                        :docItem="docSingleItem"
+                        v-on:doc-selected="setDocFile"
+                        v-on:doc-saved-success="hideModal"
+                    />
+                </FancyBoxModal>
 
-                <div class="change-passpord" id="add-account" style="display: none;">
-                    <h2>Add new account </h2>
-                    <p>Lorem ipsum dolor sit amet</p>
-                    <form class="login-form">
-                        <div class="form-input">
-                            <label>Account holder name</label>
-                            <input type="text" placeholder="Enter name">
-                        </div>
-
-                        <div class="form-input">
-                            <label>Account number</label>
-                            <input type="number" placeholder="Enter">
-                        </div>
-
-                        <div class="form-input">
-                            <label>IFSC Code</label>
-                            <input type="text" placeholder="Enter">
-                        </div>
-
-                        <div class="form-input">
-                            <button type="submit">Save</button>
-                        </div>
-                    </form>
-                </div>
+                <!-- Add Bank Account -->
+                <FancyBoxModal heading="Manage Bank Account" id="add-account" caption="Enter your bank details here.">
+                    <BankAccountForm
+                        :user="user"
+                        :isShown="modalIsShown"
+                        v-on:bank-details-saved="hideModal"
+                        :accountData="accountData"
+                    />
+                </FancyBoxModal>
 
                 <!-- Profile Edit Modal -->
                 <FancyBoxModal heading="Edit Profile" id="edit-profile" caption="Some caption text for development.">
-                    <ProfileUpdateForm :user="user" :url="$page.url" v-on:profile-update-success="hideModal" />
+                    <ProfileUpdateForm
+                        :user="user"
+                        :url="$page.url"
+                        :fileSelected="docFileSelected"
+                        v-on:profile-update-success="hideModal"
+                        v-on:profile-pic-selected="docFileSelected = true"
+                    />
                 </FancyBoxModal>
 
-                <div class="change-passpord for-select2" id="add-service" style="display: none;">
-                    <h2>Add new service</h2>
-                    <p>Lorem ipsum dolor sit amet</p>
-
-                    <form class="login-form">
-                        <div class="form-input">
-                            <label>Upload service image</label>
-                            <div class="file-upload-container">
-                                <input type="file" accept="image/*">
-                                <div class="placeholder">
-                                    <img src="/public/frontend_assets/images/document-upload.svg" alt="Upload icon">
-                                    <span>Upload your document</span>
-                                </div>
-                                <img class="preview-img">
-                            </div>
-                        </div>
-
-                        <div class="form-input">
-                            <label>Service title</label>
-                            <input type="text" placeholder="Enter">
-                        </div>
-
-                        <div class="form-input">
-                            <label>Service price</label>
-                            <input type="text" placeholder="Enter">
-                        </div>
-
-                        <div class="form-input">
-                            <label>Service description</label>
-                            <textarea placeholder="Write here..."></textarea>
-                        </div>
-                        <div class="form-input">
-                            <button type="submit">Save</button>
-                        </div>
-                    </form>
-                </div>
+                <FancyBoxModal
+                    :heading="!serviceSingleItem ? `Add new service` : `Update Service`"
+                    id="add-service"
+                    caption="Create a new service item."
+                >
+                    <NewServiceItem
+                        :isShown="modalIsShown"
+                        :fileSelected="docFileSelected"
+                        :services="allServices"
+                        :serviceItem="serviceSingleItem"
+                        v-on:data-saved="hideModal"
+                        v-on:image-selected="setDocFile"
+                    />
+                </FancyBoxModal>
                 <div class="sidebar-overlay"></div>
             </div>
         </div>

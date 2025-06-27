@@ -9336,6 +9336,21 @@ padding: 25px;
     flex-wrap: wrap;
 }
 
+
+/* 26/06/2025 dm */
+
+.select-option-cont .select-card form{ 
+    width: 100%;
+}
+
+.select-option-cont .error-message{ 
+    margin-top: 10px;
+    color: red;
+    font-size: 14px;
+}
+
+/* 26/06/2025 dm */
+
 /* ========== responsive css =========== */
 
 

@@ -1,7 +1,10 @@
 <script setup>
-import { computed } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { computed, ref, onMounted } from 'vue'
+import { usePage, Link } from '@inertiajs/vue3'
 import { FormatMoney } from 'format-money-js'
+import { Modal } from 'bootstrap'
+
+import BookingModal from '../../components/frontend/BookingModal.vue'
 
 const fm = new FormatMoney({
     decimals: 0,
@@ -9,8 +12,24 @@ const fm = new FormatMoney({
 });
 
 const page = usePage()
+const modalShown = ref(false)
+const bookingModal = ref(null)
 
 const provider = computed(() => page.props.provider)
+
+onMounted(() => {
+    const bookingModalEl = document.getElementById('bookingModal')
+    
+    bookingModal.value = new Modal(`#bookingModal`)
+    
+    bookingModalEl.addEventListener('shown.bs.modal', () => {
+        modalShown.value = true
+    })
+
+    bookingModalEl.addEventListener('hidden.bs.modal', () => {
+        modalShown.value = false
+    })
+})
 
 const timings = computed(() => {
     const originalAvailability = JSON.parse(page.props.timings)
@@ -40,6 +59,10 @@ const timings = computed(() => {
 })
 
 const workingDaysCount = computed(() => timings.value.filter(t => t.timeRange != 'No Availability').length)
+
+function closeBookingModal() {
+    bookingModal.value.hide()
+}
 </script>
 
 <template>
@@ -79,8 +102,11 @@ const workingDaysCount = computed(() => timings.value.filter(t => t.timeRange !=
                             <div class="provider-details-head">
                                 <div class="card-profile">
                                     <div class="card-profile-img-wrap">
-                                        <img src="/public/frontend_assets/images/profile-image-01.png"
+                                        <img v-if="!provider.provider.profile_photo_path"
+                                            src="/public/frontend_assets/images/profile-image-01.png"
                                             alt="profile-image-01">
+                                        <img v-else :src="provider.provider.profile_photo_url"
+                                            :alt="provider.provider.name">
                                     </div>
                                     <div class="card-profile-details">
                                         <h2 v-text="provider.provider.name"></h2>
@@ -183,7 +209,7 @@ const workingDaysCount = computed(() => timings.value.filter(t => t.timeRange !=
                         <div class="provider-details-col-inner">
                             <div class="provider-pricing-card">
                                 <div class="provider-pricing-card-head">
-                                    <h4>{{ provider.service.name }} Price</h4>
+                                    <h4>{{ provider.service.name }} Fee</h4>
                                     <p class="pricing">{{ fm.from(parseInt(provider.price / 100)) }}</p>
                                 </div>
 
@@ -194,7 +220,7 @@ const workingDaysCount = computed(() => timings.value.filter(t => t.timeRange !=
                                             <img src="/public/frontend_assets/images/location-green.svg"
                                                 alt="location-green">
                                         </figure>
-                                        <p v-text="provider.location"></p>
+                                        <p v-text="provider.provider?.location ?? `Not Available`"></p>
                                     </div>
                                 </div>
 
@@ -207,327 +233,16 @@ const workingDaysCount = computed(() => timings.value.filter(t => t.timeRange !=
                                         <ul>
                                             <li v-for="(timing, index) in timings" :key="index">
                                                 <span class="date">{{ timing.day }}</span>
-                                                <span :class="{'close': timing.timeRange == 'No Availability', 'timing': timing.timeRange != 'No Availability'}">{{ timing.timeRange }}</span>
+                                                <span
+                                                    :class="{'close': timing.timeRange == 'No Availability', 'timing': timing.timeRange != 'No Availability'}">{{
+                                                    timing.timeRange }}</span>
                                             </li>
                                         </ul>
                                     </template>
-                                    <a class="book-now" href="" @click.prevent="">Book now</a>
+                                    <Link v-if="!page.props.is_auth" class="book-now" href="/login" @click.prevent="">Sign in for Booking</Link>
+                                    <Link v-else-if="page.props.is_auth && !page.props.has_payment_methods" class="book-now" :href="`/client-profile?from=${page.url}`">Add a credit card</Link>
+                                    <a v-else class="book-now" href="" data-bs-toggle="modal" data-bs-target="#bookingModal">Book now</a>
                                 </div>
-                            </div>
-
-                            <div class="provider-pricing-card d-none">
-                                <div class="provide-review-sec">
-                                    <div class="review-head">
-                                        <h4>Reviews</h4>
-                                        <div class="star-ratings">
-                                            <ul>
-                                                <li>
-                                                    <span>
-                                                        <img src="/public/frontend_assets/images/profile-star.svg"
-                                                            alt="profile-star">
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    <span>
-                                                        <img src="/public/frontend_assets/images/profile-star.svg"
-                                                            alt="profile-star">
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    <span>
-                                                        <img src="/public/frontend_assets/images/profile-star.svg"
-                                                            alt="profile-star">
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    <span>
-                                                        <img src="/public/frontend_assets/images/profile-star.svg"
-                                                            alt="profile-star">
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    <span>
-                                                        <img src="/public/frontend_assets/images/profile-star.svg"
-                                                            alt="profile-star">
-                                                    </span>
-                                                </li>
-                                            </ul>
-
-                                            <p><strong>4.9</strong></p>
-
-                                            <p>(764 reviews)</p>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="reatngs-wrap">
-                                        <div class="star-ratings-sec">
-                                            <ul>
-                                                <li>
-                                                    <p><strong>5 stars</strong></p>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" role="progressbar" style="width: 90%"
-                                                            aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                    <p>
-                                                        (688)
-                                                    </p>
-                                                </li>
-                                                <li>
-                                                    <p><strong>4 stars</strong></p>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" role="progressbar" style="width: 80%"
-                                                            aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                    <p>
-                                                        (68)
-                                                    </p>
-                                                </li>
-                                                <li>
-                                                    <p><strong>3 stars</strong></p>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" role="progressbar" style="width: 20%"
-                                                            aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                    <p>
-                                                        (6)
-                                                    </p>
-                                                </li>
-                                                <li>
-                                                    <p><strong>2 stars</strong></p>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" role="progressbar" style="width: 5%"
-                                                            aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                    <p>
-                                                        (1)
-                                                    </p>
-                                                </li>
-                                                <li>
-                                                    <p><strong>1 stars</strong></p>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" role="progressbar" style="width: 5%"
-                                                            aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                    <p>
-                                                        (1)
-                                                    </p>
-                                                </li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="ratings-cat">
-                                            <ul>
-                                                <li>
-                                                    <p><strong>Availability</strong></p>
-                                                    <p>5 rating</p>
-                                                </li>
-                                                <li>
-                                                    <p><strong>Skills</strong></p>
-                                                    <p>5 rating</p>
-                                                </li>
-                                                <li>
-                                                    <p><strong>Quality</strong></p>
-                                                    <p>5 rating</p>
-                                                </li>
-                                                <li>
-                                                    <p><strong>Corporation</strong></p>
-                                                    <p>5 rating</p>
-                                                </li>
-                                                <li>
-                                                    <p><strong>Communication</strong></p>
-                                                    <p>5 rating</p>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="review-items">
-                                    <div class="review-cont">
-                                        <div class="review-head">
-                                            <figure><img src="/public/frontend_assets/images/quote.svg" alt="quote">
-                                            </figure>
-                                            <p class="date">23.07.2023</p>
-                                        </div>
-
-                                        <div class="review-body">
-                                            <p><strong>Donec ex risus, iaculis id turpis a, auctor lobortis arcu.
-                                                </strong></p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                                                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-                                                veniam, quis nostrud.
-                                            </p>
-                                        </div>
-
-                                        <div class="card-profile">
-                                            <div class="card-profile-img-wrap">
-                                                <img src="/public/frontend_assets/images/rosy.png" alt="rosy">
-                                            </div>
-                                            <div class="card-profile-details">
-                                                <h3>Rossy D’suza</h3>
-                                                <div class="ratings">
-                                                    <ul>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star">
-                                                            </figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star">
-                                                            </figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star">
-                                                            </figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star">
-                                                            </figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure>
-                                                                <img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star">
-                                                            </figure>
-                                                        </li>
-                                                    </ul>
-
-                                                    <p>5.0</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="review-cont">
-                                        <div class="review-head">
-                                            <figure><img src="/public/frontend_assets/images/quote.svg" alt="quote">
-                                            </figure>
-                                            <p class="date">23.07.2023</p>
-                                        </div>
-
-                                        <div class="review-body">
-                                            <p><strong>Donec ex risus, iaculis id turpis a, auctor lobortis arcu.
-                                                </strong></p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                                                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-                                                veniam, quis nostrud.
-                                            </p>
-                                        </div>
-
-                                        <div class="card-profile">
-                                            <div class="card-profile-img-wrap">
-                                                <img src="/public/frontend_assets/images/rosy.png" alt="rosy">
-                                            </div>
-                                            <div class="card-profile-details">
-                                                <h3>Rossy D’suza</h3>
-                                                <div class="ratings">
-                                                    <ul>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                    </ul>
-
-                                                    <p>5.0</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="review-cont">
-                                        <div class="review-head">
-                                            <figure><img src="/public/frontend_assets/images/quote.svg" alt="quote">
-                                            </figure>
-                                            <p class="date">23.07.2023</p>
-                                        </div>
-
-                                        <div class="review-body">
-                                            <p><strong>Donec ex risus, iaculis id turpis a, auctor lobortis arcu.
-                                                </strong></p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                                                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-                                                veniam, quis nostrud.
-                                            </p>
-                                        </div>
-
-                                        <div class="card-profile">
-                                            <div class="card-profile-img-wrap">
-                                                <img src="/public/frontend_assets/images/rosy.png" alt="rosy">
-                                            </div>
-                                            <div class="card-profile-details">
-                                                <h3>Rossy D’suza</h3>
-                                                <div class="ratings">
-                                                    <ul>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                        <li>
-                                                            <figure><img
-                                                                    src="/public/frontend_assets/images/profile-star.svg"
-                                                                    alt="profile-star"></figure>
-                                                        </li>
-                                                    </ul>
-
-                                                    <p>5.0</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <a class="booknow" href="review-page.html">View all</a>
                             </div>
                         </div>
                     </div>
@@ -535,5 +250,14 @@ const workingDaysCount = computed(() => timings.value.filter(t => t.timeRange !=
             </div>
         </div>
         <div class="blur green"></div>
+        <!-- Modal -->
+        <BookingModal
+            :provider="provider.provider"
+            :service="provider.service"
+            :timings="JSON.parse(page.props.schedules)"
+            :fees="provider.price/100"
+            :modalShown="modalShown"
+            v-on:booking-success="closeBookingModal"
+        />
     </section>
 </template>

@@ -8,11 +8,8 @@ const page = usePage()
 const user = computed(() => page.props.user)
 
 const form = useForm({
-    payment_method_id: null,
-    stripe_id: null,
+    payment_method_id: null
 })
-
-const clientSecret = computed(() => page.props.client_secret)
 
 const cardForm = useTemplateRef('cardForm')
 
@@ -28,24 +25,21 @@ onMounted(() => {
 
     cardForm.value.addEventListener('submit', async (e) => {
         e.preventDefault()
-        const { setupIntent, error } = await stripe.value.confirmCardSetup(
-            clientSecret.value, {
-                payment_method: {
-                    card: cardElement,
-                    billing_details: {
-                        name: user.value.name,
-                        email: user.value.email,
-                    }
-                }
+        
+        const { paymentMethod, error } = await stripe.value.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+            billing_details: {
+                name: user.value.name,
+                email: user.value.email,
+                phone: user.value.phone,
             }
-        )
+        })
 
         if (error) {
             cardError.value = error
         } else {
-            const { payment_method } = setupIntent
-            form.payment_method_id = payment_method
-            form.stripe_id = user.value.stripe_id
+            form.payment_method_id = paymentMethod.id
             form.post(`/onboard/client/payment-info`, { replace: true })
         }
     })

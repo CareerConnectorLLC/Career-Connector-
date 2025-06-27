@@ -1,25 +1,26 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminManagementController;
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\BlogCategoryManagementController;
-use App\Http\Controllers\Admin\BlogManagementController;
-use App\Http\Controllers\Admin\BookingManagementController;
-use App\Http\Controllers\Admin\CategoryManagementController;
-use App\Http\Controllers\Admin\CmsManagementController;
-use App\Http\Controllers\Admin\InquiryManagementController;
-use App\Http\Controllers\Admin\FaqManagementController;
-use App\Http\Controllers\Admin\LocationManagementController;
-use App\Http\Controllers\Admin\ServiceManagementController;
-use App\Http\Controllers\Admin\ServiceProviderManagementController;
-use App\Http\Controllers\Admin\SiteSettingController;
-use App\Http\Controllers\Admin\TestController;
-use App\Http\Controllers\Admin\UserManagementController;
-use App\Http\Controllers\ClientTestController;
-use App\Http\Controllers\SocialLoginController;
+use Inertia\Inertia;
 use App\Models\Category;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\TestController;
+use App\Http\Controllers\ClientTestController;
+use App\Http\Controllers\SocialLoginController;
+use App\Http\Controllers\Admin\SeoSettingController;
+use App\Http\Controllers\Admin\SiteSettingController;
+use App\Http\Controllers\Admin\CmsManagementController;
+use App\Http\Controllers\Admin\FaqManagementController;
+use App\Http\Controllers\Admin\BlogManagementController;
+use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\AdminManagementController;
+use App\Http\Controllers\Admin\BookingManagementController;
+use App\Http\Controllers\Admin\InquiryManagementController;
+use App\Http\Controllers\Admin\ServiceManagementController;
+use App\Http\Controllers\Admin\CategoryManagementController;
+use App\Http\Controllers\Admin\LocationManagementController;
+use App\Http\Controllers\Admin\BlogCategoryManagementController;
+use App\Http\Controllers\Admin\ServiceProviderManagementController;
 
 
 Route::prefix('admin')->name('admin.')->group(function() {
@@ -122,12 +123,13 @@ Route::prefix('admin')->name('admin.')->group(function() {
 
         Route::get('/site-setting', [SiteSettingController::class, 'index'])->name('site-setting.index');
         Route::post('/site-setting/update', [SiteSettingController::class, 'update'])->name('site-setting.update');
+        Route::resource('/seo-settings', SeoSettingController::class);
     });
 });
 
 
 Route::name('frontend.')->group(function() {
-    Route::get('/', fn () => Inertia::render('Frontend/Home'))->name('home');
+    Route::get('/', \App\Http\Controllers\Frontend\HomePageController::class)->name('home');
     Route::resource('blog', \App\Http\Controllers\Frontend\BlogController::class)->only(['index', 'show']);
     Route::match(['get', 'post'], '/contact-us', \App\Http\Controllers\Frontend\ContactUsController::class)->name('contact');
     Route::get('/provider-listing', \App\Http\Controllers\Frontend\ProviderListingController::class)->name('provider.listing');
@@ -168,11 +170,18 @@ Route::name('frontend.')->group(function() {
         Route::middleware(['is-customer'])->group(function () {
             Route::get('/client-dashboard', fn () => Inertia::render('Frontend/ClientDashboard'))->name('client.dashboard');
             Route::resource('/client-profile', \App\Http\Controllers\Frontend\Customer\ProfileController::class)->only('index', 'store');
+            Route::post('/save-card', \App\Http\Controllers\Frontend\Customer\SaveCardController::class);
+            Route::delete('/remove-card/{id}', \App\Http\Controllers\Frontend\Customer\RemoveCardController::class);
+            Route::resource('/bookings', \App\Http\Controllers\Frontend\Provider\BookingController::class)->only('index', 'store');
         });
 
         Route::middleware(['is-provider'])->group(function () {
             Route::get('/provider-dashboard', fn () => Inertia::render('Frontend/ProviderDashboard'))->name('provider.dashboard');
             Route::resource('/provider-profile', \App\Http\Controllers\Frontend\Provider\ProfileController::class)->only('index', 'store');
+            Route::resource('/bank-details', \App\Http\Controllers\Frontend\Provider\BankDetailsController::class)->only('store', 'update', 'destroy');
+            Route::resource('/service-details', \App\Http\Controllers\Frontend\Provider\ServiceDetailController::class)->only('show', 'store', 'destroy');
+            Route::resource('/doc-upload', \App\Http\Controllers\Frontend\Provider\DocumentUploadController::class)->only('store', 'destroy');
+            Route::post('/stripe-setup', [\App\Http\Controllers\Frontend\Provider\BankDetailsController::class, 'stripeSetup']);
         });
 
         Route::post('/change-password', [\App\Http\Controllers\Frontend\AuthController::class, 'changePassword']);

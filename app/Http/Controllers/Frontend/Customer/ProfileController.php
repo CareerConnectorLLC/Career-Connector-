@@ -15,8 +15,31 @@ class ProfileController extends Controller
     {
         $user = $request->user()->load('profile');
 
+        if ($user->stripe_id) {
+            $paymentMethods = app('stripe')->customers->allPaymentMethods(
+                $user->stripe_id,
+                ['type' => 'card']
+            );
+    
+            $formattedCards = collect($paymentMethods->data)->map(function ($pm) {
+                return [
+                    'id' => $pm->id,
+                    'brand' => $pm->card->brand,
+                    'last4' => $pm->card->last4,
+                    'exp_month' => $pm->card->exp_month,
+                    'exp_year' => $pm->card->exp_year,
+                    'fingerprint' => $pm->card->fingerprint,
+                    'funding' => $pm->card->funding,
+                    'customer' => $pm->customer,
+                    'default' => $pm->id === optional(app('stripe')->customers->retrieve($pm->customer))->invoice_settings->default_payment_method,
+                ];
+            })->toArray();
+        }
+
         return Inertia::render('Frontend/ClientProfile', [
             'user' => $user,
+            'stripe_key' => env('STRIPE_KEY'),
+            'savedCards' => $formattedCards ?? [],
         ]);
     }
 
@@ -100,7 +123,7 @@ class ProfileController extends Controller
         );
 
         if ($request->has('mode')) {
-            return to_route('frontend.onboard.client.payment.info');
+            //
         }
     }
 }

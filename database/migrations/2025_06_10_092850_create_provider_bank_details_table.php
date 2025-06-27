@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('provider_service_details', function (Blueprint $table) {
+        Schema::create('provider_bank_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('provider_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
-            $table->string('location')->nullable();
-            $table->text('description')->nullable();
-            $table->integer('price')->nullable();
-            $table->string('image_path')->nullable();
+            $table->string('bank_id');
+            $table->string('account_number');
+            $table->string('bank_name');
+            $table->string('account_holder_name');
+            $table->string('account_holder_type');
+            $table->string('routing_number')->nullable();
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('provider_service_details');
+        Schema::dropIfExists('provider_bank_details');
     }
 };

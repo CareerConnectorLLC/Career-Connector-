@@ -10,10 +10,18 @@ defineProps({
 })
 
 const showDropdown = ref(false)
+
+const hideDropDown = () => {
+    if (!showDropdown.value) {
+        return
+    }
+
+    showDropdown.value = false
+}
 </script>
 
 <template>
-    <div class="dashboard-head-profile" v-bind:class="{ 'active': showDropdown }" @click="showDropdown = !showDropdown">
+    <div class="dashboard-head-profile" v-bind:class="{ 'active': showDropdown }" @click="showDropdown = !showDropdown" v-click-outside="hideDropDown">
         <div class="dashboard-profile-wrap">
             <div class="dashboard-profile-image">
                 <figure v-if="user.profile_photo_url"><img :src="user.profile_photo_url" alt="devid"></figure>

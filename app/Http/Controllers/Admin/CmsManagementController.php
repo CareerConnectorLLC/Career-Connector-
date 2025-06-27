@@ -52,12 +52,19 @@ class CmsManagementController extends Controller
         $request->validate([
             'title'         => 'required|string|max:255',
             'text_content'  => 'required|string',
+            'meta_title'   => 'required',
+            'meta_description'   => 'required',
+            'meta_keywords'   => 'required',
         ]);
+
         try {
 
             $cms = new Cms();
             $cms->title = $request->title;
             $cms->text_content = $request->text_content;
+            $cms->meta_title = $request->meta_title;
+            $cms->meta_description = $request->meta_description;
+            $cms->meta_keywords = $request->meta_keywords;
             $cms->save();
 
             return to_route('admin.cms.list')->with('success', 'CMS has been created successfully');
@@ -85,12 +92,18 @@ class CmsManagementController extends Controller
         $request->validate([
             'title'            => 'required|string|max:255',
             'text_content'     => 'required|string',
+            'meta_title'   => 'required',
+            'meta_description'   => 'required',
+            'meta_keywords'   => 'required',
         ]);
 
         try {
 
             $cms->title = $request->title;
             $cms->text_content = $request->text_content;
+            $cms->meta_title = $request->meta_title;
+            $cms->meta_description = $request->meta_description;
+            $cms->meta_keywords = $request->meta_keywords;
             $cms->update();
             return to_route('admin.cms.list')->with('success', 'CMS has been updated successfully');
 

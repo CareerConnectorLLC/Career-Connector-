@@ -154,6 +154,12 @@
         <div>Site Settings</div>
         </Link>
       </li>
+      <li class="menu-item">
+        <Link href="/admin/seo-settings" class="menu-link">
+        <Icon icon="iconoir:settings" width="21" height="21" class="menu-icon" />
+        <div>SEO Settings</div>
+        </Link>
+      </li>
     </ul>
   </aside>
 </template>

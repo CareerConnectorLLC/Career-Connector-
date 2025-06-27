@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Link, usePage, router } from '@inertiajs/vue3'
 import { FormatMoney } from 'format-money-js'
+import { useHead } from '@vueuse/head';
 import ProviderFilter from '../../components/frontend/ProviderFilterPanel.vue'
 import Pagination from '../../components/frontend/Pagination.vue'
 
@@ -10,6 +11,17 @@ const services = computed(() => page.props.services)
 const providers = computed(() => page.props.providers)
 const serviceIds = computed(() => page.props.service_ids)
 const price = computed(() => page.props.pricing)
+
+useHead({
+    title: page.props.seo?.title ?? page.props.site_title,
+    meta: [
+        { name: 'description', content: page.props.seo?.description || "" },
+        { name: 'keywords', content: page.props.seo?.keywords || "" }
+    ],
+    link: [
+        { rel: 'canonical', href: page.props.seo?.canonical_url || page.url }
+    ]
+})
 
 const fm = new FormatMoney({
     decimals: 0,
@@ -81,16 +93,17 @@ const handleFilter = (param) => {
                                     <div class="card-head">
                                         <div class="card-profile">
                                             <div class="card-profile-img-wrap">
-                                                <img src="/public/frontend_assets/images/profile-image-01.png"
+                                                <img v-if="!provider.provider.profile_photo_path" src="/public/frontend_assets/images/profile-image-01.png"
                                                     alt="profile-image-01">
-                                                <figure>
+                                                <img v-else :src="provider.provider.profile_photo_url" v-bind:alt="provider.provider.name">
+                                                <figure style="display: none;">
                                                     <img src="/public/frontend_assets/images/profile-star.svg"
                                                         alt="profile-star">
                                                 </figure>
                                             </div>
                                             <div class="card-profile-details">
                                                 <h3 v-text="provider.provider.name"></h3>
-                                                <div class="ratings">
+                                                <div class="ratings d-none">
                                                     <figure>
                                                         <img src="/public/frontend_assets/images/profile-star.svg"
                                                             alt="profile-star">
