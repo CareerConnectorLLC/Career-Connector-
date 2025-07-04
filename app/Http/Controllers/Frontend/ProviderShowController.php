@@ -27,16 +27,33 @@ class ProviderShowController extends Controller
             'timings' => $timings,
             'schedules' => $timings,
             'has_payment_methods' => $this->hasPaymentMethods() ? true : false,
+            'has_pending_or_confirmed_booking_today' => $this->hasPendingOrConfirmedBookingToday() ? true : false,
         ]);
     }
 
     private function hasPaymentMethods()
     {
+        if (!auth()->check() || empty(auth()->user()->stripe_id)) {
+            return false;
+        }
+
         $paymentMethods = app('stripe')->customers->allPaymentMethods(
             auth()->user()->stripe_id,
             ['type' => 'card']
         );
 
         return !empty($paymentMethods->data);
+    }
+
+    private function hasPendingOrConfirmedBookingToday()
+    {
+        if (!auth()->check()) {
+            return false;
+        }
+
+        return \App\Models\Booking::where('client_id', auth()->id())
+            ->whereIn('status', ['Pending', 'Confirmed'])
+            ->whereDate('start_date', today())
+            ->exists();
     }
 }

@@ -36,13 +36,13 @@ const signout = () => {
                                 <span>Messaging</span>
                             </a>
                         </li>
-                        <li class="d-none">
-                            <a href="">
+                        <li :class="{ 'active': $page.url.startsWith('/bookings') }">
+                            <Link href="/bookings">
                                 <figure>
                                     <img src="/public/frontend_assets/images/document.svg" alt="document">
                                 </figure>
                                 <span>Bookings</span>
-                            </a>
+                            </Link>
                         </li>
                         <li class="d-none">
                             <a href="">

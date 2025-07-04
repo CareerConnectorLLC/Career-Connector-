@@ -20,7 +20,6 @@
 
                               <span class="text-danger" v-if="form.errors?.text_content">{{ form.errors?.text_content }}</span>
                          </div>
-                         {{ metaData }}
                          <div class="form-group row mb-3">
                               <div class="col-lg-4">
                                    <label for="meta_title">Meta Title</label>

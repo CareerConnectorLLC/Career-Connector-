@@ -49,9 +49,8 @@ onMounted(() => {
 
     timeSlots.value = props.timings[date.toString().split(' ')[0]]
     
-    if (isTimeSlotEarlierThan(
-        timeSlots.value[timeSlots.value.length - 1]
-    )) {
+    if (timeSlots.value && timeSlots.value.length && isTimeSlotEarlierThan(
+        timeSlots.value[timeSlots.value.length - 1])) {
         let today = new Date();
         today.setDate(today.getDate() + 1)
         datepicker.value.setDate(today)
@@ -133,8 +132,9 @@ function goToNextStep() {
 }
 
 function makeTheBooking() {
-    form['amount'] = props.fees/2
-    form['description'] = `Fee paid to avail ${props.service.name} service from ${props.provider.name}`
+    form['provider_id'] = props.provider.id
+    form['service_id'] = props.service.id
+    form['amount'] = props.fees
     
     processing.value = true
 

@@ -3,6 +3,7 @@ import { computed, onMounted, ref, onUnmounted } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import ProfileDropdown from "../../components/frontend/provider/ProfileDropdown.vue";
 import SideNavigation from "../../components/frontend/provider/SideNavigation.vue";
+import BookingSection from "../../components/frontend/customer/dashboard/BookingSection.vue";
 
 const page = usePage()
 const scrollY = ref(0);
@@ -17,6 +18,7 @@ onUnmounted(() => {
 });
 
 const user = computed(() => page.props.auth.user)
+const bookings = computed(() => page.props.bookings)
 
 function handleScroll() {
     scrollY.value = window.scrollY;
@@ -109,97 +111,11 @@ function handleScroll() {
                                         </div>
                                     </div>
 
-                                    <div class="bookings-sec">
-                                        <div class="bookings-heading">
-                                            <h3>Bookings</h3>
-                                            <a class="view-all" href="">View all</a>
-                                        </div>
-                                        <div class="booking-content">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Client name</th>
-                                                        <th>Service</th>
-                                                        <th>Location</th>
-                                                        <th>Proposed time</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            Jenny Wilson
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            4517 Washington Ave. Manchester...
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn" href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Esther Howard
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            6391 Elgin St. Celina, Delaware 10299
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn" href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Jane Cooper
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            70 Washington Square South, New York,...
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn" href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            Wade Warren
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            3891 Ranchview Dr. Richardson...
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn" href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-
-                                            </table>
-                                        </div>
-                                    </div>
+                                    <!-- Booking Section -->
+                                    <template v-if="bookings.length">
+                                        <BookingSection :bookings="bookings" :isCustomer="false" />
+                                    </template>
+                                    <!-- Booking Section -->
 
                                     <div class="bookings-sec">
                                         <div class="bookings-heading">

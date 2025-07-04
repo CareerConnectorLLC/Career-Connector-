@@ -154,10 +154,16 @@
         <div>Site Settings</div>
         </Link>
       </li>
-      <li class="menu-item">
+      <li class="menu-item" :class="{ 'active': $page.url.startsWith('/admin/seo-settings') }">
         <Link href="/admin/seo-settings" class="menu-link">
         <Icon icon="iconoir:settings" width="21" height="21" class="menu-icon" />
         <div>SEO Settings</div>
+        </Link>
+      </li>
+      <li class="menu-item" :class="{ 'active': $page.url.startsWith('/admin/commission-setting') }">
+        <Link href="/admin/commission-setting" class="menu-link">
+        <Icon icon="iconoir:settings" width="21" height="21" class="menu-icon" />
+        <div>Commission Settings</div>
         </Link>
       </li>
     </ul>

@@ -19,6 +19,7 @@ class ProfileController extends Controller
         ]);
 
         $services = $user->providerServiceDetails;
+        
         $documents = $user->providerDocuments;
 
         if ($request->user()->stripe_id) {

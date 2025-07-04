@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             'name' => "Administrator",
             'email' => "admin@admin.com",
             'password' => "admin@01",
+            'email_verified_at' => now(),
             'active' => true
         ]);
 
@@ -26,6 +27,7 @@ class DatabaseSeeder extends Seeder
             'name' => "Nyah Jones",
             'email' => "olson.jocelyn@example.org",
             'password' => "password",
+            'email_verified_at' => now(),
             'active' => true
         ]);
 
@@ -33,6 +35,7 @@ class DatabaseSeeder extends Seeder
             'name' => "Brice Friesen",
             'email' => "norma.little@example.com",
             'password' => "password",
+            'email_verified_at' => now(),
             'active' => true
         ]);
 
@@ -47,5 +50,6 @@ class DatabaseSeeder extends Seeder
         $this->call(\Database\Seeders\SiteSettingSeeder::class);
         $this->call(\Database\Seeders\ProviderServiceDetailSeeder::class);
         $this->call(\Database\Seeders\ProviderAvailabilitySeeder::class);
+        $this->call(\Database\Seeders\CommissionSettingSeeder::class);
     }
 }

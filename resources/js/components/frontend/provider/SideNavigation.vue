@@ -29,15 +29,15 @@ const signout = () => {
                                 <span>Dashboard</span>
                             </Link>
                         </li>
-                        <li>
-                            <a href="">
+                        <li :class="{ 'active': $page.url.startsWith('/booking-request') }">
+                            <Link href="/booking-request">
                                 <figure>
                                     <img src="/public/frontend_assets/images/provider-img-5.svg" alt="message-notif">
                                 </figure>
                                 <span>Received request</span>
-                            </a>
+                            </Link>
                         </li>
-                        <li>
+                        <li class="d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/document.svg" alt="document">
@@ -45,7 +45,7 @@ const signout = () => {
                                 <span>Message</span>
                             </a>
                         </li>
-                        <li>
+                        <li class="d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/provider-logo-1.svg" alt="wallet">
@@ -53,7 +53,7 @@ const signout = () => {
                                 <span>Manage availability</span>
                             </a>
                         </li>
-                        <li>
+                        <li class="d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/provider-logo-2.svg" alt="user">
@@ -61,7 +61,7 @@ const signout = () => {
                                 <span>Job completion</span>
                             </a>
                         </li>
-                        <li>
+                        <li class="d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/reviewsimg.svg" alt="user">
@@ -69,7 +69,7 @@ const signout = () => {
                                 <span>Reviews &amp; ratings</span>
                             </a>
                         </li>
-                        <li>
+                        <li class="d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/provider-img-3.svg" alt="user">

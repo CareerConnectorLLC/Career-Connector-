@@ -3,6 +3,7 @@ import { computed, onMounted, ref, onUnmounted } from "vue";
 import { usePage, Link } from "@inertiajs/vue3";
 import ProfileDropdown from "../../components/frontend/customer/ProfileDropdown.vue";
 import CustomerSidebar from "../../components/frontend/customer/LeftSidebar.vue";
+import BookingSection from "../../components/frontend/customer/dashboard/BookingSection.vue";
 
 const page = usePage()
 const scrollY = ref(0);
@@ -17,6 +18,7 @@ onUnmounted(() => {
 });
 
 const user = computed(() => page.props.auth.user)
+const bookings = computed(() => page.props.bookings)
 
 function handleScroll() {
     scrollY.value = window.scrollY;
@@ -34,7 +36,7 @@ function handleScroll() {
                 <h1>Dashboard</h1>
                 <div class="search-sec">
                     <div class="serach-inner-wrap">
-                        <div class="search-form">
+                        <div class="search-form d-none">
                             <form>
                                 <div class="search-inner">
                                     <div class="search-inner-wrap">
@@ -128,111 +130,11 @@ function handleScroll() {
                                         </div>
                                     </div>
 
-                                    <div class="bookings-sec">
-                                        <div class="bookings-heading">
-                                            <h3>Bookings</h3>
-                                            <a class="view-all" href="">View all</a>
-                                        </div>
-                                        <div class="booking-content">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Booking id</th>
-                                                        <th>Service</th>
-                                                        <th>Status</th>
-                                                        <th>Date</th>
-                                                        <th>Time</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            #00051
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            <span class="tag">Paid</span>
-                                                        </td>
-                                                        <td>
-                                                            Aug 14, 2025
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn" href="">View
-                                                                Details</a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            #00051
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            <span class="tag">paid</span>
-                                                        </td>
-                                                        <td>
-                                                            Aug 14, 2025
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn" href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            #00051
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            <span class="tag pending">Pending</span>
-                                                        </td>
-                                                        <td>
-                                                            Aug 14, 2025
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn" href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            #00051
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            <span class="tag pending">Pending</span>
-                                                        </td>
-                                                        <td>
-                                                            Aug 14, 2025
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn" href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-
-                                            </table>
-                                        </div>
-                                    </div>
+                                    <!-- Booking Section -->
+                                    <template v-if="bookings.length">
+                                        <BookingSection :bookings="bookings" :isCustomer="true" />
+                                    </template>
+                                    <!-- Booking Section -->
 
                                     <div class="bookings-sec">
                                         <div class="bookings-heading">

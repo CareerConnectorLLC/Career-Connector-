@@ -16,6 +16,7 @@ const modalShown = ref(false)
 const bookingModal = ref(null)
 
 const provider = computed(() => page.props.provider)
+const hasBooking = computed(() => page.props.has_pending_or_confirmed_booking_today)
 
 onMounted(() => {
     const bookingModalEl = document.getElementById('bookingModal')
@@ -241,7 +242,7 @@ function closeBookingModal() {
                                     </template>
                                     <Link v-if="!page.props.is_auth" class="book-now" href="/login" @click.prevent="">Sign in for Booking</Link>
                                     <Link v-else-if="page.props.is_auth && !page.props.has_payment_methods" class="book-now" :href="`/client-profile?from=${page.url}`">Add a credit card</Link>
-                                    <a v-else class="book-now" href="" data-bs-toggle="modal" data-bs-target="#bookingModal">Book now</a>
+                                    <a v-else-if="page.props.is_auth && !hasBooking" class="book-now" href="" data-bs-toggle="modal" data-bs-target="#bookingModal">Book now</a>
                                 </div>
                             </div>
                         </div>

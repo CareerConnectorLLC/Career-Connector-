@@ -124,6 +124,7 @@ Route::prefix('admin')->name('admin.')->group(function() {
         Route::get('/site-setting', [SiteSettingController::class, 'index'])->name('site-setting.index');
         Route::post('/site-setting/update', [SiteSettingController::class, 'update'])->name('site-setting.update');
         Route::resource('/seo-settings', SeoSettingController::class);
+        Route::resource('/commission-setting', \App\Http\Controllers\Admin\CommissionSettingController::class)->only('index', 'store');
     });
 });
 
@@ -168,20 +169,21 @@ Route::name('frontend.')->group(function() {
     
     Route::middleware(['auth'])->group(function () {
         Route::middleware(['is-customer'])->group(function () {
-            Route::get('/client-dashboard', fn () => Inertia::render('Frontend/ClientDashboard'))->name('client.dashboard');
+            Route::get('/client-dashboard', \App\Http\Controllers\Frontend\Customer\ClientDashboard::class)->name('client.dashboard');
             Route::resource('/client-profile', \App\Http\Controllers\Frontend\Customer\ProfileController::class)->only('index', 'store');
             Route::post('/save-card', \App\Http\Controllers\Frontend\Customer\SaveCardController::class);
             Route::delete('/remove-card/{id}', \App\Http\Controllers\Frontend\Customer\RemoveCardController::class);
-            Route::resource('/bookings', \App\Http\Controllers\Frontend\Provider\BookingController::class)->only('index', 'store');
+            Route::resource('/bookings', \App\Http\Controllers\Frontend\Customer\BookingController::class)->only('index', 'store', 'update');
         });
 
         Route::middleware(['is-provider'])->group(function () {
-            Route::get('/provider-dashboard', fn () => Inertia::render('Frontend/ProviderDashboard'))->name('provider.dashboard');
+            Route::get('/provider-dashboard', \App\Http\Controllers\Frontend\Provider\ProviderDashboard::class)->name('provider.dashboard');
             Route::resource('/provider-profile', \App\Http\Controllers\Frontend\Provider\ProfileController::class)->only('index', 'store');
             Route::resource('/bank-details', \App\Http\Controllers\Frontend\Provider\BankDetailsController::class)->only('store', 'update', 'destroy');
             Route::resource('/service-details', \App\Http\Controllers\Frontend\Provider\ServiceDetailController::class)->only('show', 'store', 'destroy');
             Route::resource('/doc-upload', \App\Http\Controllers\Frontend\Provider\DocumentUploadController::class)->only('store', 'destroy');
             Route::post('/stripe-setup', [\App\Http\Controllers\Frontend\Provider\BankDetailsController::class, 'stripeSetup']);
+            Route::resource('/booking-request', \App\Http\Controllers\Frontend\Provider\BookingRequestController::class)->only('index', 'update');
         });
 
         Route::post('/change-password', [\App\Http\Controllers\Frontend\AuthController::class, 'changePassword']);
