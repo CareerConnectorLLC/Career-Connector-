@@ -185,7 +185,10 @@ Route::name('frontend.')->group(function() {
             Route::post('/stripe-setup', [\App\Http\Controllers\Frontend\Provider\BankDetailsController::class, 'stripeSetup']);
             Route::resource('/booking-request', \App\Http\Controllers\Frontend\Provider\BookingRequestController::class)->only('index', 'update');
         });
-
+        
+        Route::resource('/messaging', \App\Http\Controllers\Frontend\Customer\MessagingController::class)->only('index', 'show', 'store');
+        Route::post('/conversations/{conversation}/read', [\App\Http\Controllers\Frontend\Customer\MessagingController::class, 'markAsRead'])->name('conversations.read');
+        Route::resource('/chat-message', \App\Http\Controllers\Frontend\ChatMessageController::class)->only('store');
         Route::post('/change-password', [\App\Http\Controllers\Frontend\AuthController::class, 'changePassword']);
         Route::post('/logout', [\App\Http\Controllers\Frontend\AuthController::class, 'logout'])->name('logout');
     });

@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
             'is_auth' => auth()->check(),
             'auth' => [
                 'user'=> [
+                    'id' => auth()->id() ?? null,
                     'name' => auth()->user()->name ?? null,
                     'profile_photo_url' => isset(auth()->user()->profile_photo_url) ? auth()->user()->profile_photo_url : null,
                     'email' => isset(auth()->user()->email) ? auth()->user()->email : null,

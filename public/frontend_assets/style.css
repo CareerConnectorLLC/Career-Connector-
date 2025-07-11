@@ -4224,6 +4224,7 @@ table {
     width: 100%;
     position: relative;
     z-index: 2;
+    height: 100%;
 }
 
 .dashboard-sec{ 
@@ -4231,6 +4232,7 @@ table {
     position: relative;
     /* min-height: 100vh; */
     background: #F8F8F8;
+    height: 100svh;
 }
 
 .top-left-shape{
@@ -4250,6 +4252,7 @@ table {
     flex-wrap: wrap;
     position: relative;
     /* z-index: 2; */
+    height: 100%;
 }
 
 
@@ -5256,6 +5259,7 @@ table {
 .dashboard-right-inner{ 
     position: relative;
     /* z-index: 2; */
+    height: 100%;
 }
 
 .login .dashboard-right-inner{ 
@@ -5827,6 +5831,7 @@ table {
     display: flex;
     flex-wrap: wrap;
     margin: 0 -10px;
+    height: 100%;
 }
 
 .messaging-left{ 
@@ -5847,6 +5852,7 @@ table {
 .chat-card{
     background: #FFFFFF;
     border-radius: 20px;
+    height: 100%;
 }
 
 .chat-head{ 
@@ -6188,6 +6194,7 @@ table {
 
 .message .dashboard-right-panel{
     min-height: inherit;
+    height: 100%;
 }
 
 
@@ -9350,6 +9357,22 @@ padding: 25px;
 }
 
 /* 26/06/2025 dm */
+
+.dashboard-profile-image { 
+    position: relative;
+}
+
+.dashboard-profile-image .dot{
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    background: #F77B7B;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
 
 /* ========== responsive css =========== */
 

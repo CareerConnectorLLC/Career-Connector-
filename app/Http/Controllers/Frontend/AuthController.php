@@ -45,7 +45,7 @@ class AuthController extends Controller
                 session()->flash('warning', 'Your account is not verified');
                 return back();
             }
-            
+
             $roleNames = Auth::user()->role_names->toArray();
             if (in_array('USER', $roleNames)) {
                 return to_route('frontend.client.dashboard');

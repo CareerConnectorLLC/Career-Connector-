@@ -2,7 +2,9 @@
 import { Link, router } from "@inertiajs/vue3";
 
 const signout = () => {
-    router.post(`/logout`)
+    router.post(`/logout`, {
+        onSuccess: () => Echo.leaveChannel('career-connector')
+    })
 }
 </script>
 
@@ -28,13 +30,13 @@ const signout = () => {
                                 <span>Dashboard</span>
                             </Link>
                         </li>
-                        <li class="d-none">
-                            <a href="">
+                        <li :class="{ 'active': $page.url.startsWith('/messaging') }">
+                            <Link href="/messaging">
                                 <figure>
                                     <img src="/public/frontend_assets/images/message-notif.svg" alt="message-notif">
                                 </figure>
                                 <span>Messaging</span>
-                            </a>
+                            </Link>
                         </li>
                         <li :class="{ 'active': $page.url.startsWith('/bookings') }">
                             <Link href="/bookings">

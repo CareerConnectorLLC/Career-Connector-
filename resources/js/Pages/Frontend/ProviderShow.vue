@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import { usePage, Link } from '@inertiajs/vue3'
+import { usePage, Link, router } from '@inertiajs/vue3'
 import { FormatMoney } from 'format-money-js'
 import { Modal } from 'bootstrap'
 
@@ -64,6 +64,17 @@ const workingDaysCount = computed(() => timings.value.filter(t => t.timeRange !=
 function closeBookingModal() {
     bookingModal.value.hide()
 }
+
+function goToChatRoom() {
+    router.post(`/messaging`, {
+            provider_id: provider.value.provider.id,
+            service_id: provider.value.service.id
+        },
+        {
+            preserveScroll: true,
+        }
+    )
+}
 </script>
 
 <template>
@@ -71,7 +82,7 @@ function closeBookingModal() {
         <div class="container-fluid">
             <div class="banner-inner">
                 <div class="banner-inner-cont-wrap">
-                    <h1>Find service provider</h1>
+                    <h1 class="text-capitalize">service provider</h1>
                     <p>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
                         labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.
@@ -235,14 +246,19 @@ function closeBookingModal() {
                                             <li v-for="(timing, index) in timings" :key="index">
                                                 <span class="date">{{ timing.day }}</span>
                                                 <span
-                                                    :class="{'close': timing.timeRange == 'No Availability', 'timing': timing.timeRange != 'No Availability'}">{{
-                                                    timing.timeRange }}</span>
+                                                    :class="{'close': timing.timeRange == 'No Availability', 'timing': timing.timeRange != 'No Availability'}">
+                                                    {{ timing.timeRange }}
+                                                </span>
                                             </li>
                                         </ul>
                                     </template>
                                     <Link v-if="!page.props.is_auth" class="book-now" href="/login" @click.prevent="">Sign in for Booking</Link>
-                                    <Link v-else-if="page.props.is_auth && !page.props.has_payment_methods" class="book-now" :href="`/client-profile?from=${page.url}`">Add a credit card</Link>
-                                    <a v-else-if="page.props.is_auth && !hasBooking" class="book-now" href="" data-bs-toggle="modal" data-bs-target="#bookingModal">Book now</a>
+                                    
+                                    <template v-if="page.props.is_auth && page.props.auth.user.role === 'USER'">
+                                        <Link v-if="!page.props.has_payment_methods" class="book-now" :href="`/client-profile?from=${page.url}`">Add a credit card</Link>
+                                        <a v-if="!hasBooking && !page.props.has_payment_methods" class="book-now" href="" data-bs-toggle="modal" data-bs-target="#bookingModal">Book now</a>
+                                        <a href="" @click.prevent="goToChatRoom" class="book-now mt-3">Start a Conversation</a>
+                                    </template>
                                 </div>
                             </div>
                         </div>

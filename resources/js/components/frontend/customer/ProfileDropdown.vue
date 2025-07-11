@@ -26,6 +26,7 @@ const hideDropDown = () => {
             <div class="dashboard-profile-image">
                 <figure v-if="user.profile_photo_url"><img :src="user.profile_photo_url" alt="devid"></figure>
                 <figure v-else><img src="/public/frontend_assets/images/devid.png" alt="devid"></figure>
+                <i class="dot d-none"></i>
             </div>
             <div class="dashboard-profile-cont">
                 <span>{{ user.name }}</span>

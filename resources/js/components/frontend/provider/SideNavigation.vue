@@ -37,13 +37,13 @@ const signout = () => {
                                 <span>Received request</span>
                             </Link>
                         </li>
-                        <li class="d-none">
-                            <a href="">
+                        <li :class="{ 'active': $page.url.startsWith('/messaging') }">
+                            <Link href="/messaging">
                                 <figure>
                                     <img src="/public/frontend_assets/images/document.svg" alt="document">
                                 </figure>
-                                <span>Message</span>
-                            </a>
+                                <span>Messaging</span>
+                            </Link>
                         </li>
                         <li class="d-none">
                             <a href="">
