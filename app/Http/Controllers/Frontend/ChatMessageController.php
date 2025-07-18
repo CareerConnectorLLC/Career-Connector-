@@ -15,6 +15,8 @@ class ChatMessageController extends Controller
         $request->validate([
             'conversation_id' => 'required|exists:conversations,id',
             'body' => 'required|string|max:1000',
+        ], [
+            'body.max' => 'Message cannot exceed 1000 characters.'
         ]);
 
         $conversation = Conversation::findOrFail($request->conversation_id);
@@ -32,7 +34,7 @@ class ChatMessageController extends Controller
         $message = Message::create([
             'conversation_id' => $request->conversation_id,
             'sender_id' => $senderId,
-            'body' => $request->body,
+            'body' => e($request->body),
             'receiver_id' => $receiverId,
         ]);
 

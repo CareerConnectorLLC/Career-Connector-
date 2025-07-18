@@ -128,6 +128,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Service::class);
     }
+
+    public function providerSocialLinks(): HasMany
+    {
+        return $this->hasMany(ProviderSocialLink::class, 'provider_id');
+    }
     
     public function scopeFilter($query, array $filters)
     {

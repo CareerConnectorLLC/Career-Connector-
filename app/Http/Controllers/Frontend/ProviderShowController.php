@@ -17,6 +17,7 @@ class ProviderShowController extends Controller
         $providerData = ProviderServiceDetail::with([
             'provider:id,name,profile_photo_path,location',
             'provider.availability',
+            'provider.providerSocialLinks:provider_id,name,url',
             'service:id,name'
         ])->find($id);
 
@@ -33,7 +34,7 @@ class ProviderShowController extends Controller
 
     private function hasPaymentMethods()
     {
-        if (!auth()->check() || empty(auth()->user()->stripe_id)) {
+        if (!auth()->check() || !auth()->user()->hasRole('USER') || empty(auth()->user()->stripe_id)) {
             return false;
         }
 

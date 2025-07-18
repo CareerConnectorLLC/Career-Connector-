@@ -1,7 +1,8 @@
 <script setup>
-import { computed, ref, onMounted, reactive, watch, nextTick } from 'vue';
+import { computed, ref, onMounted, onUnmounted, reactive, watch, nextTick } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import axios from 'axios';
+import emitter from '@/eventBus';
 
 import ProfileDropdown from "../../../components/frontend/customer/ProfileDropdown.vue";
 import CustomerSidebar from "../../../components/frontend/customer/LeftSidebar.vue";
@@ -18,10 +19,29 @@ const messages = ref([])
 const isLoadingMessages = ref(false)
 const otherUserIsTyping = ref(false);
 const chatDisplayRef = ref(null);
+const validationErrors = ref({});
 const typingUserName = ref('');
 
 let typingTimeout = null;
 let typingWhisperTimer = null;
+
+const handleGlobalMessage = (e) => {
+    // This will catch messages for ALL conversations for this user, via the event bus.
+
+    // Check if the message is for the currently active conversation.
+    if (activeConversation.value && e.message.conversation_id === activeConversation.value.id) {
+        // If it is, the other listener (`private.conversation.[id]`) will handle it.
+        // We do nothing here to avoid double processing.
+        return;
+    }
+
+    // If it's for an INACTIVE conversation, find it and update the unread count.
+    const conversationInList = conversations.value.find(c => c.id === e.message.conversation_id);
+    if (conversationInList) {
+        // Increment the count. Vue's reactivity will update the UI.
+        conversationInList.unread_messages_count = (conversationInList.unread_messages_count || 0) + 1;
+    }
+};
 
 const chatMsg = reactive({
     body: '',
@@ -51,7 +71,8 @@ onMounted(() => {
         fetchChatMessages(initialConversation.id);
     }
 
-    console.log(activeConversation.value);
+    // Listen for global message events from the event bus.
+    emitter.on('global-message-received', handleGlobalMessage);
 })
 
 watch(
@@ -99,7 +120,12 @@ watch(
     }
 )
 
-watch(() => chatMsg.body, () => {
+watch(() => chatMsg.body, (newValue) => {
+    // If there's a validation error, check if the user's edit has resolved it.
+    if (validationErrors.value.body && newValue.length <= 1000) {
+        validationErrors.value = {};
+    }
+
     if (!activeConversation.value || typingWhisperTimer) {
         return;
     }
@@ -113,6 +139,16 @@ watch(() => chatMsg.body, () => {
     typingWhisperTimer = setTimeout(() => {
         typingWhisperTimer = null;
     }, 1500);
+});
+
+onUnmounted(() => {
+    // Leave the active conversation channel if it exists
+    if (activeConversation.value) {
+        Echo.leave(`private.conversation.${activeConversation.value.id}`);
+    }
+
+    // Clean up the event bus listener.
+    emitter.off('global-message-received', handleGlobalMessage);
 });
 
 function getConversationUsers() {
@@ -177,7 +213,7 @@ function formatTimestamp(timestamp) {
 }
 
 async function sendMsg() {
-    if (chatMsg.body.trim() === '' || !activeConversation.value) {
+    if (!activeConversation.value) {
         return;
     }
 
@@ -200,6 +236,7 @@ async function sendMsg() {
 
     try {
         // Now, make the API call.
+        validationErrors.value = {}; // Clear previous errors
         const payload = {
             body: originalMessageBody,
             conversation_id: activeConversation.value.id,
@@ -213,14 +250,19 @@ async function sendMsg() {
             messages.value[messageIndex] = savedMessage;
         }
     } catch (error) {
-        console.error('Failed to send message:', error);
-        // If the API call fails, remove the optimistic message and restore the input.
+        if (error.response && error.response.status === 422) {
+            // Assign validation errors from the server response
+            validationErrors.value = error.response.data.errors;
+        } else {
+            console.error('Failed to send message:', error);
+        }
+
+        // For any error, restore the UI to its previous state
         const messageIndex = messages.value.findIndex(m => m.id === tempId);
         if (messageIndex !== -1) {
             messages.value.splice(messageIndex, 1);
         }
         chatMsg.body = originalMessageBody;
-        // You could also add a user-facing error notification here.
     }
 }
 
@@ -380,7 +422,7 @@ async function markConversationAsRead() {
                                                             <div class="message-card-wrap-item">
                                                                 <div class="chat-message-card">
                                                                     <!-- Assuming message content is in 'body' attribute -->
-                                                                    <p>{{ message.body }}</p>
+                                                                    <p v-html="message.body"></p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -405,6 +447,7 @@ async function markConversationAsRead() {
                                                     <textarea v-model="chatMsg.body" placeholder="Type here something..." @keydown.enter.prevent="sendMsg"></textarea>
                                                     <input type="submit" value="submit">
                                                 </div>
+                                                <span v-if="validationErrors.body" class="text-danger">{{ validationErrors.body[0] }}</span>
                                             </form>
                                         </div>
                                     </div>

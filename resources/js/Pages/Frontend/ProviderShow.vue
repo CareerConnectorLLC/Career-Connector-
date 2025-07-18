@@ -5,6 +5,7 @@ import { FormatMoney } from 'format-money-js'
 import { Modal } from 'bootstrap'
 
 import BookingModal from '../../components/frontend/BookingModal.vue'
+import NoCardModal from '../../components/frontend/NoCardModal.vue'
 
 const fm = new FormatMoney({
     decimals: 0,
@@ -14,6 +15,7 @@ const fm = new FormatMoney({
 const page = usePage()
 const modalShown = ref(false)
 const bookingModal = ref(null)
+const noCardModal = ref(null)
 
 const provider = computed(() => page.props.provider)
 const hasBooking = computed(() => page.props.has_pending_or_confirmed_booking_today)
@@ -22,6 +24,7 @@ onMounted(() => {
     const bookingModalEl = document.getElementById('bookingModal')
     
     bookingModal.value = new Modal(`#bookingModal`)
+    noCardModal.value = new Modal(`#noCardModal`)
     
     bookingModalEl.addEventListener('shown.bs.modal', () => {
         modalShown.value = true
@@ -65,6 +68,14 @@ function closeBookingModal() {
     bookingModal.value.hide()
 }
 
+function checkForPaymentMethods() {
+    if (page.props.has_payment_methods) {
+        bookingModal.value.show()
+    } else {
+        noCardModal.value.show()
+    }
+}
+
 function goToChatRoom() {
     router.post(`/messaging`, {
             provider_id: provider.value.provider.id,
@@ -74,6 +85,15 @@ function goToChatRoom() {
             preserveScroll: true,
         }
     )
+}
+
+function goToProfilePage() {
+    noCardModal.value.hide()
+    router.visit(`/client-profile`)
+}
+
+function socialIconImageUrl(name) {
+    return `${window.location.origin}/frontend_assets/images/${name.toLowerCase()}.svg`
 }
 </script>
 
@@ -156,6 +176,16 @@ function goToChatRoom() {
                                                 </li>
                                             </ul>
                                             <p>4.9</p>
+                                        </div>
+
+                                        <div class="social-links" v-if="provider.provider.provider_social_links">
+                                            <ul>
+                                                <li v-for="link in provider.provider.provider_social_links" :key="link.id">
+                                                    <a :href="link.url" target="_blank">
+                                                        <img :src="socialIconImageUrl(link.name)" :alt="link.name.toLowerCase()">
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -255,8 +285,7 @@ function goToChatRoom() {
                                     <Link v-if="!page.props.is_auth" class="book-now" href="/login" @click.prevent="">Sign in for Booking</Link>
                                     
                                     <template v-if="page.props.is_auth && page.props.auth.user.role === 'USER'">
-                                        <Link v-if="!page.props.has_payment_methods" class="book-now" :href="`/client-profile?from=${page.url}`">Add a credit card</Link>
-                                        <a v-if="!hasBooking && !page.props.has_payment_methods" class="book-now" href="" data-bs-toggle="modal" data-bs-target="#bookingModal">Book now</a>
+                                        <a href="" @click.prevent="checkForPaymentMethods" class="book-now">Book now</a>
                                         <a href="" @click.prevent="goToChatRoom" class="book-now mt-3">Start a Conversation</a>
                                     </template>
                                 </div>
@@ -275,6 +304,10 @@ function goToChatRoom() {
             :fees="provider.price/100"
             :modalShown="modalShown"
             v-on:booking-success="closeBookingModal"
+        />
+        <NoCardModal
+            :customer="page.props.auth.user"
+            v-on:proceed-to-add-card="goToProfilePage"
         />
     </section>
 </template>

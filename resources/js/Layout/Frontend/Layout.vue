@@ -1,5 +1,18 @@
 <template>
     <Toast />
+    <Toast position="top-right" group="message-toast">
+        <template #message="slotProps">
+            <div class="d-flex flex-column align-items-start" style="flex: 1; padding: 1rem;">
+                <div class="d-flex align-items-center" style="gap: 0.5rem;">
+                    <i class="pi pi-envelope" style="font-size: 1.5rem;"></i>
+                    <span class="fw-bold text-dark">{{ slotProps.message.summary }}</span>
+                </div>
+                <p class="my-3 text-dark">{{ slotProps.message.detail }}</p>
+                <Button class="p-button-sm" label="View Message" @click="navigateToConversation(slotProps.message.data.conversationId)"></Button>
+            </div>
+        </template>
+    </Toast>
+
     <template v-if="isAuthPage">
         <Header :user="user" />
     </template>
@@ -13,13 +26,59 @@
 
 <script setup>
 import Toast from 'primevue/toast';
-import { computed } from 'vue';
-import { usePage } from "@inertiajs/vue3";
+import Button from 'primevue/button';
+import { computed, onMounted, onUnmounted } from 'vue';
+import { usePage, router } from "@inertiajs/vue3";
+import { useToast } from 'primevue/usetoast';
 import Header from './Header.vue';
 import Footer from './Footer.vue';
+import emitter from '@/eventBus';
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
+const toast = useToast();
+
+const handleBroadcastedMessage = (e) => {
+    // Don't show a toast for our own sent messages.
+    if (e.message.sender_id === user.value.id) {
+        return;
+    }
+
+    // If the user is on the messaging page, don't show a toast.
+    // Instead, emit an event for the Messaging component to update unread counts.
+    if (page.url.startsWith('/messaging')) {
+        emitter.emit('global-message-received', e);
+        return;
+    }
+
+    // For all other pages, show the toast notification.
+    toast.add({
+        group: 'message-toast',
+        summary: `New message from ${e.message.sender.name}`,
+        detail: e.message.body,
+        data: { conversationId: e.message.conversation_id },
+        life: 6000
+    });
+};
+
+onMounted(() => {
+    // Listen for new message notifications on the user's private channel.
+    if (user.value) {
+        Echo.private(`private.user.${user.value.id}`)
+            .listen('MessageSent', handleBroadcastedMessage);
+    }
+});
+
+onUnmounted(() => {
+    if (user.value) {
+        Echo.leave(`private.user.${user.value.id}`);
+    }
+});
+
+// Function to handle clicks on the toast notification
+function navigateToConversation(conversationId) {
+    router.get(`/messaging?conversation=${conversationId}`);
+}
 
 const isAuthPage = computed(() => {
     let paths = [

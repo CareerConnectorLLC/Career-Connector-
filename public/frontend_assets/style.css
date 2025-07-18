@@ -5897,7 +5897,7 @@ table {
 }
 
 .chat-profile-details h3{
-    font-size: 14px;
+    font-size: 18px;
     margin-bottom: 3px;
     font-weight: 600;
 }
@@ -9372,6 +9372,89 @@ padding: 25px;
     background: #F77B7B;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
+
+
+/* 11/07/2025 dm */
+
+.messaging-left .message-wrap ul li a{ 
+    position: relative;
+}
+
+.messaging-left .message-wrap ul li a .counting{ 
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+.messaging-left .message-wrap ul li a .message-cont h5{ 
+    font-size: 16px;
+}
+
+/* 11/07/2025 dm */
+
+
+/* 16/07/2025 dm */
+
+
+.card-profile-details .social-links{ 
+    margin-top: 10px;
+}
+
+.card-profile-details .social-links ul{
+    display: flex;
+    align-items: center;
+    list-style: none;
+    padding-left: 0;
+}
+
+.card-profile-details .social-links ul li:not(:last-child){ 
+    margin-right: 10px;
+}
+
+.card-profile-details .social-links ul li a{
+    width: 30px;
+    height: 30px;
+    line-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    background: var(--btnSecondary);
+}
+
+.card-profile-details .social-links ul li a img{
+    width: 13px;
+    height: 13px;
+    filter: brightness(0) invert(1);
+}
+
+.card-profile-details .social-links ul li a:hover{
+    background: var(--btnPrimary);
+}
+
+
+/* 16/07/2025 dm */
+
+/* 17/07/2025 dm */
+
+/* Social media Links */
+
+.form-error{ 
+    margin-top: 20px;
+}
+
+.booking-content table tr td:first-child{ 
+    width: 20%;
+}
+
+.booking-content table tr td:last-child{ 
+    width: 80%;
+}
+
+/* Social media Links */
+
+/* 17/07/2025 dm */
 
 
 /* ========== responsive css =========== */
@@ -12929,7 +13012,7 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     .chat-profile-details h3 {
-        font-size: 12px;
+        font-size: 14px;
     }
 
     .chat-head-option > a, .chat-head-option > ul > li > a, .message-toggler, .back-btn{

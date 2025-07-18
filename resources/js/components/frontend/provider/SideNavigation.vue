@@ -53,13 +53,13 @@ const signout = () => {
                                 <span>Manage availability</span>
                             </a>
                         </li>
-                        <li class="d-none">
-                            <a href="">
+                        <li :class="{ 'active': $page.url.startsWith('/social-links') }">
+                            <Link href="/social-links">
                                 <figure>
                                     <img src="/public/frontend_assets/images/provider-logo-2.svg" alt="user">
                                 </figure>
-                                <span>Job completion</span>
-                            </a>
+                                <span>Social Links</span>
+                            </Link>
                         </li>
                         <li class="d-none">
                             <a href="">

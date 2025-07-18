@@ -37,8 +37,18 @@ class MessageSent implements ShouldBroadcastNow
      */
     public function broadcastOn(): array
     {
-        return [
-            new PrivateChannel('private.conversation.'.$this->message->conversation_id),
+        // The message is always sent on the conversation channel.
+        $channels = [
+            new PrivateChannel('private.conversation.' . $this->message->conversation_id),
         ];
+
+        // If there's a recipient, also broadcast on their user-specific channel.
+        // This is used for notifications and unread counts when the user is not in the active conversation.
+        // The receiver_id is set in ChatMessageController.
+        if ($this->message->receiver_id) {
+            $channels[] = new PrivateChannel('private.user.' . $this->message->receiver_id);
+        }
+
+        return $channels;
     }
 }
