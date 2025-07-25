@@ -9444,11 +9444,11 @@ padding: 25px;
     margin-top: 20px;
 }
 
-.booking-content table tr td:first-child{ 
+.dashboard-right-inner form .booking-content table tr td:first-child{ 
     width: 20%;
 }
 
-.booking-content table tr td:last-child{ 
+.dashboard-right-inner form .booking-content table tr td:last-child{ 
     width: 80%;
 }
 

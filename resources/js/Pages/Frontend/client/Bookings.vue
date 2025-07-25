@@ -2,6 +2,8 @@
 import { computed, onMounted, ref, onUnmounted } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import dayjs from 'dayjs';
+import { useGlobalMessageNotifier } from "../../../composables/useGlobalMessageNotifier";
+import { usePresenceChannel } from "../../../composables/usePresenceChannel";
 
 import ProfileDropdown from "../../../components/frontend/customer/ProfileDropdown.vue";
 import CustomerSidebar from "../../../components/frontend/customer/LeftSidebar.vue";
@@ -9,6 +11,10 @@ import CustomerSidebar from "../../../components/frontend/customer/LeftSidebar.v
 const page = usePage()
 const scrollY = ref(0);
 const isFixed = ref(false);
+
+// Initialize real-time listeners for notifications and presence.
+useGlobalMessageNotifier();
+usePresenceChannel();
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);

@@ -1,77 +1,52 @@
 <script setup>
-import { computed, onMounted, ref, onUnmounted } from "vue";
-import { Link, usePage, router } from "@inertiajs/vue3";
-import dayjs from 'dayjs';
+import { onMounted, onUnmounted, ref, computed } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { FormatMoney } from "format-money-js";
 
 import { useGlobalMessageNotifier } from "../../../composables/useGlobalMessageNotifier";
 import { usePresenceChannel } from "../../../composables/usePresenceChannel";
+import ProviderSidebar from "../../../components/frontend/provider/SideNavigation.vue";
+import ProfileDropdown from "../../../components/frontend/provider/ProfileDropdown.vue";
 
-import ProfileDropdown from "../../../components/frontend/customer/ProfileDropdown.vue";
-import SideNavigation from "../../../components/frontend/provider/SideNavigation.vue";
+const fm = new FormatMoney({
+    decimals: 0,
+    symbol: "$"
+});
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
 const bookings = computed(() => page.props.bookings)
 
-const scrollY = ref(0);
-const isFixed = ref(false);
-
 // Initialize real-time listeners for notifications and presence.
 useGlobalMessageNotifier();
 usePresenceChannel();
 
+const scrollY = ref(0);
+const isFixed = ref(false);
+
 onMounted(() => {
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll); 
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
+    window.removeEventListener('scroll', handleScroll);
 });
 
 function handleScroll() {
     scrollY.value = window.scrollY;
     isFixed.value = scrollY.value > 0;
 }
-
-function formatDateTime(dateTimeString) {
-    return dayjs(dateTimeString).format('MMM D, YYYY h:mm A');
-}
-
-function cancelRequest(id) {
-    router.patch(`/booking-request/${id}`, {
-        status: 'Cancelled'
-    }, {
-        preserveState: true,
-        onSuccess: (page) => {
-            router.reload({ only: ['bookings'] })
-        }
-    })
-}
-
-function acceptRequest(id) {
-    router.patch(`/booking-request/${id}`, {
-        status: 'Confirmed'
-    }, {
-        preserveState: true,
-        onSuccess: (page) => {
-            router.reload({ only: ['bookings'] })
-        }
-    })
-}
-
-function isPastDate(dateTimeString) {
-    return dayjs(dateTimeString).isBefore(dayjs(), 'day');
-}
 </script>
 
 <template>
-    <div class="dashboard-sec bookings">
+    <div class="dashboard-sec">
         <div class="dashboard-container">
-            <div class="dashboard-head">
+            <div class="dashboard-head" :class="{'fixed': isFixed}">
                 <button class="dashboard-toggler">
                     <span class="stick"></span>
                 </button>
-                <h1>Received request</h1>
+
+                <h1>Bookings</h1>
                 <div class="search-sec">
                     <div class="serach-inner-wrap">
                         <div class="nofication">
@@ -90,52 +65,33 @@ function isPastDate(dateTimeString) {
             </div>
             <div class="dashboard-inner-wrap">
                 <!-- Left sidebar for provider -->
-                <SideNavigation />
+                <ProviderSidebar />
                 <!-- Left sidebar for provider -->
                 <div class="dashboard-right-panel">
                     <div class="dashboard-right-inner">
                         <div class="bookings-sec">
-                            <p class="lead" v-if="!bookings.length">Lorem ipsum dolor sit amet consectetur.</p>
-                            <div class="booking-content" v-else>
+                            <div class="booking-content" v-if="bookings.length">
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>Client Name</th>
-                                            <th>Booking ID</th>
-                                            <th>Service </th>
-                                            <th>Proposed Time</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th>Booking Number</th>
+                                            <th>Client name</th>
+                                            <th>Service</th>
+                                            <th>Price</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
                                         <tr v-for="booking in bookings" :key="booking.id">
-                                            <td v-text="booking.client.name"></td>
                                             <td v-text="booking.booking_number"></td>
+                                            <td v-text="booking.client.name"></td>
                                             <td v-text="booking.service.name"></td>
-                                            <td v-text="formatDateTime(booking.start_date)"></td>
-                                            <td>
-                                                <span class="tag">{{ booking.status }}</span>
-                                            </td>
-                                            <td>
-                                                <ul class="right-recived" v-if="!isPastDate(booking.start_date) && booking.status === 'Pending'">
-                                                    <li>
-                                                        <a href="" @click.prevent="cancelRequest(booking.id)" class="crs-img">
-                                                            <img src="/public/frontend_assets/images/crs-svg.svg" alt="icon">
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="" @click.prevent="acceptRequest(booking.id)" class="right-img">
-                                                            <img src="/public/frontend_assets/images/right-svg.svg" alt="icon">
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </td>
+                                            <td v-text="fm.from(parseInt(booking.price / 100))"></td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                            <p class="lead" v-else>No Data Available</p>
                             <div class="cmn-pgns d-none">
                                 <ul>
                                     <li class="prev"><a href="#">Prev</a></li>
@@ -150,9 +106,9 @@ function isPastDate(dateTimeString) {
                         </div>
                     </div>
                 </div>
+                <div class="sidebar-overlay"></div>
             </div>
         </div>
-
 
         <div class="top-left-shape">
             <img src="/public/frontend_assets/images/top-left-image.png" alt="">

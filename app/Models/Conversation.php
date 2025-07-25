@@ -30,4 +30,50 @@ class Conversation extends Model
     {
         return $this->belongsTo(Service::class);
     }
+
+    public function lastMessage()
+    {
+        return $this->hasOne(Message::class)->latest('id');
+    }
+
+    public function getParticipantsAttribute()
+    {
+        $participants = new \Illuminate\Database\Eloquent\Collection();
+
+        if ($this->relationLoaded('customer')) {
+            $participants->push($this->customer);
+        }
+
+        if ($this->relationLoaded('provider')) {
+            $participants->push($this->provider);
+        }
+
+        return $participants;
+    }
+
+    public function getParticipantNameAttribute()
+    {
+        if (auth()->check()) {
+            if ($this->customer_id === auth()->id()) {
+                return $this->provider->name;
+            }
+            if ($this->provider_id === auth()->id()) {
+                return $this->customer->name;
+            }
+        }
+        return null;
+    }
+
+    public function getParticipantAvatarAttribute()
+    {
+        if (auth()->check()) {
+            if ($this->customer_id === auth()->id()) {
+                return $this->provider->profile_photo_url;
+            }
+            if ($this->provider_id === auth()->id()) {
+                return $this->customer->profile_photo_url;
+            }
+        }
+        return null;
+    }
 }

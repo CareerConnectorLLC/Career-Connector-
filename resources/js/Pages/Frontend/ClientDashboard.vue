@@ -1,9 +1,11 @@
 <script setup>
 import { computed, onMounted, ref, onUnmounted } from "vue";
 import { usePage, Link } from "@inertiajs/vue3";
+import { useMessageUpdater } from "../../composables/useMessageUpdater.js";
 import ProfileDropdown from "../../components/frontend/customer/ProfileDropdown.vue";
 import CustomerSidebar from "../../components/frontend/customer/LeftSidebar.vue";
 import BookingSection from "../../components/frontend/customer/dashboard/BookingSection.vue";
+import MessageListComponent from '../../components/MessageListComponent.vue';
 
 const page = usePage()
 const scrollY = ref(0);
@@ -19,6 +21,10 @@ onUnmounted(() => {
 
 const user = computed(() => page.props.auth.user)
 const bookings = computed(() => page.props.bookings)
+const conversations = ref(page.props.conversations)
+
+// Set up the real-time message listener and updater.
+useMessageUpdater(conversations);
 
 function handleScroll() {
     scrollY.value = window.scrollY;
@@ -229,9 +235,9 @@ function handleScroll() {
                                         <div class="card-head">
                                             <div class="bookings-heading">
                                                 <h4>Messages</h4>
-                                                <a class="view-all" href="message.html">View all</a>
+                                                <Link class="view-all" href="/messaging">View all</Link>
                                             </div>
-                                            <div class="message-search">
+                                            <div class="message-search d-none">
                                                 <form>
                                                     <div class="form-input">
                                                         <input type="text" placeholder="Search">
@@ -239,162 +245,7 @@ function handleScroll() {
                                                 </form>
                                             </div>
                                         </div>
-
-                                        <div class="message-wrap dashboard-message-list">
-                                            <ul>
-                                                <li>
-                                                    <a href="message.html">
-                                                        <figure><img
-                                                                src="/public/frontend_assets/images/message-profile-01.png"
-                                                                alt="message-profile"></figure>
-                                                        <div class="message-cont">
-                                                            <div class="message-cont-head">
-                                                                <h5>Wade Warren</h5>
-                                                                <p class="time">12:35</p>
-                                                            </div>
-                                                            <p>
-                                                                Lorem ipsum dolor sit consectetur adipiscing.
-                                                            </p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-
-                                                <li>
-                                                    <a href="message.html">
-                                                        <figure><img
-                                                                src="/public/frontend_assets/images/message-profile-02.png"
-                                                                alt="message-profile"></figure>
-                                                        <div class="message-cont">
-                                                            <div class="message-cont-head">
-                                                                <h5>Esther Howard</h5>
-                                                                <p class="time">12:35</p>
-                                                            </div>
-                                                            <p>
-                                                                Lorem ipsum dolor sit consectetur adipiscing.
-                                                            </p>
-                                                            <p class="counting">02</p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="message.html">
-                                                        <figure><img
-                                                                src="/public/frontend_assets/images/message-profile-03.png"
-                                                                alt="message-profile"></figure>
-                                                        <div class="message-cont">
-                                                            <div class="message-cont-head">
-                                                                <h5>Alison D’suza</h5>
-                                                                <p class="time">12:35</p>
-                                                            </div>
-                                                            <p>
-                                                                Lorem ipsum dolor sit consectetur adipiscing.
-                                                            </p>
-                                                            <p class="counting">02</p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-
-                                                <li>
-                                                    <a href="message.html">
-                                                        <figure><img
-                                                                src="/public/frontend_assets/images/message-profile-04.png"
-                                                                alt="message-profile"></figure>
-                                                        <div class="message-cont">
-                                                            <div class="message-cont-head">
-                                                                <h5>Brooklyn Simmons</h5>
-                                                                <p class="time">12:35</p>
-                                                            </div>
-                                                            <p>
-                                                                Lorem ipsum dolor sit consectetur adipiscing.
-                                                            </p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-
-                                                <li>
-                                                    <a href="message.html">
-                                                        <figure><img
-                                                                src="/public/frontend_assets/images/jenny-wilson-2.png"
-                                                                alt="Jenny-w">
-                                                        </figure>
-                                                        <div class="message-cont">
-                                                            <div class="message-cont-head">
-                                                                <h5>Jenny Wilson</h5>
-                                                                <p class="time">12:35</p>
-                                                            </div>
-                                                            <p>
-                                                                Lorem ipsum dolor sit consectetur adipiscing.
-                                                            </p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="message.html">
-                                                        <figure><img
-                                                                src="/public/frontend_assets/images/Kristin-Watson-2.png"
-                                                                alt="Kristin-Watson"></figure>
-                                                        <div class="message-cont">
-                                                            <div class="message-cont-head">
-                                                                <h5>Kristin Watson</h5>
-                                                                <p class="time">12:35</p>
-                                                            </div>
-                                                            <p>
-                                                                Lorem ipsum dolor sit consectetur adipiscing.
-                                                            </p>
-                                                            <p class="counting">02</p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="message.html">
-                                                        <figure><img
-                                                                src="/public/frontend_assets/images/message-profile-05.png"
-                                                                alt="message-profile"></figure>
-                                                        <div class="message-cont">
-                                                            <div class="message-cont-head">
-                                                                <h5>Savannah Nguyen</h5>
-                                                                <p class="time">12:35</p>
-                                                            </div>
-                                                            <p>
-                                                                Lorem ipsum dolor sit consectetur adipiscing.
-                                                            </p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="message.html">
-                                                        <figure><img
-                                                                src="/public/frontend_assets/images/message-profile-06.png"
-                                                                alt="message-profile"></figure>
-                                                        <div class="message-cont">
-                                                            <div class="message-cont-head">
-                                                                <h5>Cody Fisher</h5>
-                                                                <p class="time">12:35</p>
-                                                            </div>
-                                                            <p>
-                                                                Lorem ipsum dolor sit consectetur adipiscing.
-                                                            </p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="message.html">
-                                                        <figure><img
-                                                                src="/public/frontend_assets/images/message-profile-07.png"
-                                                                alt="message-profile"></figure>
-                                                        <div class="message-cont">
-                                                            <div class="message-cont-head">
-                                                                <h5>Annette Black</h5>
-                                                                <p class="time">12:35</p>
-                                                            </div>
-                                                            <p>
-                                                                Lorem ipsum dolor sit consectetur adipiscing.
-                                                            </p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                        <MessageListComponent :conversations="conversations" :role="user.role" />
                                     </div>
                                 </div>
                             </div>

@@ -27,53 +27,21 @@
 <script setup>
 import Toast from 'primevue/toast';
 import Button from 'primevue/button';
-import { computed, onMounted, onUnmounted } from 'vue';
+import { computed } from 'vue';
 import { usePage, router } from "@inertiajs/vue3";
-import { useToast } from 'primevue/usetoast';
 import Header from './Header.vue';
 import Footer from './Footer.vue';
-import emitter from '@/eventBus';
+import { useGlobalMessageNotifier } from '../../composables/useGlobalMessageNotifier';
+import { usePresenceChannel } from '../../composables/usePresenceChannel';
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
-const toast = useToast();
 
-const handleBroadcastedMessage = (e) => {
-    // Don't show a toast for our own sent messages.
-    if (e.message.sender_id === user.value.id) {
-        return;
-    }
+// This composable will handle listening for new messages and showing toasts.
+useGlobalMessageNotifier();
 
-    // If the user is on the messaging page, don't show a toast.
-    // Instead, emit an event for the Messaging component to update unread counts.
-    if (page.url.startsWith('/messaging')) {
-        emitter.emit('global-message-received', e);
-        return;
-    }
-
-    // For all other pages, show the toast notification.
-    toast.add({
-        group: 'message-toast',
-        summary: `New message from ${e.message.sender.name}`,
-        detail: e.message.body,
-        data: { conversationId: e.message.conversation_id },
-        life: 6000
-    });
-};
-
-onMounted(() => {
-    // Listen for new message notifications on the user's private channel.
-    if (user.value) {
-        Echo.private(`private.user.${user.value.id}`)
-            .listen('MessageSent', handleBroadcastedMessage);
-    }
-});
-
-onUnmounted(() => {
-    if (user.value) {
-        Echo.leave(`private.user.${user.value.id}`);
-    }
-});
+// This composable handles the global presence channel connection.
+usePresenceChannel();
 
 // Function to handle clicks on the toast notification
 function navigateToConversation(conversationId) {

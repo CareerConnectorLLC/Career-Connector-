@@ -184,6 +184,7 @@ Route::name('frontend.')->group(function() {
             Route::resource('/doc-upload', \App\Http\Controllers\Frontend\Provider\DocumentUploadController::class)->only('store', 'destroy');
             Route::post('/stripe-setup', [\App\Http\Controllers\Frontend\Provider\BankDetailsController::class, 'stripeSetup']);
             Route::resource('/booking-request', \App\Http\Controllers\Frontend\Provider\BookingRequestController::class)->only('index', 'update');
+            Route::resource('/my-bookings', \App\Http\Controllers\Frontend\Provider\MyBookingController::class)->only('index');
             Route::resource('/social-links', \App\Http\Controllers\Frontend\Provider\SocialLinkController::class)->only('index', 'store');
         });
         

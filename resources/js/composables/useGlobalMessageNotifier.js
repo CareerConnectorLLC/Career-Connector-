@@ -1,14 +1,29 @@
-import { onMounted, onUnmounted, computed } from 'vue';
+import { computed, watch } from 'vue';
 import { usePage, router } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import emitter from '@/eventBus';
 
+// --- Singleton State ---
+// This flag ensures the initialization logic runs only once per application lifecycle.
+let isInitialized = false;
+
 export function useGlobalMessageNotifier() {
+    // If the notifier has already been set up, do nothing.
+    if (isInitialized) {
+        return;
+    }
+    isInitialized = true;
+
     const page = usePage();
     const user = computed(() => page.props.auth.user);
     const toast = useToast();
 
     const handleIncomingNotification = (event) => {
+        // Don't show a toast for our own sent messages.
+        if (user.value && event.message.sender_id === user.value.id) {
+            return;
+        }
+
         // Emit a global event that other components (like Messaging.vue) can listen to.
         emitter.emit('global-message-received', event);
 
@@ -32,18 +47,16 @@ export function useGlobalMessageNotifier() {
         });
     };
 
-    onMounted(() => {
-        if (user.value) {
-            // Listen on the private channel for the authenticated user.
-            window.Echo.private(`private.user.${user.value.id}`)
+    watch(user, (currentUser, previousUser) => {
+        // Clean up the old channel listener if the user changes (e.g., logs out).
+        if (previousUser) {
+            window.Echo.leave(`private.user.${previousUser.id}`);
+        }
+
+        // Set up the new channel listener if we have a new user (e.g., logs in).
+        if (currentUser) {
+            window.Echo.private(`private.user.${currentUser.id}`)
                 .listen('MessageSent', handleIncomingNotification);
         }
-    });
-
-    onUnmounted(() => {
-        // Clean up the listener when the user logs out or the app closes.
-        if (user.value) {
-            window.Echo.leave(`private.user.${user.value.id}`);
-        }
-    });
+    }, { immediate: true });
 }

@@ -69,6 +69,14 @@ const signout = () => {
                                 <span>Reviews &amp; ratings</span>
                             </a>
                         </li>
+                        <li :class="{ 'active': $page.url.startsWith('/my-bookings') }">
+                            <Link href="/my-bookings">
+                                <figure>
+                                    <img src="/public/frontend_assets/images/provider-img-3.svg" alt="user">
+                                </figure>
+                                <span>Bookings</span>
+                            </Link>
+                        </li>
                         <li class="d-none">
                             <a href="">
                                 <figure>
