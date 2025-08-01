@@ -11,6 +11,8 @@ const page = usePage()
 const scrollY = ref(0);
 const isFixed = ref(false);
 
+const searchQuery = ref('');
+
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);
 })
@@ -25,6 +27,15 @@ const conversations = ref(page.props.conversations)
 
 // Set up the real-time message listener and updater.
 useMessageUpdater(conversations);
+
+const filteredConversations = computed(() => {
+    if (!searchQuery.value) {
+        return conversations.value;
+    }
+    return conversations.value.filter(conversation =>
+        conversation.customer.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+});
 
 function handleScroll() {
     scrollY.value = window.scrollY;
@@ -218,16 +229,16 @@ function handleScroll() {
                                                 <h4>Messages</h4>
                                                 <Link class="view-all" href="/messaging">View all</Link>
                                             </div>
-                                            <div class="message-search d-none">
+                                            <div class="message-search">
                                                 <form>
                                                     <div class="form-input">
-                                                        <input type="text" placeholder="Search">
+                                                        <input type="text" placeholder="Search" v-model="searchQuery">
                                                     </div>
                                                 </form>
                                             </div>
                                         </div>
 
-                                        <MessageListComponent :conversations="conversations" :role="user.role"/>
+                                        <MessageListComponent :conversations="filteredConversations" :role="user.role"/>
                                     </div>
                                 </div>
                             </div>

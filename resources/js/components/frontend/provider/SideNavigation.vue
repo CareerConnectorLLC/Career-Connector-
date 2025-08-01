@@ -45,13 +45,21 @@ const signout = () => {
                                 <span>Messaging</span>
                             </Link>
                         </li>
-                        <li class="d-none">
-                            <a href="">
+                        <li :class="{ 'active': $page.url.startsWith('/my-availability') }">
+                            <Link href="/my-availability">
                                 <figure>
                                     <img src="/public/frontend_assets/images/provider-logo-1.svg" alt="wallet">
                                 </figure>
-                                <span>Manage availability</span>
-                            </a>
+                                <span>Manage timings</span>
+                            </Link>
+                        </li>
+                        <li :class="{ 'active': $page.url.startsWith('/completed-jobs') }">
+                            <Link href="/completed-jobs">
+                                <figure>
+                                    <img src="/public/frontend_assets/images/provider-logo-2.svg" alt="user">
+                                </figure>
+                                <span>Job completion</span>
+                            </Link>
                         </li>
                         <li :class="{ 'active': $page.url.startsWith('/social-links') }">
                             <Link href="/social-links">

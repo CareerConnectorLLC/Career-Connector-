@@ -1,6 +1,8 @@
 <script setup>
-defineProps({
-    users: {
+import { ref, computed } from 'vue';
+
+const props = defineProps({
+    conversations: {
         type: Array,
         required: true
     },
@@ -15,6 +17,30 @@ const emit = defineEmits(['select-user'])
 function selectUser(userId, serviceId) {
     emit('select-user', { userId, serviceId })
 }
+
+const searchQuery = ref('');
+
+const filteredUsers = computed(() => {
+    if (!props.conversations) {
+        return [];
+    }
+    const users = props.conversations.map(conversation => {
+        const user = props.role === 'USER' ? conversation.provider : conversation.customer;
+        return {
+            ...user,
+            service_id: conversation.service.id,
+            unread_messages_count: conversation.unread_messages_count
+        };
+    });
+
+    if (!searchQuery.value) {
+        return users;
+    }
+
+    return users.filter(user =>
+        user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+});
 </script>
 
 <template>
@@ -24,18 +50,18 @@ function selectUser(userId, serviceId) {
                 <div class="bookings-heading">
                     <h4 v-text="role === 'USER' ? 'Providers' : 'Customers'"></h4>
                 </div>
-                <div class="message-search d-none">
+                <div class="message-search">
                     <form>
                         <div class="form-input">
-                            <input type="text" placeholder="Search">
+                            <input type="text" placeholder="Search" v-model="searchQuery">
                         </div>
                     </form>
                 </div>
             </div>
 
             <div class="message-wrap">
-                <ul v-if="users.length">
-                    <li v-for="(user, index) in users" :key="index">
+                <ul v-if="filteredUsers.length">
+                    <li v-for="(user, index) in filteredUsers" :key="index">
                         <a href="" @click.prevent="selectUser(user.id, user.service_id)" class="d-flex align-items-center">
                             <figure v-if="user.profile_photo_path">
                                 <img :src="user.profile_photo_url" :alt="user.name">

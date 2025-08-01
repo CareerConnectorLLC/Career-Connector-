@@ -23,8 +23,19 @@ const user = computed(() => page.props.auth.user)
 const bookings = computed(() => page.props.bookings)
 const conversations = ref(page.props.conversations)
 
+const searchQuery = ref('');
+
 // Set up the real-time message listener and updater.
 useMessageUpdater(conversations);
+
+const filteredConversations = computed(() => {
+    if (!searchQuery.value) {
+        return conversations.value;
+    }
+    return conversations.value.filter(conversation =>
+        conversation.provider.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+});
 
 function handleScroll() {
     scrollY.value = window.scrollY;
@@ -237,15 +248,15 @@ function handleScroll() {
                                                 <h4>Messages</h4>
                                                 <Link class="view-all" href="/messaging">View all</Link>
                                             </div>
-                                            <div class="message-search d-none">
-                                                <form>
-                                                    <div class="form-input">
-                                                        <input type="text" placeholder="Search">
-                                                    </div>
-                                                </form>
-                                            </div>
+                                            <div class="message-search">
+                                            <form>
+                                                <div class="form-input">
+                                                    <input type="text" placeholder="Search" v-model="searchQuery">
+                                                </div>
+                                            </form>
                                         </div>
-                                        <MessageListComponent :conversations="conversations" :role="user.role" />
+                                    </div>
+                                    <MessageListComponent :conversations="filteredConversations" :role="user.role" />
                                     </div>
                                 </div>
                             </div>

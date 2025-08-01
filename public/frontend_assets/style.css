@@ -5258,7 +5258,7 @@ table {
 
 .dashboard-right-inner{ 
     position: relative;
-    /* z-index: 2; */
+    z-index: 2;
     height: 100%;
 }
 
@@ -9455,6 +9455,17 @@ padding: 25px;
 /* Social media Links */
 
 /* 17/07/2025 dm */
+
+
+
+.dashboard-right-inner form .manage-table table tr td:last-child{
+ width: auto;  
+}
+
+.dashboard-right-inner form .manage-table table tr td span{
+    width: 100%;
+}
+
 
 
 /* ========== responsive css =========== */

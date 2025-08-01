@@ -4,6 +4,13 @@ import { Link, useForm, usePage } from "@inertiajs/vue3";
 import ProviderSidebar from '../../../components/frontend/provider/SideNavigation.vue';
 import ProfileDropdown from '../../../components/frontend/provider/ProfileDropdown.vue';
 
+import { useGlobalMessageNotifier } from '../../../composables/useGlobalMessageNotifier';
+import { usePresenceChannel } from '../../../composables/usePresenceChannel';
+
+// Initialize real-time listeners for notifications and presence.
+useGlobalMessageNotifier();
+usePresenceChannel();
+
 const page = usePage()
 
 const form = useForm({

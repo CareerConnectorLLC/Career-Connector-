@@ -8,6 +8,10 @@ import { usePresenceChannel } from "../../../composables/usePresenceChannel";
 import ProviderSidebar from "../../../components/frontend/provider/SideNavigation.vue";
 import ProfileDropdown from "../../../components/frontend/provider/ProfileDropdown.vue";
 
+// Initialize real-time listeners for notifications and presence.
+useGlobalMessageNotifier();
+usePresenceChannel();
+
 const fm = new FormatMoney({
     decimals: 0,
     symbol: "$"
@@ -36,6 +40,11 @@ function handleScroll() {
     scrollY.value = window.scrollY;
     isFixed.value = scrollY.value > 0;
 }
+
+const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+};
 </script>
 
 <template>
@@ -77,6 +86,7 @@ function handleScroll() {
                                             <th>Booking Number</th>
                                             <th>Client name</th>
                                             <th>Service</th>
+                                            <th>Date</th>
                                             <th>Price</th>
                                         </tr>
                                     </thead>
@@ -86,6 +96,7 @@ function handleScroll() {
                                             <td v-text="booking.booking_number"></td>
                                             <td v-text="booking.client.name"></td>
                                             <td v-text="booking.service.name"></td>
+                                            <td v-text="formatDate(booking.created_at)"></td>
                                             <td v-text="fm.from(parseInt(booking.price / 100))"></td>
                                         </tr>
                                     </tbody>

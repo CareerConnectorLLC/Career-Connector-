@@ -186,6 +186,8 @@ Route::name('frontend.')->group(function() {
             Route::resource('/booking-request', \App\Http\Controllers\Frontend\Provider\BookingRequestController::class)->only('index', 'update');
             Route::resource('/my-bookings', \App\Http\Controllers\Frontend\Provider\MyBookingController::class)->only('index');
             Route::resource('/social-links', \App\Http\Controllers\Frontend\Provider\SocialLinkController::class)->only('index', 'store');
+            Route::resource('/my-availability', \App\Http\Controllers\Frontend\Provider\AvailabilityController::class)->only('index', 'store');
+            Route::resource('/completed-jobs', \App\Http\Controllers\Frontend\Provider\CompletedJobsController::class)->only('index');
         });
         
         Route::resource('/messaging', \App\Http\Controllers\Frontend\Customer\MessagingController::class)->only('index', 'show', 'store');

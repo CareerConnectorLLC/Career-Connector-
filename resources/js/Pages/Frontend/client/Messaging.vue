@@ -13,7 +13,7 @@ import { usePresenceChannel } from "../../../composables/usePresenceChannel.js";
 const { onlineUsers } = usePresenceChannel();
 const page = usePage()
 const user = computed(() => page.props.auth.user)
-const conversations = computed(() => page.props.conversations)
+const conversations = ref(page.props.conversations)
 const activeConversation = ref(null)
 const messages = ref([])
 const isLoadingMessages = ref(false)
@@ -372,7 +372,7 @@ async function markConversationAsRead() {
                     <div class="dashboard-right-inner">
                         <div class="messaging-wrap">
                             <!-- User Listing Component -->
-                            <UserListing :users="getConversationUsers()" :role="user.role" @select-user="initiateConversation" />
+                            <UserListing :conversations="conversations" :role="user.role" @select-user="initiateConversation" />
                             
                             <!-- User Messaging Area -->
                             <div class="messaging-center" v-if="activeConversation">
