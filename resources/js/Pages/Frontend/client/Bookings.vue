@@ -132,7 +132,7 @@ function markAsComplete(id) {
                                             </td>
                                             <td v-if="!isPastDate(booking.start_date) && booking.status === 'Confirmed'">
                                                 <a class="cmn-gray-btn" href="" @click.prevent="markAsComplete(booking.id)">
-                                                    Mark as complete
+                                                    Start Meeting
                                                 </a>
                                             </td>
                                         </tr>

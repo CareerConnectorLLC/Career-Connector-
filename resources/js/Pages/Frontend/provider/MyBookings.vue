@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, ref, computed } from "vue";
 import { usePage } from "@inertiajs/vue3";
+import dayjs from "dayjs";
 import { FormatMoney } from "format-money-js";
 
 import { useGlobalMessageNotifier } from "../../../composables/useGlobalMessageNotifier";
@@ -41,9 +42,12 @@ function handleScroll() {
     isFixed.value = scrollY.value > 0;
 }
 
+function isPastDate(dateTimeString) {
+    return dayjs(dateTimeString).isBefore(dayjs(), 'day');
+}
+
 const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    return dayjs(dateString).format('MMMM D, YYYY, h:mm A');
 };
 </script>
 
@@ -86,8 +90,9 @@ const formatDate = (dateString) => {
                                             <th>Booking Number</th>
                                             <th>Client name</th>
                                             <th>Service</th>
-                                            <th>Date</th>
+                                            <th>Date & Time</th>
                                             <th>Price</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
 
@@ -96,8 +101,13 @@ const formatDate = (dateString) => {
                                             <td v-text="booking.booking_number"></td>
                                             <td v-text="booking.client.name"></td>
                                             <td v-text="booking.service.name"></td>
-                                            <td v-text="formatDate(booking.created_at)"></td>
+                                            <td v-text="formatDate(booking.start_date)"></td>
                                             <td v-text="fm.from(parseInt(booking.price / 100))"></td>
+                                            <td v-if="!isPastDate(booking.start_date) && booking.status === 'Confirmed'">
+                                                <a class="cmn-gray-btn" href="#">
+                                                    Start Meeting
+                                                </a>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>

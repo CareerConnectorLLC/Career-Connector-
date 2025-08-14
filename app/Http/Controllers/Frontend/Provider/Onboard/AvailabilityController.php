@@ -7,6 +7,8 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Rules\HasAtLeastOneAvailableTime;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\W9TaxFormMail;
 
 class AvailabilityController extends Controller
 {
@@ -33,13 +35,15 @@ class AvailabilityController extends Controller
             'timings.*.*' => ['nullable', 'string', 'regex:/^(0[1-9]|1[0-2]):[0-5][0-9]\s(am|pm)$/i'],
         ]);
 
-        $user = User::select('id','name')->find(session('user_onboard')['id']);
+        $user = User::select('id','name', 'email')->find(session('user_onboard')['id']);
 
         $timings = collect($request->input('timings'))->map(fn ($item) => count($item) ? $item : null)->toJson();
 
         $user->availability()->create([
             'timings' => $timings
         ]);
+
+        Mail::to($user->email)->send(new W9TaxFormMail($user));
 
         $request->session()->forget('services');
         $request->session()->forget('user_onboard');

@@ -121,12 +121,12 @@ function isPastDate(dateTimeString) {
                                             <td>
                                                 <ul class="right-recived" v-if="!isPastDate(booking.start_date) && booking.status === 'Pending'">
                                                     <li>
-                                                        <a href="" @click.prevent="cancelRequest(booking.id)" class="crs-img">
+                                                        <a href="" title="Decline" @click.prevent="cancelRequest(booking.id)" class="crs-img">
                                                             <img src="/public/frontend_assets/images/crs-svg.svg" alt="icon">
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="" @click.prevent="acceptRequest(booking.id)" class="right-img">
+                                                        <a href="" title="Accept" @click.prevent="acceptRequest(booking.id)" class="right-img">
                                                             <img src="/public/frontend_assets/images/right-svg.svg" alt="icon">
                                                         </a>
                                                     </li>

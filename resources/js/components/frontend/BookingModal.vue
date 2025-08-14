@@ -4,6 +4,7 @@ import { router } from '@inertiajs/vue3'
 import dayjs from 'dayjs'
 import { FormatMoney } from 'format-money-js'
 import Datepicker from 'vanillajs-datepicker/Datepicker'
+import axios from 'axios'
 
 const props = defineProps({
     provider: Object,
@@ -18,9 +19,11 @@ const emit = defineEmits(['booking-success'])
 const timeSlots = ref(null)
 const processing = ref(false)
 const datePicker = useTemplateRef('datePicker')
-const errorMsg = useTemplateRef('errorMsg')
+const errorMessage = ref('')
 const dateSelected = ref(false)
 const datepicker = ref(null)
+const duration = ref(1)
+const bookedSlots = ref([])
 
 const fm = new FormatMoney({
     decimals: 0,
@@ -31,6 +34,19 @@ const form = reactive({
     date: dayjs().format('YYYY-MM-DD'),
     time: null,
 })
+
+async function fetchAvailability(date) {
+    if (date && props.provider) {
+        try {
+            const response = await axios.get(`/provider/${props.provider.id}/availability/${date}`);
+            timeSlots.value = response.data.available_slots;
+            bookedSlots.value = response.data.booked_slots;
+        } catch (error) {
+            console.error('Error fetching availability:', error);
+            timeSlots.value = [];
+        }
+    }
+}
 
 onMounted(() => {
     const date = new Date()
@@ -45,6 +61,7 @@ onMounted(() => {
         let { date } = e.detail
         timeSlots.value = props.timings[date.toString().split(' ')[0]]
         form.date = dayjs(date).format('YYYY-MM-DD')
+        fetchAvailability(form.date);
     })
 
     timeSlots.value = props.timings[date.toString().split(' ')[0]]
@@ -62,10 +79,7 @@ watch(
         if (!value) {
             form.date = dayjs().format('YYYY-MM-DD')
             datepicker.value.setDate(new Date())
-            
-            if (!errorMsg.value.classList.contains('d-none')) {
-                errorMsg.value.classList.add('d-none')
-            }
+            errorMessage.value = ''
             
             if (form.time) {
                 form.time = null
@@ -74,6 +88,8 @@ watch(
             if (dateSelected.value) {
                 dateSelected.value = false
             }
+
+            duration.value = 1
         }
     }
 )
@@ -118,23 +134,41 @@ function areDatesTheSameDay(date) {
     return today === givenDate
 }
 
-function goToNextStep() {
+async function goToNextStep() {
     if (!form.time) {
-        errorMsg.value.classList.remove('d-none')
+        errorMessage.value = 'Please select a time'
         return
     }
-
-    if (!errorMsg.value.classList.contains('d-none')) {
-        errorMsg.value.classList.add('d-none')
-    }
     
-    dateSelected.value = true
+    errorMessage.value = ''
+    processing.value = true
+
+    try {
+        const response = await axios.post('/api/check-availability', {
+            provider_id: props.provider.id,
+            date: form.date,
+            time: form.time,
+            duration: duration.value, // Assuming service has a duration property
+        });
+
+        if (response.data.available) {
+            dateSelected.value = true
+        } else {
+            errorMessage.value = response.data.message
+        }
+    } catch (error) {
+        console.error('Error checking availability:', error);
+        errorMessage.value = 'An error occurred while checking availability.'
+    } finally {
+        processing.value = false
+    }
 }
 
 function makeTheBooking() {
     form['provider_id'] = props.provider.id
     form['service_id'] = props.service.id
     form['amount'] = props.fees
+    form['duration'] = duration.value
     
     processing.value = true
 
@@ -198,8 +232,8 @@ function makeTheBooking() {
                                 </form>
                                 <span v-else class="help-block fw-semibold">No Availability</span>
                             </div>
-                            <p ref="errorMsg" class="error-message d-none">
-                                Please select a time
+                            <p v-if="errorMessage" class="error-message">
+                                {{ errorMessage }}
                             </p>
                         </div>
                     </div>
@@ -246,8 +280,10 @@ function makeTheBooking() {
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" v-show="dateSelected"
                         @click="dateSelected = false">Go Back</button>
-                    <button type="button" v-if="!dateSelected" class="btn btn-primary" @click="goToNextStep">Continue</button>
-                    <button type="button" v-else class="btn btn-primary" :disabled="processing" @click="makeTheBooking">Confirm</button>
+                    <button type="button" v-if="!dateSelected" class="btn btn-primary"
+                        @click="goToNextStep">Continue</button>
+                    <button type="button" v-else class="btn btn-primary" :disabled="processing"
+                        @click="makeTheBooking">Confirm</button>
                 </div>
             </div>
         </div>

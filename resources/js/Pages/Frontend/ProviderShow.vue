@@ -16,6 +16,7 @@ const page = usePage()
 const modalShown = ref(false)
 const bookingModal = ref(null)
 const noCardModal = ref(null)
+const redirectToBookingsAfterClose = ref(false)
 
 const provider = computed(() => page.props.provider)
 const hasBooking = computed(() => page.props.has_pending_or_confirmed_booking_today)
@@ -32,6 +33,10 @@ onMounted(() => {
 
     bookingModalEl.addEventListener('hidden.bs.modal', () => {
         modalShown.value = false
+        if (redirectToBookingsAfterClose.value) {
+            router.visit('/bookings')
+            redirectToBookingsAfterClose.value = false // Reset for next time
+        }
     })
 })
 
@@ -65,6 +70,7 @@ const timings = computed(() => {
 const workingDaysCount = computed(() => timings.value.filter(t => t.timeRange != 'No Availability').length)
 
 function closeBookingModal() {
+    redirectToBookingsAfterClose.value = true
     bookingModal.value.hide()
 }
 

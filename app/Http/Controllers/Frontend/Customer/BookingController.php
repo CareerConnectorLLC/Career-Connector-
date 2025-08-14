@@ -11,7 +11,10 @@ class BookingController extends Controller
 {
     public function index(Request $request)
     {
-        $bookings = $request->user()->clientBookings()->with('service:id,name', 'provider:id,name')->get();
+        $bookings = $request->user()->clientBookings()
+                        ->with(['service:id,name', 'provider:id,name'])
+                        ->orderBy('created_at', 'desc')
+                        ->get();
         
         return Inertia::render('Frontend/client/Bookings', [
             'bookings' => $bookings,
@@ -21,9 +24,11 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $startDate = now()->createFromFormat('Y-m-d h:i a', $request->date.' '.$request->time);
+        $endDate = now()->parse($startDate)->addHour()->format('Y-m-d H:i:s');
 
         $request->user()->clientBookings()->create([
             'start_date' => $startDate,
+            'end_date' => $endDate,
             'booking_number' => $this->generateUniqueBookingNumber(),
             'service_id' => $request->service_id,
             'provider_id' => $request->provider_id,

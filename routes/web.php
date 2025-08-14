@@ -134,7 +134,7 @@ Route::name('frontend.')->group(function() {
     Route::resource('blog', \App\Http\Controllers\Frontend\BlogController::class)->only(['index', 'show']);
     Route::match(['get', 'post'], '/contact-us', \App\Http\Controllers\Frontend\ContactUsController::class)->name('contact');
     Route::get('/provider-listing', \App\Http\Controllers\Frontend\ProviderListingController::class)->name('provider.listing');
-    Route::get('/provider/{id}', \App\Http\Controllers\Frontend\ProviderShowController::class)->name('provider.details');
+    Route::any('/provider/{id}', \App\Http\Controllers\Frontend\ProviderShowController::class)->name('provider.details');
     
     Route::middleware(['guest'])->group(function () {
         Route::get('/login', [\App\Http\Controllers\Frontend\AuthController::class, 'index'])->name('login');
@@ -174,6 +174,8 @@ Route::name('frontend.')->group(function() {
             Route::post('/save-card', \App\Http\Controllers\Frontend\Customer\SaveCardController::class);
             Route::delete('/remove-card/{id}', \App\Http\Controllers\Frontend\Customer\RemoveCardController::class);
             Route::resource('/bookings', \App\Http\Controllers\Frontend\Customer\BookingController::class)->only('index', 'store', 'update');
+            Route::get('/provider/{providerId}/availability/{date}', [\App\Http\Controllers\Frontend\ProviderAvailabilityController::class, 'getAvailability']);
+            Route::post('/api/check-availability', [\App\Http\Controllers\Frontend\ProviderAvailabilityController::class, 'checkAvailability']);
         });
 
         Route::middleware(['is-provider'])->group(function () {
