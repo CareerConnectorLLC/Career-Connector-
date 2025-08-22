@@ -7,6 +7,10 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\CommissionSetting;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
+use App\Mail\ProviderMeetingNotification;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class BookingRequestController extends Controller
 {
@@ -32,10 +36,17 @@ class BookingRequestController extends Controller
 
         if ($request->status === 'Confirmed') {
             $this->makeStripeChargeForCustomer($booking);
+            $this->generateTheMeeting($booking);
         }
 
         $booking->status = $request->status;
         $booking->save();
+
+        if ($request->status === 'Confirmed') {
+            session()->flash('success', 'Booking confirmed successfully.');
+        } else {
+            session()->flash('success', 'Booking cancelled successfully.');
+        }
     }
 
     private function makeStripeChargeForCustomer($booking)
@@ -60,6 +71,38 @@ class BookingRequestController extends Controller
                 'off_session' => true,
                 'confirm' => true,
             ]);
+        }
+    }
+
+    private function generateTheMeeting($booking)
+    {
+        $apiKey = config('services.digitalsamba.developer_key');
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type' => 'application/json',
+        ])->post('https://api.digitalsamba.com/api/v1/rooms', [
+            'topic' => 'Booking with ' . $booking->provider->name,
+            'privacy' => 'private',
+            "roles" => ["moderator", "speaker"],
+            "default_role" => "moderator"
+        ]);
+
+        if ($response->successful()) {
+            $meetingData = $response->json();
+            $friendlyUrlCode = $meetingData['friendly_url'];
+
+            $booking->meeting_url = $friendlyUrlCode;
+            $booking->provider_join_token = Str::random(40);
+            $booking->provider_join_token_expires_at = now()->addHours(1);
+            $booking->save();
+
+            // Send email to provider
+            Mail::to($booking->provider->email)->send(new ProviderMeetingNotification($booking, $booking->provider->name, $booking->provider_join_token));
+        } else {
+            // Handle the error, e.g., log it or show an error message
+            // For now, let's just dump the error response
+            dd($response->json());
         }
     }
 }

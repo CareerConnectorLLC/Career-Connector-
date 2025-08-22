@@ -125,5 +125,7 @@ class ProfileController extends Controller
         if ($request->has('mode')) {
             //
         }
+
+        $request->session()->flash('success', 'Profile updated successfully!');
     }
 }

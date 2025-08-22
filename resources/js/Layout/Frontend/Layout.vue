@@ -27,15 +27,26 @@
 <script setup>
 import Toast from 'primevue/toast';
 import Button from 'primevue/button';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { usePage, router } from "@inertiajs/vue3";
 import Header from './Header.vue';
 import Footer from './Footer.vue';
 import { useGlobalMessageNotifier } from '../../composables/useGlobalMessageNotifier';
 import { usePresenceChannel } from '../../composables/usePresenceChannel';
+import { useToast } from 'primevue';
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
+const toast = useToast();
+
+watch(() => page.props.flash, (flash) => {
+    if (flash && flash.success) {
+        toast.add({ severity: 'success', summary: 'Success', detail: flash.success, life: 3000 });
+    }
+    if (flash && flash.error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: flash.error, life: 3000 });
+    }
+})
 
 // This composable will handle listening for new messages and showing toasts.
 useGlobalMessageNotifier();

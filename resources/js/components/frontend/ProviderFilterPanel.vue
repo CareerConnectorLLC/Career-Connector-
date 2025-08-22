@@ -4,7 +4,7 @@ import { ref, onMounted, watch } from 'vue'
 const props = defineProps({
     services: Object,
     serviceIds: Object,
-    price: String
+    price: Number
 })
 
 const emit = defineEmits(['option-selected'])

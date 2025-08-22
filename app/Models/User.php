@@ -81,7 +81,7 @@ class User extends Authenticatable
 
     public function getProfilePhotoUrlAttribute()
     {
-        return ($this->profile_photo_path) ? asset('/storage/' . $this->profile_photo_path) : null;
+        return ($this->profile_photo_path) ? asset('/storage/' . $this->profile_photo_path) : 'https://ui-avatars.com/api/?name='. $this->name .'&background=0D8ABC&color=fff&rounded=true';
     }
 
     public function clientBookings(): HasMany

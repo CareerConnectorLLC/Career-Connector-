@@ -47,15 +47,12 @@ const processedConversations = computed(() => {
     return props.conversations.map(conversation => {
         const isClient = props.role === 'USER';
         const participant = isClient ? conversation.provider : conversation.customer;
-        const defaultAvatar = isClient
-            ? window.location.origin + '/frontend_assets/images/profile-image-01.png'
-            : window.location.origin + '/frontend_assets/images/message-profile-01.png';
 
         return {
             id: conversation.id,
             participantId: participant.id,
             name: participant.name,
-            avatar: participant.profile_photo_path ? participant.profile_photo_url : defaultAvatar,
+            avatar: participant.profile_photo_url,
             lastMessage: conversation.last_message ? conversation.last_message.body : '',
             lastMessageTime: conversation.last_message ? conversation.last_message.created_at : '',
             unreadCount: conversation.unread_messages_count

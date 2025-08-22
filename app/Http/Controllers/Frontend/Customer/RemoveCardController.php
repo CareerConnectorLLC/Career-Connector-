@@ -13,5 +13,6 @@ class RemoveCardController extends Controller
     public function __invoke(Request $request, $id)
     {
         app('stripe')->paymentMethods->detach($id);
+        $request->session()->flash('success', 'Card removed successfully!');
     }
 }

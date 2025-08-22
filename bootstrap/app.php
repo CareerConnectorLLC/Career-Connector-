@@ -37,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return route('frontend.login');
             }
         });
+        $middleware->validateCsrfTokens(except: ['/webhook/*']);
     })->withExceptions(function (Exceptions $exceptions) {
         Integration::handles($exceptions);
     })->create();

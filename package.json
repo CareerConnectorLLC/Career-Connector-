@@ -29,6 +29,7 @@
         "vue-loader": "^17.3.1"
     },
     "dependencies": {
+        "@digitalsamba/embedded-sdk": "^0.0.49",
         "@inertiajs/vue3": "^2.0.3",
         "@primevue/themes": "^4.2.5",
         "dayjs": "^1.11.13",

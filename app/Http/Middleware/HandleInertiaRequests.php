@@ -40,7 +40,7 @@ class HandleInertiaRequests extends Middleware
             'appUrl' => config('app.url'),
             'is_auth' => auth()->check(),
             'auth' => [
-                'user'=> [
+                'user' => [
                     'id' => auth()->id() ?? null,
                     'name' => auth()->user()->name ?? null,
                     'profile_photo_url' => isset(auth()->user()->profile_photo_url) ? auth()->user()->profile_photo_url : null,
@@ -48,16 +48,15 @@ class HandleInertiaRequests extends Middleware
                     'phone' => isset(auth()->user()->phone) ? auth()->user()->phone : null,
                     'location' => isset(auth()->user()->location) ? auth()->user()->location : null,
                     'role' => auth()->user()?->roleNames[0]
-                  ]
-                ],
-                'flash' => [
-                    'success' => fn() => $request->session()->get('success'),
-                    'error' => fn() => $request->session()->get('error'),
-                    'info' => fn() => $request->session()->get('info'),
-                    'warning' => fn() => $request->session()->get('warning'),
-                ],
+                ]
+            ],
+            'flash' => [
+                'success' => fn() => $request->session()->get('success') ?? null,
+                'error' => fn() => $request->session()->get('error') ?? null,
+                'info' => fn() => $request->session()->get('info') ?? null,
+                'warning' => fn() => $request->session()->get('warning') ?? null,
             ]
-        );
+        ]);
     }
 
     public function rootView(Request $request): string

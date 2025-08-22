@@ -63,11 +63,8 @@ const filteredUsers = computed(() => {
                 <ul v-if="filteredUsers.length">
                     <li v-for="(user, index) in filteredUsers" :key="index">
                         <a href="" @click.prevent="selectUser(user.id, user.service_id)" class="d-flex align-items-center">
-                            <figure v-if="user.profile_photo_path">
+                            <figure>
                                 <img :src="user.profile_photo_url" :alt="user.name">
-                            </figure>
-                            <figure v-else>
-                                <img src="/public/frontend_assets/images/profile-image-01.png" alt="message-profile">
                             </figure>
                             <div class="message-cont flex-grow-1">
                                 <h5>{{ user.name }}</h5>

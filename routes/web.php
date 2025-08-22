@@ -135,7 +135,8 @@ Route::name('frontend.')->group(function() {
     Route::match(['get', 'post'], '/contact-us', \App\Http\Controllers\Frontend\ContactUsController::class)->name('contact');
     Route::get('/provider-listing', \App\Http\Controllers\Frontend\ProviderListingController::class)->name('provider.listing');
     Route::any('/provider/{id}', \App\Http\Controllers\Frontend\ProviderShowController::class)->name('provider.details');
-    
+    Route::get('/meeting/{booking}', [\App\Http\Controllers\Frontend\MeetingPageController::class, 'show'])->name('meeting.show');
+
     Route::middleware(['guest'])->group(function () {
         Route::get('/login', [\App\Http\Controllers\Frontend\AuthController::class, 'index'])->name('login');
         Route::get('/register', fn () => Inertia::render('Frontend/Register'));
@@ -176,6 +177,7 @@ Route::name('frontend.')->group(function() {
             Route::resource('/bookings', \App\Http\Controllers\Frontend\Customer\BookingController::class)->only('index', 'store', 'update');
             Route::get('/provider/{providerId}/availability/{date}', [\App\Http\Controllers\Frontend\ProviderAvailabilityController::class, 'getAvailability']);
             Route::post('/api/check-availability', [\App\Http\Controllers\Frontend\ProviderAvailabilityController::class, 'checkAvailability']);
+            Route::resource('/payment-history', \App\Http\Controllers\Frontend\Customer\PaymentHistoryController::class)->only('index');
         });
 
         Route::middleware(['is-provider'])->group(function () {
@@ -203,3 +205,4 @@ Route::name('frontend.')->group(function() {
 });
 
 Route::view('/mail-test', 'mail.send-o-t-p-mail');
+Route::post('/webhook/meeting-ended', \App\Http\Controllers\Webhook\MeetingEndController::class);

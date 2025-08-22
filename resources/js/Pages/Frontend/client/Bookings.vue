@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref, onUnmounted } from "vue";
-import { usePage, router } from "@inertiajs/vue3";
+import { usePage, Link } from "@inertiajs/vue3";
 import dayjs from 'dayjs';
 import { useGlobalMessageNotifier } from "../../../composables/useGlobalMessageNotifier";
 import { usePresenceChannel } from "../../../composables/usePresenceChannel";
@@ -39,23 +39,12 @@ function formatDateTime(dateTimeString) {
 function isPastDate(dateTimeString) {
     return dayjs(dateTimeString).isBefore(dayjs(), 'day');
 }
-
-function markAsComplete(id) {
-    router.patch(`/bookings/${id}`, {
-        status: 'Completed'
-    }, {
-        preserveState: true,
-        onSuccess: (page) => {
-            router.reload({ only: ['bookings'] })
-        }
-    })
-}
 </script>
 
 <template>
     <div class="dashboard-sec bookings">
         <div class="dashboard-container">
-            <div class="dashboard-head">
+            <div class="dashboard-head" :class="{'fixed': isFixed}">
                 <button class="dashboard-toggler">
                     <span class="stick"></span>
                 </button>
@@ -130,10 +119,10 @@ function markAsComplete(id) {
                                             <td>
                                                 {{ formatDateTime(booking.start_date) }}
                                             </td>
-                                            <td v-if="!isPastDate(booking.start_date) && booking.status === 'Confirmed'">
-                                                <a class="cmn-gray-btn" href="" @click.prevent="markAsComplete(booking.id)">
+                                            <td v-if="!isPastDate(booking.start_date) && booking.status === 'Confirmed' && booking.status !== 'Completed'">
+                                                <Link class="cmn-gray-btn" :href="`/meeting/${booking.id}`">
                                                     Start Meeting
-                                                </a>
+                                                </Link>
                                             </td>
                                         </tr>
                                     </tbody>

@@ -93,9 +93,7 @@ const handleFilter = (param) => {
                                     <div class="card-head">
                                         <div class="card-profile">
                                             <div class="card-profile-img-wrap">
-                                                <img v-if="!provider.provider.profile_photo_path" src="/public/frontend_assets/images/profile-image-01.png"
-                                                    alt="profile-image-01">
-                                                <img v-else :src="provider.provider.profile_photo_url" v-bind:alt="provider.provider.name">
+                                                <img :src="provider.provider.profile_photo_url" v-bind:alt="provider.provider.name">
                                                 <figure style="display: none;">
                                                     <img src="/public/frontend_assets/images/profile-star.svg"
                                                         alt="profile-star">

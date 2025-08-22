@@ -28,7 +28,7 @@ function formatDateTime(params) {
     <div class="bookings-sec">
         <div class="bookings-heading">
             <h3>Bookings</h3>
-            <Link class="view-all" href="/bookings">View all</Link>
+            <Link class="view-all" :href="`${isCustomer ? '/bookings' : '/booking-request'}`">View all</Link>
         </div>
         <div class="booking-content">
             <table>

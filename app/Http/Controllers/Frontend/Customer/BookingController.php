@@ -26,13 +26,17 @@ class BookingController extends Controller
         $startDate = now()->createFromFormat('Y-m-d h:i a', $request->date.' '.$request->time);
         $endDate = now()->parse($startDate)->addHour()->format('Y-m-d H:i:s');
 
+        $token = \Illuminate\Support\Str::random(32);
+        $meetingUrl = route('frontend.meeting.show', ['token' => $token]);
+
         $request->user()->clientBookings()->create([
             'start_date' => $startDate,
             'end_date' => $endDate,
             'booking_number' => $this->generateUniqueBookingNumber(),
             'service_id' => $request->service_id,
             'provider_id' => $request->provider_id,
-            'price' => $request->amount * 100
+            'price' => $request->amount * 100,
+            'meeting_url' => $meetingUrl,
         ]);
     }
 

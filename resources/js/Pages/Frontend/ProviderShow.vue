@@ -140,10 +140,7 @@ function socialIconImageUrl(name) {
                             <div class="provider-details-head">
                                 <div class="card-profile">
                                     <div class="card-profile-img-wrap">
-                                        <img v-if="!provider.provider.profile_photo_path"
-                                            src="/public/frontend_assets/images/profile-image-01.png"
-                                            alt="profile-image-01">
-                                        <img v-else :src="provider.provider.profile_photo_url"
+                                        <img :src="provider.provider.profile_photo_url"
                                             :alt="provider.provider.name">
                                     </div>
                                     <div class="card-profile-details">

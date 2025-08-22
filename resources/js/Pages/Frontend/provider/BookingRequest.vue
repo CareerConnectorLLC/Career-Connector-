@@ -105,7 +105,7 @@ function isPastDate(dateTimeString) {
                                             <th>Service </th>
                                             <th>Proposed Time</th>
                                             <th>Status</th>
-                                            <th>Action</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
 
@@ -131,6 +131,9 @@ function isPastDate(dateTimeString) {
                                                         </a>
                                                     </li>
                                                 </ul>
+                                                <Link v-if="!isPastDate(booking.start_date) && booking.status === 'Confirmed' && booking.status !== 'Completed'" class="cmn-gray-btn" :href="`/meeting/${booking.id}`">
+                                                    Start Meeting
+                                                </Link>
                                             </td>
                                         </tr>
                                     </tbody>

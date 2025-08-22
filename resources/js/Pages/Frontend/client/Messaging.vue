@@ -382,11 +382,8 @@ async function markConversationAsRead() {
                                             <img src="/public/frontend_assets/images/arrow-left.svg" alt="left-arrow">
                                         </button>
                                         <div class="chat-profile" v-if="user.role === 'USER'">
-                                            <figure v-if="activeConversation.provider.profile_photo_path">
+                                            <figure>
                                                 <img :src="activeConversation.provider.profile_photo_url" :alt="activeConversation.provider.name">
-                                            </figure>
-                                            <figure v-if="!activeConversation.provider.profile_photo_path">
-                                                <img src="/public/frontend_assets/images/profile-image-01.png" alt="/message-profile">
                                             </figure>
                                             <div class="chat-profile-details">
                                                 <h3>{{ activeConversation.provider.name }}</h3>
@@ -394,11 +391,8 @@ async function markConversationAsRead() {
                                             </div>
                                         </div>
                                         <div class="chat-profile" v-if="user.role === 'SERVICE-PROVIDER'">
-                                            <figure v-if="activeConversation.customer.profile_photo_path">
+                                            <figure>
                                                 <img :src="activeConversation.customer.profile_photo_url" :alt="activeConversation.customer.name">
-                                            </figure>
-                                            <figure v-if="!activeConversation.customer.profile_photo_path">
-                                                <img src="/public/frontend_assets/images/profile-image-01.png" alt="/message-profile">
                                             </figure>
                                             <div class="chat-profile-details">
                                                 <h3>{{ activeConversation.customer.name }}</h3>
@@ -427,8 +421,7 @@ async function markConversationAsRead() {
                                                             </div>
                                                         </div>
                                                         <figure>
-                                                            <img v-if="message.sender.profile_photo_path" :src="message.sender.profile_photo_url" :alt="message.sender.name">
-                                                            <img v-else src="/public/frontend_assets/images/profile-image-01.png" alt="profile-image">
+                                                            <img :src="message.sender.profile_photo_url" :alt="message.sender.name">
                                                         </figure>
                                                     </div>
                                                     <p v-html="formatTimestamp(message.created_at)"></p>

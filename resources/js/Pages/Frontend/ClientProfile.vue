@@ -99,7 +99,7 @@ const deleteCard = (param) => {
                 <h1 class="text-capitalize">My profile</h1>
                 <div class="search-sec">
                     <div class="serach-inner-wrap">
-                        <div class="search-form">
+                        <div class="search-form d-none">
                             <form>
                                 <div class="search-inner">
                                     <div class="search-inner-wrap">
@@ -115,7 +115,7 @@ const deleteCard = (param) => {
                             </a>
                         </div>
 
-                        <div class="nofication">
+                        <div class="nofication d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/notification.svg" alt="nofication">
@@ -146,12 +146,8 @@ const deleteCard = (param) => {
 
                                     <div class="my-profile-inner-wrap">
                                         <div class="profile-details">
-                                            <figure v-if="user.profile_photo_url">
+                                            <figure>
                                                 <img :src="user.profile_photo_url"
-                                                    alt="profile-image">
-                                            </figure>
-                                            <figure v-else>
-                                                <img src="/public/frontend_assets/images/my-profile-image.png"
                                                     alt="profile-image">
                                             </figure>
                                             <h3>{{ user.name }}</h3>

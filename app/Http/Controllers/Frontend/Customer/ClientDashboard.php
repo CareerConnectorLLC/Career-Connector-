@@ -15,7 +15,11 @@ class ClientDashboard extends Controller
         $user = Auth::user();
         $userId = $user->id;
 
-        $bookings = $request->user()->clientBookings()->with('service:id,name', 'provider:id,name')->get();
+        $bookings = $request->user()->clientBookings()
+            ->with('service:id,name', 'provider:id,name')
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
 
         $conversations = Conversation::where('customer_id', $userId)
             ->orWhere('provider_id', $userId)

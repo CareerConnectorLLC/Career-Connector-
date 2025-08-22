@@ -46,13 +46,13 @@ const signout = () => {
                                 <span>Bookings</span>
                             </Link>
                         </li>
-                        <li class="d-none">
-                            <a href="">
+                        <li :class="{ 'active': $page.url.startsWith('/payment-history') }">
+                            <Link href="/payment-history">
                                 <figure>
                                     <img src="/public/frontend_assets/images/wallet-minus.svg" alt="wallet">
                                 </figure>
                                 <span>Payment history</span>
-                            </a>
+                            </Link>
                         </li>
                         <li :class="{ 'active': $page.url.startsWith('/client-profile') }">
                             <Link href="/client-profile">

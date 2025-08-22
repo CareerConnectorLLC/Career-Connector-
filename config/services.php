@@ -41,4 +41,10 @@ return [
         'redirect'      => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'digitalsamba' => [
+        'team_id' => env('DIGITAL_SAMBA_TEAM_ID', ''),
+        'developer_key' => env('DIGITAL_SAMBA_DEVELOPER_KEY', ''),
+        'base_url' => env('DIGITAL_SAMBA_BASE_URL', ''),
+    ],
+
 ];

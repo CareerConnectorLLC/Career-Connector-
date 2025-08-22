@@ -37,5 +37,7 @@ class SaveCardController extends Controller
             $stripeCustomerId,
             ['invoice_settings' => ['default_payment_method' => $paymentMethod->id]]
         );
+
+        $request->session()->flash('success', 'Card saved successfully!');
     }
 }
