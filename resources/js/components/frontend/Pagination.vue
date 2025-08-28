@@ -7,26 +7,26 @@ const props = defineProps({
 })
 
 const pageLinks = computed(() => {
-    return props.pagination.links.filter(
-        item => item.label != "&laquo; Previous" && item.label != "Next &raquo;"
-    )
+    return props.pagination.links.slice(1, -1);
 })
 </script>
 
 <template>
-    <div class="cmn-pgns">
-        <ul>
-            <li class="prev" v-if="pagination.current_page > 1">
-                <Link :href="pagination.prev_page_url">Prev</Link>
-            </li>
-            <template v-for="link in pageLinks" :key="link.label">
-                <li>
-                    <Link :class="{ 'active': link.active }" :href="link.url" preserve-scroll preserve-state>{{ link.label }}</Link>
+    <div v-if="pagination.last_page > 1">
+        <div class="cmn-pgns">
+            <ul>
+                <li class="prev" v-if="pagination.current_page > 1">
+                    <Link :href="pagination.prev_page_url">Prev</Link>
                 </li>
-            </template>
-            <li class="next" v-if="pagination.current_page !== pagination.last_page">
-                <Link :href="pagination.next_page_url">Next</Link>
-            </li>
-        </ul>
+                <template v-for="link in pageLinks" :key="link.label">
+                    <li>
+                        <Link :class="{ 'active': link.active }" :href="link.url" preserve-scroll preserve-state>{{ link.label }}</Link>
+                    </li>
+                </template>
+                <li class="next" v-if="pagination.current_page !== pagination.last_page">
+                    <Link :href="pagination.next_page_url">Next</Link>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>

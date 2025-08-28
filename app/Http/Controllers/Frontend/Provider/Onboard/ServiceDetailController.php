@@ -42,11 +42,13 @@ class ServiceDetailController extends Controller
             'description' => ['required', 'array', 'min:1'],
             'description.*' => ['required', 'string'],
             'price' => ['required', 'array', 'min:1'],
-            'price.*' => ['required', 'numeric'],
+            'price.*' => ['required', 'numeric', 'max:999'],
         ], [
-            'location.*' => 'The location field is required',
-            'description.*' => 'The description field is required',
-            'price.*' => 'The price field is required'
+            'location.*.required' => 'The location field is required',
+            'description.*.required' => 'The description field is required',
+            'price.*.required' => 'The price field is required',
+            'price.*.numeric' => 'The price must be a number.',
+            'price.*.max' => 'The price may not be greater than 999.',
         ]);
 
         $user = User::select('id','name')->find(session('user_onboard')['id']);

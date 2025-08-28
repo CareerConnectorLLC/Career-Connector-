@@ -28,6 +28,7 @@ usePresenceChannel();
 
 const scrollY = ref(0);
 const isFixed = ref(false);
+const isOpen = ref(false);
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll); 
@@ -40,6 +41,12 @@ onUnmounted(() => {
 function handleScroll() {
     scrollY.value = window.scrollY;
     isFixed.value = scrollY.value > 0;
+}
+
+function toggleDashboard() {
+    isOpen.value = !isOpen.value;
+    document.body.classList.toggle('open-sidebar', isOpen.value);
+    document.documentElement.classList.toggle('open-sidebar', isOpen.value);
 }
 
 function isPastDate(dateTimeString) {
@@ -55,15 +62,15 @@ const formatDate = (dateString) => {
     <div class="dashboard-sec">
         <div class="dashboard-container">
             <div class="dashboard-head" :class="{'fixed': isFixed}">
-                <button class="dashboard-toggler">
+                <button class="dashboard-toggler" @click="toggleDashboard" :class="{'open': isOpen}">
                     <span class="stick"></span>
                 </button>
 
                 <h1>Bookings</h1>
                 <div class="search-sec">
                     <div class="serach-inner-wrap">
-                        <div class="nofication">
-                            <a href="provider-notification.html">
+                        <div class="nofication d-none">
+                            <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/notification.svg" alt="nofication">
                                     <span class="notification-indecator"></span>
@@ -78,7 +85,7 @@ const formatDate = (dateString) => {
             </div>
             <div class="dashboard-inner-wrap">
                 <!-- Left sidebar for provider -->
-                <ProviderSidebar />
+                <ProviderSidebar @toggled="toggleDashboard" :isOpen="isOpen" />
                 <!-- Left sidebar for provider -->
                 <div class="dashboard-right-panel">
                     <div class="dashboard-right-inner">
@@ -127,7 +134,7 @@ const formatDate = (dateString) => {
                         </div>
                     </div>
                 </div>
-                <div class="sidebar-overlay"></div>
+                <div class="sidebar-overlay" @click="toggleDashboard"></div>
             </div>
         </div>
 

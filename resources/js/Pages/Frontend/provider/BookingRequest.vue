@@ -8,6 +8,7 @@ import { usePresenceChannel } from "../../../composables/usePresenceChannel";
 
 import ProfileDropdown from "../../../components/frontend/customer/ProfileDropdown.vue";
 import SideNavigation from "../../../components/frontend/provider/SideNavigation.vue";
+import Pagination from "../../../components/frontend/Pagination.vue";
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
@@ -15,6 +16,7 @@ const bookings = computed(() => page.props.bookings)
 
 const scrollY = ref(0);
 const isFixed = ref(false);
+const isOpen = ref(false);
 
 // Initialize real-time listeners for notifications and presence.
 useGlobalMessageNotifier();
@@ -62,20 +64,26 @@ function acceptRequest(id) {
 function isPastDate(dateTimeString) {
     return dayjs(dateTimeString).isBefore(dayjs(), 'day');
 }
+
+function toggleDashboard() {
+    isOpen.value = !isOpen.value;
+    document.body.classList.toggle('open-sidebar', isOpen.value);
+    document.documentElement.classList.toggle('open-sidebar', isOpen.value);
+}
 </script>
 
 <template>
     <div class="dashboard-sec bookings">
         <div class="dashboard-container">
-            <div class="dashboard-head">
-                <button class="dashboard-toggler">
+            <div class="dashboard-head" :class="{'fixed': isFixed}">
+                <button class="dashboard-toggler" @click="toggleDashboard" :class="{'open': isOpen}">
                     <span class="stick"></span>
                 </button>
                 <h1>Received request</h1>
                 <div class="search-sec">
                     <div class="serach-inner-wrap">
-                        <div class="nofication">
-                            <a href="provider-notification.html">
+                        <div class="nofication d-none">
+                            <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/notification.svg" alt="nofication">
                                     <span class="notification-indecator"></span>
@@ -90,13 +98,13 @@ function isPastDate(dateTimeString) {
             </div>
             <div class="dashboard-inner-wrap">
                 <!-- Left sidebar for provider -->
-                <SideNavigation />
+                <SideNavigation @toggled="toggleDashboard" :class="{'open': isOpen}" />
                 <!-- Left sidebar for provider -->
                 <div class="dashboard-right-panel">
                     <div class="dashboard-right-inner">
-                        <div class="bookings-sec">
-                            <p class="lead" v-if="!bookings.length">Lorem ipsum dolor sit amet consectetur.</p>
-                            <div class="booking-content" v-else>
+                        <p class="lead" v-if="!bookings.data.length">No Data Available</p>
+                        <div class="bookings-sec" v-else>
+                            <div class="booking-content">
                                 <table>
                                     <thead>
                                         <tr>
@@ -110,7 +118,7 @@ function isPastDate(dateTimeString) {
                                     </thead>
 
                                     <tbody>
-                                        <tr v-for="booking in bookings" :key="booking.id">
+                                        <tr v-for="booking in bookings.data" :key="booking.id">
                                             <td v-text="booking.client.name"></td>
                                             <td v-text="booking.booking_number"></td>
                                             <td v-text="booking.service.name"></td>
@@ -139,20 +147,11 @@ function isPastDate(dateTimeString) {
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="cmn-pgns d-none">
-                                <ul>
-                                    <li class="prev"><a href="#">Prev</a></li>
-                                    <li><a href="#" class="active">01</a></li>
-                                    <li><a href="#">02</a></li>
-                                    <li><a href="#">03</a></li>
-                                    <li><a href="#">04</a></li>
-                                    <li><a href="#">05</a></li>
-                                    <li class="next"><a href="#">Next</a></li>
-                                </ul>
-                            </div>
+                            <Pagination :pagination="bookings" />
                         </div>
                     </div>
                 </div>
+                <div class="sidebar-overlay" @click="toggleDashboard"></div>
             </div>
         </div>
 

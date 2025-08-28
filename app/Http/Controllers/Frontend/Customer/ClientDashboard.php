@@ -15,7 +15,9 @@ class ClientDashboard extends Controller
         $user = Auth::user();
         $userId = $user->id;
 
-        $bookings = $request->user()->clientBookings()
+        $clientBookingsQuery = $request->user()->clientBookings(); // New variable
+
+        $bookings = $clientBookingsQuery
             ->with('service:id,name', 'provider:id,name')
             ->orderBy('created_at', 'desc')
             ->take(3)
@@ -30,9 +32,25 @@ class ClientDashboard extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $payments = $clientBookingsQuery // Use the new variable
+            ->select(['id', 'price', 'booking_number', 'provider_id', 'service_id', 'status', 'updated_at'])
+            ->with('service:id,name', 'provider:id,name')
+            ->where('status', 'Completed')
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $activeBookings = (clone $clientBookingsQuery)->where('status', 'Confirmed')->count();
+        $cancelledBookings = (clone $clientBookingsQuery)->where('status', 'Cancelled')->count();
+        $totalBookings = (clone $clientBookingsQuery)->count();
+
         return Inertia::render('Frontend/ClientDashboard', [
             'bookings' => $bookings,
             'conversations' => $conversations,
+            'payments' => $payments,
+            'activeBookings' => $activeBookings,
+            'cancelledBookings' => $cancelledBookings,
+            'totalBookings' => $totalBookings,
         ]);
     }
 }

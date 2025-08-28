@@ -38,9 +38,7 @@ const handleSearch = () => {
             <div class="search-col">
                 <select v-model="form.price">
                     <option value="0">Select Price</option>
-                    <option value="100">$100</option>
-                    <option value="500">$500</option>
-                    <option value="1000">$1000</option>
+                    <option v-for="i in 10" :key="i" :value="i * 1000">${{ i * 10 }}</option>
                 </select>
             </div>
             <div class="search-col">

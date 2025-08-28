@@ -6,6 +6,7 @@ import { FormatMoney } from 'format-money-js'
 
 import { useGlobalMessageNotifier } from "../../../composables/useGlobalMessageNotifier";
 import { usePresenceChannel } from "../../../composables/usePresenceChannel";
+import Pagination from "../../../components/frontend/Pagination.vue";
 
 import ProfileDropdown from "../../../components/frontend/provider/ProfileDropdown.vue"
 import CustomerSidebar from "../../../components/frontend/customer/LeftSidebar.vue"
@@ -24,6 +25,7 @@ const bookings = computed(() => page.props.bookings)
 
 const scrollY = ref(0);
 const isFixed = ref(false);
+const isOpen = ref(false);
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);
@@ -41,13 +43,19 @@ function handleScroll() {
     scrollY.value = window.scrollY;
     isFixed.value = scrollY.value > 0;
 }
+
+function toggleDashboard() {
+    isOpen.value = !isOpen.value;
+    document.body.classList.toggle('open-sidebar', isOpen.value);
+    document.documentElement.classList.toggle('open-sidebar', isOpen.value);
+}
 </script>
 
 <template>
     <div class="dashboard-sec payment">
         <div class="dashboard-container">
             <div class="dashboard-head" :class="{'fixed': isFixed}">
-                <button class="dashboard-toggler">
+                <button class="dashboard-toggler" @click="toggleDashboard" :class="{'open': isOpen}">
                     <span class="stick"></span>
                 </button>
                 <h1>Payment history</h1>
@@ -69,12 +77,13 @@ function handleScroll() {
             </div>
             <div class="dashboard-inner-wrap">
                 <!-- Left sidebar panel -->
-                <CustomerSidebar />
+                <CustomerSidebar @toggled="toggleDashboard" :class="{'open': isOpen}" />
                 <!-- Left sidebar panel -->
                 <div class="dashboard-right-panel">
                     <div class="dashboard-right-inner">
-                        <div class="bookings-sec">
-                            <div class="booking-content" v-if="bookings.length">
+                        <p class="lead fw-semibold" v-if="!bookings.data.length">No Data Available</p>
+                        <div class="bookings-sec" v-else>
+                            <div class="booking-content">
                                 <table>
                                     <thead>
                                         <tr>
@@ -83,27 +92,24 @@ function handleScroll() {
                                             <th>Provider</th>
                                             <th>Amount</th>
                                             <th>Date Time</th>
-                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="item in bookings" :key="item.id">
+                                        <tr v-for="item in bookings.data" :key="item.id">
                                             <td>{{ item.booking_number }}</td>
                                             <td>{{ item.service.name }}</td>
                                             <td>{{ item.provider.name }}</td>
                                             <td>{{ fm.from(parseInt(item.price / 100)) }}</td>
                                             <td>{{ formatDateTime(item.start_date) }}</td>
-                                            <td>
-                                                <a class="cmn-gray-btn" href="">View More</a>
-                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <p class="lead fw-semibold" v-else>No Data Available</p>
+                            <Pagination :pagination="bookings" />
                         </div>
                     </div>
                 </div>
+                <div class="sidebar-overlay" @click="toggleDashboard"></div>
             </div>
         </div>
 

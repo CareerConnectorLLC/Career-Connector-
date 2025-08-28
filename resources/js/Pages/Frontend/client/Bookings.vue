@@ -7,10 +7,12 @@ import { usePresenceChannel } from "../../../composables/usePresenceChannel";
 
 import ProfileDropdown from "../../../components/frontend/customer/ProfileDropdown.vue";
 import CustomerSidebar from "../../../components/frontend/customer/LeftSidebar.vue";
+import Pagination from "../../../components/frontend/Pagination.vue";
 
 const page = usePage()
 const scrollY = ref(0);
 const isFixed = ref(false);
+const isOpen = ref(false);
 
 // Initialize real-time listeners for notifications and presence.
 useGlobalMessageNotifier();
@@ -32,6 +34,12 @@ function handleScroll() {
     isFixed.value = scrollY.value > 0;
 }
 
+function toggleDashboard() {
+    isOpen.value = !isOpen.value;
+    document.body.classList.toggle('open-sidebar', isOpen.value);
+    document.documentElement.classList.toggle('open-sidebar', isOpen.value);
+}
+
 function formatDateTime(dateTimeString) {
     return dayjs(dateTimeString).format('MMM D, YYYY h:mm A');
 }
@@ -45,7 +53,7 @@ function isPastDate(dateTimeString) {
     <div class="dashboard-sec bookings">
         <div class="dashboard-container">
             <div class="dashboard-head" :class="{'fixed': isFixed}">
-                <button class="dashboard-toggler">
+                <button class="dashboard-toggler" @click="toggleDashboard" :class="{'open': isOpen}">
                     <span class="stick"></span>
                 </button>
 
@@ -67,7 +75,7 @@ function isPastDate(dateTimeString) {
                             </a>
                         </div>
 
-                        <div class="nofication">
+                        <div class="nofication d-none">
                             <a href="client-notification.html">
                                 <figure>
                                     <img src="/public/frontend_assets/images/notification.svg" alt="nofication">
@@ -88,7 +96,7 @@ function isPastDate(dateTimeString) {
                 <div class="dashboard-right-panel">
                     <div class="dashboard-right-inner">
                         <div class="bookings-sec">
-                            <p class="lead fw-semibold" v-if="!bookings.length">No Data Available</p>
+                            <p class="lead fw-semibold" v-if="!bookings.data.length">No Data Available</p>
                             <div class="booking-content" v-else>
                                 <table>
                                     <thead>
@@ -103,7 +111,7 @@ function isPastDate(dateTimeString) {
                                     </thead>
 
                                     <tbody>
-                                        <tr v-for="booking in bookings" :key="booking.id">
+                                        <tr v-for="booking in bookings.data" :key="booking.id">
                                             <td>
                                                 {{ booking.booking_number }}
                                             </td>
@@ -114,7 +122,8 @@ function isPastDate(dateTimeString) {
                                                 {{ booking.service.name }}
                                             </td>
                                             <td>
-                                                <span class="tag pending">{{ booking.status }}</span>
+                                                <span v-if="booking.status === 'Pending'" class="tag pending">{{ booking.status }}</span>
+                                                <span v-if="booking.status === 'Completed'" class="tag completed">{{ booking.status }}</span>
                                             </td>
                                             <td>
                                                 {{ formatDateTime(booking.start_date) }}
@@ -129,21 +138,10 @@ function isPastDate(dateTimeString) {
                                 </table>
                             </div>
                         </div>
-                        <div class="cmn-pgns d-none">
-                            <ul>
-                                <li class="prev"><a href="#">Prev</a></li>
-                                <li><a href="#" class="active">01</a></li>
-                                <li><a href="#">02</a></li>
-                                <li><a href="#">03</a></li>
-                                <li><a href="#">04</a></li>
-                                <li><a href="#">05</a></li>
-                                <li class="next"><a href="#">Next</a></li>
-                            </ul>
-                        </div>
+                        <Pagination :pagination="bookings" />
                     </div>
-
                 </div>
-                <div class="sidebar-overlay"></div>
+                <div class="sidebar-overlay" @click="toggleDashboard"></div>
             </div>
         </div>
 

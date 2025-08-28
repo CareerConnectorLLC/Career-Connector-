@@ -11,6 +11,9 @@ import CardInfo from "../../components/frontend/customer/CardInfo.vue";
 
 const stripe = ref(null)
 const cardError = ref(null)
+const isOpen = ref(false);
+const scrollY = ref(0);
+const isFixed = ref(false);
 
 const page = usePage()
 
@@ -87,13 +90,24 @@ const deleteCard = (param) => {
         }
     })
 }
+
+function toggleDashboard() {
+    isOpen.value = !isOpen.value;
+    document.body.classList.toggle('open-sidebar', isOpen.value);
+    document.documentElement.classList.toggle('open-sidebar', isOpen.value);
+}
+
+function handleScroll() {
+    scrollY.value = window.scrollY;
+    isFixed.value = scrollY.value > 0;
+}
 </script>
 
 <template>
     <div class="dashboard-sec my-profile">
         <div class="dashboard-container">
-            <div class="dashboard-head">
-                <button class="dashboard-toggler">
+            <div class="dashboard-head" :class="{'fixed': isFixed}">
+                <button class="dashboard-toggler" @click="toggleDashboard" :class="{'open': isOpen}">
                     <span class="stick"></span>
                 </button>
                 <h1 class="text-capitalize">My profile</h1>
@@ -131,7 +145,7 @@ const deleteCard = (param) => {
             </div>
             <div class="dashboard-inner-wrap">
                 <!-- Left sidebar panel -->
-                <CustomerSidebar />
+                <CustomerSidebar @toggled="toggleDashboard" :isOpen="isOpen" />
                 <!-- Left sidebar panel -->
                 <div class="dashboard-right-panel">
                     <div class="dashboard-right-inner">
@@ -218,7 +232,7 @@ const deleteCard = (param) => {
                         </div>
                     </div>
                 </div>
-                <div class="sidebar-overlay"></div>
+                <div class="sidebar-overlay" @click="toggleDashboard"></div>
             </div>
 
             <!-- Change Password Modal -->

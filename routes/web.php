@@ -177,7 +177,7 @@ Route::name('frontend.')->group(function() {
             Route::resource('/bookings', \App\Http\Controllers\Frontend\Customer\BookingController::class)->only('index', 'store', 'update');
             Route::get('/provider/{providerId}/availability/{date}', [\App\Http\Controllers\Frontend\ProviderAvailabilityController::class, 'getAvailability']);
             Route::post('/api/check-availability', [\App\Http\Controllers\Frontend\ProviderAvailabilityController::class, 'checkAvailability']);
-            Route::resource('/payment-history', \App\Http\Controllers\Frontend\Customer\PaymentHistoryController::class)->only('index');
+            Route::resource('/client-payment-history', \App\Http\Controllers\Frontend\Customer\PaymentHistoryController::class)->only('index');
         });
 
         Route::middleware(['is-provider'])->group(function () {
@@ -192,6 +192,8 @@ Route::name('frontend.')->group(function() {
             Route::resource('/social-links', \App\Http\Controllers\Frontend\Provider\SocialLinkController::class)->only('index', 'store');
             Route::resource('/my-availability', \App\Http\Controllers\Frontend\Provider\AvailabilityController::class)->only('index', 'store');
             Route::resource('/completed-jobs', \App\Http\Controllers\Frontend\Provider\CompletedJobsController::class)->only('index');
+            Route::get('/payment-history', [\App\Http\Controllers\Frontend\Provider\PaymentHistoryController::class, 'index']);
+            Route::post('/initiate-payout', [\App\Http\Controllers\Frontend\Provider\PaymentHistoryController::class, 'initiatePayout'])->name('provider.payout.initiate');
         });
         
         Route::resource('/messaging', \App\Http\Controllers\Frontend\Customer\MessagingController::class)->only('index', 'show', 'store');

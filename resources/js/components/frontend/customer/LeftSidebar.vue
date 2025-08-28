@@ -1,17 +1,23 @@
 <script setup>
 import { Link, router } from "@inertiajs/vue3";
 
+const props = defineProps({
+    isOpen: Boolean,
+})
+
 const signout = () => {
     router.post(`/logout`, {
         onSuccess: () => Echo.leaveChannel('career-connector')
     })
 }
+
+const emit = defineEmits(['toggled'])
 </script>
 
 <template>
     <div class="dashboard-left-panel">
         <div class="dashboard-inner">
-            <button class="dashboard-toggler">
+            <button class="dashboard-toggler" @click="$emit('toggled')" :class="{'open': props.isOpen}">
                 <span class="stick"></span>
             </button>
             <div class="dashboard-card">
@@ -46,8 +52,8 @@ const signout = () => {
                                 <span>Bookings</span>
                             </Link>
                         </li>
-                        <li :class="{ 'active': $page.url.startsWith('/payment-history') }">
-                            <Link href="/payment-history">
+                        <li :class="{ 'active': $page.url.startsWith('/client-payment-history') }">
+                            <Link href="/client-payment-history">
                                 <figure>
                                     <img src="/public/frontend_assets/images/wallet-minus.svg" alt="wallet">
                                 </figure>

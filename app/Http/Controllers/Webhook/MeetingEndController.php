@@ -22,6 +22,7 @@ class MeetingEndController extends Controller
         ])->get('https://api.digitalsamba.com/api/v1/rooms/'.$payload['roomId']);
 
         if (!$response->successful()) {
+            \Log::error('Failed to fetch room data from Digital Samba API.', ['response' => $response->body()]);
             return;
         }
 
@@ -38,28 +39,32 @@ class MeetingEndController extends Controller
 
     private function chargeTheRemainingAmount(Booking $booking)
     {
-        $stripe = app('stripe');
-        $client = $booking->client;
-        $amount = $booking->price / 2;
-
-        $paymentMethods = $stripe->customers->allPaymentMethods(
-            $client->stripe_id, []
-        );
-
-        if ($paymentMethods->data[0]) {
-            $stripe->paymentIntents->create([
-                'amount' => $amount,
-                'currency' => 'USD',
-                'customer' => $client->stripe_id,
-                'payment_method' => $paymentMethods->data[0]->id,
-                'description' => 'Meeting with provider: ' . $booking->provider->name,
-                'off_session' => true,
-                'confirm' => true,
-            ]);
-
-            $booking->status = 'Completed';
-            $booking->save();
-            \Log::info('Payment Successful');
+        try {
+            $stripe = app('stripe');
+            $client = $booking->client;
+            $amount = $booking->price / 2;
+    
+            $paymentMethods = $stripe->customers->allPaymentMethods(
+                $client->stripe_id, []
+            );
+    
+            if ($paymentMethods->data[0]) {
+                $stripe->paymentIntents->create([
+                    'amount' => $amount,
+                    'currency' => 'USD',
+                    'customer' => $client->stripe_id,
+                    'payment_method' => $paymentMethods->data[0]->id,
+                    'description' => 'Meeting with provider: ' . $booking->provider->name,
+                    'off_session' => true,
+                    'confirm' => true,
+                ]);
+    
+                $booking->status = 'Completed';
+                $booking->save();
+                \Log::info('Payment Successful');
+            }
+        } catch (\Exception $e) {
+            \Log::error("Failed to charge remaining amount for booking ID: {$booking->id}. Error: " . $e->getMessage());
         }
     }
 }

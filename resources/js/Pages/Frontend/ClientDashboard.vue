@@ -5,6 +5,8 @@ import { useMessageUpdater } from "../../composables/useMessageUpdater.js";
 import ProfileDropdown from "../../components/frontend/customer/ProfileDropdown.vue";
 import CustomerSidebar from "../../components/frontend/customer/LeftSidebar.vue";
 import BookingSection from "../../components/frontend/customer/dashboard/BookingSection.vue";
+import BookingSummaryCards from "../../components/frontend/customer/dashboard/BookingSummaryCards.vue"; // Add this line
+import PaymentSection from "../../components/frontend/customer/dashboard/PaymentSection.vue";
 import MessageListComponent from '../../components/MessageListComponent.vue';
 
 const page = usePage()
@@ -22,8 +24,14 @@ onUnmounted(() => {
 const user = computed(() => page.props.auth.user)
 const bookings = computed(() => page.props.bookings)
 const conversations = ref(page.props.conversations)
+const payments = computed(() => page.props.payments)
+
+const activeBookings = computed(() => page.props.activeBookings)
+const cancelledBookings = computed(() => page.props.cancelledBookings)
+const totalBookings = computed(() => page.props.totalBookings)
 
 const searchQuery = ref('');
+const isOpen = ref(false);
 
 // Set up the real-time message listener and updater.
 useMessageUpdater(conversations);
@@ -41,13 +49,19 @@ function handleScroll() {
     scrollY.value = window.scrollY;
     isFixed.value = scrollY.value > 0;
 }
+
+function toggleDashboard() {
+    isOpen.value = !isOpen.value;
+    document.body.classList.toggle('open-sidebar', isOpen.value);
+    document.documentElement.classList.toggle('open-sidebar', isOpen.value);
+}
 </script>
 
 <template>
     <div class="dashboard-sec">
-        <div class="dashboard-container">
-            <div class="dashboard-head" :class="{'fixed': isFixed}">
-                <button class="dashboard-toggler">
+        <div class="dashboard-container" :class="{'fixed': isFixed}">
+            <div class="dashboard-head">
+                <button class="dashboard-toggler" @click="toggleDashboard" :class="{'open': isOpen}">
                     <span class="stick"></span>
                 </button>
                 <h1>Dashboard</h1>
@@ -69,8 +83,8 @@ function handleScroll() {
                             </a>
                         </div>
 
-                        <div class="nofication">
-                            <a href="client-notification.html">
+                        <div class="nofication d-none">
+                            <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/notification.svg" alt="nofication">
                                     <span class="notification-indecator"></span>
@@ -86,66 +100,14 @@ function handleScroll() {
             </div>
             <div class="dashboard-inner-wrap">
                 <!-- Left sidebar panel -->
-                <CustomerSidebar />
+                <CustomerSidebar @toggled="toggleDashboard" :isOpen="isOpen" />
                 <!-- Left sidebar panel -->
                 <div class="dashboard-right-panel">
                     <div class="dashboard-right-inner">
                         <div class="dashboard-inner-wrap">
                             <div class="dashboard-inner-left">
                                 <div class="dashboard-inner-left-wrap">
-                                    <div class="row dashbaord-row">
-                                        <div class="col-lg-4 col-md-6 dashbaord-col">
-                                            <div class="dashbaord-booking-card">
-                                                <div class="dashbaord-bookign-card-wrap">
-                                                    <div class="dashboard-booking-cont">
-                                                        <h2>Total active booking</h2>
-                                                        <p class="count sky">10</p>
-                                                    </div>
-                                                    <div class="dashboard-booking-image sky">
-                                                        <figure>
-                                                            <img src="/public/frontend_assets/images/calendar-tick.svg"
-                                                                alt="calendar-tick">
-                                                        </figure>
-                                                    </div>
-                                                </div>
-                                                <p>Last updated on Mar 05, 2023</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-6 dashbaord-col">
-                                            <div class="dashbaord-booking-card">
-                                                <div class="dashbaord-bookign-card-wrap">
-                                                    <div class="dashboard-booking-cont">
-                                                        <h2>Cancelled bookings</h2>
-                                                        <p class="count lite-orange">50</p>
-                                                    </div>
-                                                    <div class="dashboard-booking-image lite-orange">
-                                                        <figure>
-                                                            <img src="/public/frontend_assets/images/calendar-remove.svg"
-                                                                alt="calendar-remove">
-                                                        </figure>
-                                                    </div>
-                                                </div>
-                                                <p>Last updated on Mar 05, 2023</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-6 dashbaord-col">
-                                            <div class="dashbaord-booking-card">
-                                                <div class="dashbaord-bookign-card-wrap">
-                                                    <div class="dashboard-booking-cont">
-                                                        <h2>Total listed clients</h2>
-                                                        <p class="count green">1000</p>
-                                                    </div>
-                                                    <div class="dashboard-booking-image green">
-                                                        <figure>
-                                                            <img src="/public/frontend_assets/images/user-tick.svg"
-                                                                alt="user-tick">
-                                                        </figure>
-                                                    </div>
-                                                </div>
-                                                <p>Last updated on Mar 05, 2023</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <BookingSummaryCards :activeBookings="activeBookings" :cancelledBookings="cancelledBookings" :totalBookings="totalBookings" />
 
                                     <!-- Booking Section -->
                                     <template v-if="bookings.length">
@@ -153,91 +115,7 @@ function handleScroll() {
                                     </template>
                                     <!-- Booking Section -->
 
-                                    <div class="bookings-sec">
-                                        <div class="bookings-heading">
-                                            <h3>Payment history</h3>
-                                            <a class="view-all" href="">View all</a>
-                                        </div>
-                                        <div class="booking-content">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Booking id</th>
-                                                        <th>Payment via</th>
-                                                        <th>Status</th>
-                                                        <th>Date</th>
-                                                        <th>Time</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            #00051
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            <span class="tag">Paid</span>
-                                                        </td>
-                                                        <td>
-                                                            Aug 14, 2025
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn"
-                                                                href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            #00051
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            <span class="tag">paid</span>
-                                                        </td>
-                                                        <td>
-                                                            Aug 14, 2025
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn"
-                                                                href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            #00051
-                                                        </td>
-                                                        <td>
-                                                            Perspiciatis
-                                                        </td>
-                                                        <td>
-                                                            <span class="tag pending">Pending</span>
-                                                        </td>
-                                                        <td>
-                                                            Aug 14, 2025
-                                                        </td>
-                                                        <td>
-                                                            12:35
-                                                        </td>
-                                                        <td>
-                                                            <a class="cmn-gray-btn"
-                                                                href="">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                    <PaymentSection :payments="payments" :isCustomer="true" />
                                 </div>
                             </div>
                             <div class="dashboard-inner-right">
@@ -263,7 +141,7 @@ function handleScroll() {
                         </div>
                     </div>
                 </div>
-                <div class="sidebar-overlay"></div>
+                <div class="sidebar-overlay" @click="toggleDashboard"></div>
             </div>
         </div>
 

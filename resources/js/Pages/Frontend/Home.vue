@@ -90,7 +90,7 @@ useHead({
                             pharetra ante, et sodales mi venenatis non. Donec at ullamcorper felis. Aenean ex tellus,
                             consequat vitae blandit quis, laoreet et tellus.
                         </p>
-                        <a class="primary-btn" href="">Read more</a>
+                        <a class="primary-btn d-none" href="">Read more</a>
                     </div>
                 </div>
             </div>

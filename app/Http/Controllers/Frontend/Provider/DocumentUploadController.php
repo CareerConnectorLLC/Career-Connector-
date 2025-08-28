@@ -49,6 +49,8 @@ class DocumentUploadController extends Controller
             'service_id' => $request->service_id,
             'file_path' => $filePath
         ]);
+
+        $request->session()->flash('success', 'Document uploaded successfully!');
     }
 
     public function destroy(Request $request, $id)
@@ -56,5 +58,7 @@ class DocumentUploadController extends Controller
         $document = ProviderDocument::find($id);
         unlink(storage_path('app/public/' . $document->file_path));
         $document->delete();
+
+        $request->session()->flash('success', 'Document deleted successfully!');
     }
 }

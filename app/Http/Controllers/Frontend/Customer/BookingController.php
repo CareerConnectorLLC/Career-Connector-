@@ -12,9 +12,9 @@ class BookingController extends Controller
     public function index(Request $request)
     {
         $bookings = $request->user()->clientBookings()
-                        ->with(['service:id,name', 'provider:id,name'])
-                        ->orderBy('created_at', 'desc')
-                        ->get();
+            ->with(['service:id,name', 'provider:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
         
         return Inertia::render('Frontend/client/Bookings', [
             'bookings' => $bookings,
@@ -26,9 +26,6 @@ class BookingController extends Controller
         $startDate = now()->createFromFormat('Y-m-d h:i a', $request->date.' '.$request->time);
         $endDate = now()->parse($startDate)->addHour()->format('Y-m-d H:i:s');
 
-        $token = \Illuminate\Support\Str::random(32);
-        $meetingUrl = route('frontend.meeting.show', ['token' => $token]);
-
         $request->user()->clientBookings()->create([
             'start_date' => $startDate,
             'end_date' => $endDate,
@@ -36,8 +33,9 @@ class BookingController extends Controller
             'service_id' => $request->service_id,
             'provider_id' => $request->provider_id,
             'price' => $request->amount * 100,
-            'meeting_url' => $meetingUrl,
         ]);
+
+        $request->session()->flash('success', 'Booking created successfully!');
     }
 
     public function update(Request $request, $id)

@@ -2081,7 +2081,7 @@ transform: translateY(-6px);
     width: 35px;
     height: 35px;
     border-radius: 100%;
-    margin-right: 11px;
+    /* margin-right: 11px; */
 }
 
 .blog-auth {
@@ -4232,7 +4232,8 @@ table {
     position: relative;
     /* min-height: 100vh; */
     background: #F8F8F8;
-    height: 100svh;
+    /* height: 100svh; */
+    height: 100%;
 }
 
 .top-left-shape{
@@ -4331,8 +4332,8 @@ table {
     margin-bottom: 0;
     position: relative;
     z-index: 1;
-    /* height: calc(100vh - 232px);
-    overflow: auto; */
+    height: calc(100vh - 232px);
+    overflow: auto;
 }
 
 .dashboard-card ul li:not(:last-child){ 
@@ -4839,14 +4840,17 @@ table {
     font-size: 14px;
 }
 
-.booking-content table tr td  .tag{
+.booking-content table tr td .tag{
     font-size: 12px;
     font-weight: 600;
-    color: #67A051;
-    background: #F3FFEE;
     border-radius: 20px;
     padding: 6px 14px;
     text-transform: capitalize;
+}
+
+.booking-content table tr td .completed{
+    color: #67A051;
+    background: #F3FFEE;
 }
 
 .booking-content table tr td .pending{
@@ -5840,7 +5844,7 @@ table {
 }
 
 .messaging-center{
-    width: 42%;
+    width: 71%;
     padding: 0 10px;
 }
 
@@ -7388,9 +7392,19 @@ table {
     height: 100px;
     margin: 0 auto;
     position: relative;
-    background: url(images/my-profile-image.png) no-repeat center center;
-    background-size: cover;
+    /* background: url(images/my-profile-image.png) no-repeat center center;
+    background-size: cover; */
 }
+
+.upload-container >  img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 100%;
+}
+
+
 
 
 .image-preview {
@@ -9458,12 +9472,16 @@ padding: 25px;
 
 
 
-.dashboard-right-inner form .manage-table table tr td:last-child{
- width: auto;  
+.dashboard-right-inner form .manage-table table tr td{
+ width: 40%;  
 }
 
 .dashboard-right-inner form .manage-table table tr td span{
     width: 100%;
+}
+
+.dashboard-right-inner form .manage-table table tr td .error-message{
+    text-align: left;
 }
 
 /* 17/07/2025 dm */
@@ -9569,9 +9587,13 @@ padding: 25px;
     .messaging-left{ 
         width: 24.5%;
     }
-    
+
     .messaging-center{
         width: 51%;
+    }
+
+    .messaging-center.user-messaing{ 
+        width: 75.5%;
     }
     
     .messaging-right{ 
@@ -9719,7 +9741,49 @@ padding: 25px;
     .download-select select{
         padding-right: 45px;
     }
+
+        .provider-list-card{ 
+            padding: 25px;
+        }
+
+
+    .provider-list-card .card-head .card-profile .card-profile-img-wrap{ 
+        width: 58px;
+        height: 58px;
+    }
+
+    .provider-list-card .card-head .card-profile .card-profile-details{ 
+        max-width: calc(100% - 58px);
+    }
+
+    .provider-list-card .card-head .card-profile .card-profile-details h3{
+        font-size: 20px;
+    }
     
+    .provider-list-card .card-head .card-tags span{ 
+        padding: 9px 10px;
+        font-size: 12px;
+    }
+
+    .provider-list-card .card-head .card-tags .price{
+        font-size: 25px;
+    }
+}
+
+@media(max-width: 1440px){ 
+    .provider-list-card{ 
+        padding: 20px;
+    }
+
+    .provider-list-card .card-head .card-profile .card-profile-img-wrap{
+        width: 48px;
+        height: 48px;
+    }
+
+    .provider-list-card .card-head .card-profile .card-profile-details{ 
+        max-width: calc(100% - 48px)
+    }
+
 }
 
 @media(max-width: 1300px){ 
@@ -9987,6 +10051,28 @@ padding: 25px;
         max-width: 100%;
     }
 
+    .provider-list-card .card-head .card-profile .card-profile-img-wrap {
+        width: 40px;
+        height: 40px;
+    }
+
+    .provider-list-card .card-head .card-profile .card-profile-details{ 
+        max-width: calc(100% - 40px);
+    }
+
+    .provider-list-card .card-head .card-profile .card-profile-details h3 {
+        font-size: 18px;
+    }
+
+    .card-head{ 
+        margin-bottom: 18px;
+    }
+
+    .provider-list-card .card-head .card-tags span {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+
 }
 
 
@@ -10091,6 +10177,7 @@ padding: 25px;
     
     .blog-auth {
         font-size: 16px;
+        margin-right: 15px;
     }
     
     .blog-dtls-text .blog-tag-item {
@@ -10130,7 +10217,20 @@ padding: 25px;
     }
 
     .provider-list-card{ 
-        padding: 20px;
+        padding: 15px;
+    }
+
+    .provider-list-card .card-head .card-profile .card-profile-img-wrap {
+        width: 38px;
+        height: 38px;
+    }
+
+    .provider-list-card .card-head .card-profile .card-profile-details{ 
+        max-width: calc(100% - 38px);
+    }
+
+    .provider-list-card .card-head .card-profile .card-profile-details h3 {
+        font-size: 16px;
     }
 
     .card-profile-img-wrap{ 
@@ -10513,17 +10613,26 @@ padding: 25px;
         left: 0;
     }
     .stick.open,
-    .side-bar-toggler.active .stick{
+    .side-bar-toggler.active .stick,
+    .navbar-toggler[aria-expanded="true"] .stick,
+    .dashboard-toggler.open .stick,
+    .dashboard-left-panel.open .dashboard-toggler .stick{
         transform: translateX(-50px);
         background: transparent;
     }
     .stick.open:before,
-    .side-bar-toggler.active .stick::before {
+    .side-bar-toggler.active .stick::before,
+    .navbar-toggler[aria-expanded="true"] .stick::before,
+    .dashboard-toggler.open .stick::before,
+    .dashboard-left-panel.open .dashboard-toggler .stick::before {
         transform: rotate(45deg) translate(42px, -28px);
         left: 2px;
     }
     .stick.open:after,
-    .side-bar-toggler.active .stick::after {
+    .side-bar-toggler.active .stick::after,
+    .navbar-toggler[aria-expanded="true"] .stick::after,
+    .dashboard-toggler.open .stick::after,
+        .dashboard-left-panel.open .dashboard-toggler .stick::after {
         transform: rotate(-45deg) translate(42px, 28px);
         left: 2px;
     }
@@ -10577,6 +10686,10 @@ padding: 25px;
 
     .chat-head-option .share-btn{ 
         display: flex;
+    }
+
+    .provider-list-card .card-head .card-tags span{ 
+        white-space: nowrap;
     }
 
 }
@@ -11281,11 +11394,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .dashbaord-row{ 
     justify-content: center;
+    margin-bottom: 20px;
 }
 
 .dashbaord-col:not(:last-child){
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
+
 
 .dashboard-right-inner{ 
     padding-bottom: 0;
@@ -11389,6 +11504,15 @@ h1, h2, h3, h4, h5, h6 {
 .dashboard-sec.meeting .dashboard-right-panel{ 
     padding-top: 120px;
 }
+
+.bookings-sec:not(:last-child){
+    margin-bottom: 20px;
+}
+
+.dashboard-inner-left{ 
+    margin-bottom: 20px;
+}
+
 
 }
 
@@ -12977,7 +13101,7 @@ h1, h2, h3, h4, h5, h6 {
 
 }
 
-@media(max-width: 374px){
+@media(max-width: 375px){
     .navbar-brand {
         width: 70px;
     }
@@ -13098,6 +13222,10 @@ h1, h2, h3, h4, h5, h6 {
 
     .book-inner .book-head h3 {
         font-size: 22px;
+    }
+
+    .blog-list-dtls-top{ 
+        gap: 10px;
     }
 
 }

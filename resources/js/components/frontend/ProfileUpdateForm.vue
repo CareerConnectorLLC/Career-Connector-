@@ -22,6 +22,7 @@ const props = defineProps({
 })
 
 onMounted(() => {
+    document.getElementById('imagePreview').style.display = 'block'
     const datepicker = new Datepicker(datePicker.value)
 
     if (props.user.profile && props.user.profile.birth_day) {
@@ -33,10 +34,12 @@ onMounted(() => {
         form.date_of_birth = date.toLocaleDateString('en-US')
     })
 
-    if (props.user.profile_photo_url) {
-        document.getElementById('imagePreview').style.display = 'block'
+    if (props.user.profile_photo_path) {
         removeBtn.value.style.display = 'inline-block'
         previewImg.value.src = props.user.profile_photo_url
+    } else {
+        removeBtn.value.style.display = 'none'
+        previewImg.value.src = `https://ui-avatars.com/api/?name=${props.user.name}&background=0D8ABC&color=fff`
     }
 })
 
@@ -99,12 +102,10 @@ const imageChosen = (event) => {
 }
 
 const removeImage = () => {
-    const previewContainer = document.getElementById('imagePreview')
     const fileInput = document.getElementById('fileInput')
     fileInput.value = ''
-    previewImg.value.src = ''
-    previewContainer.style.display = 'none'
-    form.profile_pic = null
+    previewImg.value.src = `https://ui-avatars.com/api/?name=${props.user.name}&background=0D8ABC&color=fff&rounded=true`
+    form.profile_pic = ''
     removeBtn.value.style.display = 'none'
 }
 </script>

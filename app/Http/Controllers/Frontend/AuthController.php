@@ -230,6 +230,8 @@ class AuthController extends Controller
         $request->user()->update([
             'password' => \Hash::make($validatedData['password'])
         ]);
+
+        $request->session()->flash('success', 'Password changed successfully!');
     }
 
     public function submitResetPasswordForm(Request $request)

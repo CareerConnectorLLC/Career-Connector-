@@ -19,7 +19,7 @@ class BookingRequestController extends Controller
         $bookings = $request->user()->providerBookings()->with([
             'service:id,name',
             'client:id,name'
-        ])->get();
+        ])->latest()->paginate(15);
 
         return Inertia::render('Frontend/provider/BookingRequest', [
             'bookings' => $bookings

@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 
 import { useGlobalMessageNotifier } from '../../../composables/useGlobalMessageNotifier';
@@ -15,6 +15,28 @@ usePresenceChannel();
 const page = usePage()
 const user = computed(() => page.props.auth.user)
 const completedTasks = computed(() => page.props.completedTasks)
+const isOpen = ref(false)
+const scrollY = ref(0)
+const isFixed = ref(false)
+
+onMounted(() => {
+    window.addEventListener('scroll', handleScroll);
+})
+
+onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
+})
+
+const toggleDashboard = () => {
+    isOpen.value = !isOpen.value;
+    document.body.classList.toggle('open-sidebar', isOpen.value);
+    document.documentElement.classList.toggle('open-sidebar', isOpen.value);
+}
+
+const handleScroll = () => {
+    scrollY.value = window.scrollY;
+    isFixed.value = scrollY.value > 0;
+}
 
 const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -24,16 +46,16 @@ const formatDate = (dateString) => {
 
 <template>
     <div class="dashboard-sec bookings">
-        <div class="dashboard-container">
+        <div class="dashboard-container" :class="{'fixed': isFixed}">
             <div class="dashboard-head">
-                <button class="dashboard-toggler">
+                <button class="dashboard-toggler" @click="toggleDashboard" :class="{'open': isOpen}">
                     <span class="stick"></span>
                 </button>
                 <h1>Job completion</h1>
                 <div class="search-sec">
                     <div class="serach-inner-wrap">
-                        <div class="nofication">
-                            <a href="provider-notification.html">
+                        <div class="nofication d-none">
+                            <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/notification.svg" alt="nofication">
                                     <span class="notification-indecator"></span>
@@ -47,7 +69,7 @@ const formatDate = (dateString) => {
             </div>
             <div class="dashboard-inner-wrap">
                 <!-- Left Sidebar panel for providers -->
-                <provider-sidebar />
+                <provider-sidebar @toggled="toggleDashboard" :isOpen="isOpen" />
                 <!-- Left Sidebar panel for providers -->
                 <div class="dashboard-right-panel">
                     <div class="dashboard-right-inner">
@@ -91,7 +113,7 @@ const formatDate = (dateString) => {
                     </div>
 
                 </div>
-                <div class="sidebar-overlay"></div>
+                <div class="sidebar-overlay" @click="toggleDashboard"></div>
                 <div class="booking-options" id="bookingOption">
 
                     <div class="booking-overlay"></div>

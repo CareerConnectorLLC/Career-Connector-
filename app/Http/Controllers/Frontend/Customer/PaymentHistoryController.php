@@ -15,7 +15,7 @@ class PaymentHistoryController extends Controller
             ->select(['id', 'service_id', 'provider_id', 'booking_number', 'start_date', 'end_date', 'status', 'price'])
             ->with(['service:id,name', 'provider:id,name'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(15);
         
         return Inertia::render('Frontend/client/PaymentHistory', [
             'bookings' => $bookings,

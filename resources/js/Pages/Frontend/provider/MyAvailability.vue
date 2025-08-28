@@ -1,4 +1,5 @@
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import { usePage, useForm } from '@inertiajs/vue3'
 import ProviderSidebar from '../../../components/frontend/provider/SideNavigation.vue'
 import ProfileDropdown from '../../../components/frontend/provider/ProfileDropdown.vue'
@@ -14,6 +15,22 @@ usePresenceChannel();
 const page = usePage()
 const user = page.props.auth.user
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+const scrollY = ref(0);
+const isFixed = ref(false);
+
+onMounted(() => {
+    window.addEventListener('scroll', handleScroll); 
+})
+
+onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
+});
+
+function handleScroll() {
+    scrollY.value = window.scrollY;
+    isFixed.value = scrollY.value > 0;
+}
 
 // Helper function to convert HH:MM string to Date object
 const timeStringToDate = (timeString) => {
@@ -60,7 +77,7 @@ function submit() {
 
 <template>
     <div class="dashboard-sec">
-        <div class="dashboard-container">
+        <div class="dashboard-container" :class="{'fixed': isFixed}">
             <div class="dashboard-head">
                 <button class="dashboard-toggler">
                     <span class="stick"></span>
@@ -68,8 +85,8 @@ function submit() {
                 <h1>Manage Timings</h1>
                 <div class="search-sec">
                     <div class="serach-inner-wrap">
-                        <div class="nofication">
-                            <a href="provider-notification.html">
+                        <div class="nofication d-none">
+                            <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/notification.svg" alt="nofication">
                                     <span class="notification-indecator"></span>
@@ -106,7 +123,7 @@ function submit() {
                                                         :stepMinute="60"
                                                         timeOnly
                                                     />
-                                                    <div v-if="form.errors[`availability.${day}.from_time`]" class="text-danger text-sm">
+                                                    <div v-if="form.errors[`availability.${day}.from_time`]" class="text-danger text-sm mt-2 error-message">
                                                         {{ form.errors[`availability.${day}.from_time`] }}
                                                     </div>
                                                 </td>
@@ -118,14 +135,14 @@ function submit() {
                                                         :stepMinute="60"
                                                         timeOnly
                                                     />
-                                                    <div v-if="form.errors[`availability.${day}.to_time`]" class="text-danger text-sm">
+                                                    <div v-if="form.errors[`availability.${day}.to_time`]" class="text-danger text-sm mt-2 error-message">
                                                         {{ form.errors[`availability.${day}.to_time`] }}
                                                     </div>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <div v-if="form.errors.availability" class="text-danger text-sm mt-2 ms-3">
+                                    <div v-if="form.errors.availability" class="text-danger text-sm mt-2 ms-3 error-message">
                                         {{ form.errors.availability }}
                                     </div>
                                 </div>

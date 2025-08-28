@@ -87,19 +87,21 @@ class ProfileController extends Controller
             ]
         ]);
 
-        $filePath = null;
+        $filePath = $request->user()->profile_photo_path;
 
-        if ($request->user()->profile_photo_path) {
-            $filePath = $request->user()->profile_photo_path;
-        }
-
-        if (!is_null($request->file('profile_pic'))) {
-            if (!is_null($request->user()->profile_photo_path)) {
-                unlink(storage_path('/app/public/'.$request->user()->profile_photo_path));
+        // if new file is uploaded
+        if ($request->hasFile('profile_pic')) {
+            // delete old file
+            if ($filePath) {
+                \Storage::disk('public')->delete($filePath);
             }
-            
-            $file = $request->file('profile_pic');
-            $filePath = \Storage::putFile('profile', $file, 'public');
+            $filePath = $request->file('profile_pic')->store('profile', 'public');
+        } else if ($request->input('profile_pic') === null) {
+            // if profile pic is removed
+            if ($filePath) {
+                \Storage::disk('public')->delete($filePath);
+            }
+            $filePath = null;
         }
 
         if (!$request->has('mode')) {

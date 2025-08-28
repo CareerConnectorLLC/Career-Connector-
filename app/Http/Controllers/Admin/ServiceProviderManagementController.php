@@ -74,20 +74,26 @@ class ServiceProviderManagementController extends Controller
 
             $filters = isset($request->filters) ? $request->filters : [];
 
-            // $filters = [
-            //     ["column" => "category", "value" => ["Electrician"]],
-            //     ["column" => "active", "value" => [1]]
-            // ];
-            
+            $users = User::filter($filters)
+                ->role('SERVICE-PROVIDER')
+                ->ordering($sortBy)
+                ->orderBy('id','desc')
+                    ->paginate($request->per_page ?? 10, ['*'], 'page', $request->page ?? 1)
+                    ->withQueryString()
+                    ->through(function ($user) {
+                        return [
+                            'id' => $user->id,
+                            'full_name' => $user->name,
+                            'email' => $user->email,
+                            'phone' => $user->phone,
+                            'profile_photo_url' => $user->profile_photo_url,
+                            'active' => $user->active,
+                            'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                            'updated_at' => $user->updated_at->format('Y-m-d H:i:s'),
+                        ];
+                    });
 
-            $service_providers = User::role('SERVICE-PROVIDER')
-            ->with('services.category')
-            ->filter($filters)
-            ->ordering($sortBy)
-            ->orderBy('id','asc')
-                ->paginate($request->per_page ?? 10, ['*'], 'page', $request->page ?? 1);
-                // dd($service_providers);
-            return response()->json($service_providers);
+            return response()->json($users);
         } catch (\Exception $e) {
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             return back()->with('error', 'Server error');

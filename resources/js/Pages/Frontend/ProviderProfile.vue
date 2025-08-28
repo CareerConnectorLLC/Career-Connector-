@@ -184,7 +184,7 @@ function getDocSingle(param) {
                 <h1 class="text-capitalize">My profile</h1>
                 <div class="search-sec">
                     <div class="serach-inner-wrap">
-                        <div class="nofication">
+                        <div class="nofication d-none">
                             <a href="">
                                 <figure>
                                     <img src="/public/frontend_assets/images/notification.svg" alt="nofication">
