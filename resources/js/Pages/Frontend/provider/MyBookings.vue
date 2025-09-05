@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref, computed } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
+import { useHead } from "@vueuse/head";
 import { FormatMoney } from "format-money-js";
 
 import { useGlobalMessageNotifier } from "../../../composables/useGlobalMessageNotifier";
@@ -29,6 +30,10 @@ usePresenceChannel();
 const scrollY = ref(0);
 const isFixed = ref(false);
 const isOpen = ref(false);
+
+useHead({
+    title: page.props.pageTitle
+})
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll); 

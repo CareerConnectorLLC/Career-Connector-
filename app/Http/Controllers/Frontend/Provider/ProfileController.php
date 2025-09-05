@@ -36,6 +36,7 @@ class ProfileController extends Controller
             'bank_accounts' => $bank_accounts->data ?? [],
             'all_services' => Service::select(['id','name'])->get(),
             'documents' => $documents,
+            'pageTitle' => env('APP_NAME') . ' | Provider Profile'
         ]);
     }
 

@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, onUnmounted } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
+import { useHead } from "@vueuse/head";
 import { useMessageUpdater } from "../../composables/useMessageUpdater.js";
 import ProfileDropdown from "../../components/frontend/provider/ProfileDropdown.vue";
 import SideNavigation from "../../components/frontend/provider/SideNavigation.vue";
@@ -15,6 +16,10 @@ const isFixed = ref(false);
 
 const searchQuery = ref('');
 const isOpen = ref(false);
+
+useHead({
+    title: page.props.pageTitle,
+});
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);
@@ -94,9 +99,7 @@ function toggleDashboard() {
                                     <PaymentSummaryCards :totalEarnings="totalEarnings" :pendingPayments="pendingPayments" :completedPayments="completedPayments" />
 
                                     <!-- Booking Section -->
-                                    <template v-if="bookings.length">
-                                        <BookingSection :bookings="bookings" :isCustomer="false" />
-                                    </template>
+                                    <BookingSection :bookings="bookings" :isCustomer="false" />
                                     <!-- Booking Section -->
 
                                     <!-- Payment History Section -->

@@ -28,7 +28,8 @@ class AvailabilityController extends Controller
         }
 
         return Inertia::render('Frontend/provider/MyAvailability', [
-            'availability' => $availability
+            'availability' => $availability,
+            'pageTitle' => env('APP_NAME') . ' | Provider Availability'
         ]);
     }
 

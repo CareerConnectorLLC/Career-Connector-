@@ -41,8 +41,7 @@ function formatDateTime(params) {
                         <th>Date</th>
                     </tr>
                 </thead>
-
-                <tbody>
+                <tbody v-if="bookings.length">
                     <tr v-for="booking in bookings" :key="booking.id">
                         <td>
                             {{ booking.booking_number }}
@@ -59,6 +58,11 @@ function formatDateTime(params) {
                         <td>
                             {{ formatDateTime(booking.start_date) }}
                         </td>
+                    </tr>
+                </tbody>
+                <tbody v-else>
+                    <tr>
+                        <td colspan="5" class="text-center fw-semibold">No bookings found.</td>
                     </tr>
                 </tbody>
             </table>

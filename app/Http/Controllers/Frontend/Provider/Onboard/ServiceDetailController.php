@@ -40,15 +40,17 @@ class ServiceDetailController extends Controller
             'location' => ['required', 'array', 'min:1'],
             'location.*' => ['required', 'string'],
             'description' => ['required', 'array', 'min:1'],
-            'description.*' => ['required', 'string'],
+            'description.*' => ['required', 'string', 'max:20000'],
             'price' => ['required', 'array', 'min:1'],
-            'price.*' => ['required', 'numeric', 'max:999'],
+            'price.*' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/', 'max:999'],
         ], [
             'location.*.required' => 'The location field is required',
             'description.*.required' => 'The description field is required',
             'price.*.required' => 'The price field is required',
             'price.*.numeric' => 'The price must be a number.',
+            'price.*.regex' => 'The price must be a valid monetary value.',
             'price.*.max' => 'The price may not be greater than 999.',
+            'description.*.max' => 'The description may not be greater than 20000 characters.',
         ]);
 
         $user = User::select('id','name')->find(session('user_onboard')['id']);

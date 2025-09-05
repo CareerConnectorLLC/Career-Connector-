@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { usePage, useForm, router } from "@inertiajs/vue3";
+import { useHead } from "@vueuse/head";
 
 import ProfileDropdown from "../../components/frontend/provider/ProfileDropdown.vue";
 import ProviderSidebar from "../../components/frontend/provider/SideNavigation.vue";
@@ -38,6 +39,10 @@ watch(
         myServices.value = newValue.map(s => s.service.name)
     }
 )
+
+useHead({
+    title: page.props.pageTitle,
+})
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);

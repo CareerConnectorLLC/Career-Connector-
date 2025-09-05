@@ -22,7 +22,8 @@ class BookingRequestController extends Controller
         ])->latest()->paginate(15);
 
         return Inertia::render('Frontend/provider/BookingRequest', [
-            'bookings' => $bookings
+            'bookings' => $bookings,
+            'pageTitle' => env('APP_NAME') . ' | Provider Booking Requests'
         ]);
     }
 

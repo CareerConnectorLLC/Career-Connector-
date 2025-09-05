@@ -9,21 +9,9 @@
         <form @submit.prevent="submit()" enctype="multipart/form-data">
             <div class="form-group validated row">
                 <div class="form-group col-lg-6 mb-3">
-                    <label for="first_name">First name</label>
-                    <input type="text" id="first_name" v-model="store.form.first_name" class="form-control border-gray-200" placeholder="First name">
-                    <span class="text-danger" v-if="store.form.errors?.first_name">{{ store.form.errors?.first_name[0] }}</span>
-                </div>
-
-                <div class="form-group col-lg-6 mb-3">
-                    <label for="middle_name">Middle name</label>
-                    <input type="text" id="middle_name" v-model="store.form.middle_name" class="form-control border-gray-200" placeholder="Middle name">
-                    <span class="text-danger" v-if="store.form.errors?.middle_name">{{ store.form.errors?.middle_name[0] }}</span>
-                </div>
-
-                <div class="form-group col-lg-6 mb-3">
-                    <label for="last_name">Last name</label>
-                    <input type="text" id="last_name" v-model="store.form.last_name" class="form-control border-gray-200" placeholder="Last name">
-                    <span class="text-danger" v-if="store.form.errors?.last_name">{{ store.form.errors?.last_name[0] }}</span>
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" v-model="store.form.name" class="form-control border-gray-200" placeholder="Full Name">
+                    <span class="text-danger" v-if="store.form.errors?.name">{{ store.form.errors?.name[0] }}</span>
                 </div>
 
                 <div class="form-group col-lg-6 mb-3">

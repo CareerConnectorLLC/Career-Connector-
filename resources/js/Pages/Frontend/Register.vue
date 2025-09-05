@@ -1,9 +1,16 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { Link, useForm } from '@inertiajs/vue3'
+import { Link, useForm, usePage } from '@inertiajs/vue3'
+import { useHead } from "@vueuse/head";
 import PasswordVisibility from '../../components/frontend/PasswordVisibility.vue'
 
 const userType = ref('USER')
+
+const page = usePage()
+
+useHead({
+    title: `Career Connector | Register`
+})
 
 const form = useForm({
     name: null,
@@ -46,7 +53,7 @@ const userTypeSelect = (param) => {
                     <div class="login-form">
                         <div class="login-head">
                             <h1>Sign up to your account</h1>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+                            <p>Create an account to get started with Career Connector.</p>
                         </div>
 
                         <div class="options">
@@ -136,8 +143,7 @@ const userTypeSelect = (param) => {
                         <div class="login-image-ccont-inner">
                             <h2>Welcome to The Career Connector</h2>
                             <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce non nisl sed ipsum
-                                pulvinar pellentesque ut laoreet nunc.
+                                Find the right professional for your needs or offer your services to a wide audience. Career Connector is the bridge to your next opportunity.
                             </p>
                         </div>
                     </div>

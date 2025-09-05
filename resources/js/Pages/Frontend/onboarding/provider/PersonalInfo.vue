@@ -80,7 +80,7 @@ const formatCategoryIds = (params) => {
         <div class="login-form">
             <div class="login-head">
                 <h1 v-text="`Personal Information`"></h1>
-                <p v-text="`Lorem ipsum dolor sit amet consectetur adipisicing elit.`"></p>
+                <p v-text="`Tell us a bit about yourself and your expertise.`"></p>
             </div>
             <form @submit.prevent="form.post(`/onboard/provider/personal-info`, { replace: true })">
                 <div class="form-input">

@@ -2,8 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Service;
-use App\Models\User;
+use App\Models\{User,Service,Booking};
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,15 +16,30 @@ class BookingFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition(): array
-    {   
-        $client = User::inRandomOrder()->first();
-        $provider = User::where('id', '!=', $client->id)->inRandomOrder()->first();
+    {
+        $clientIds = User::role('USER')->pluck('id')->all();
+        $providerIds = User::role('SERVICE-PROVIDER')->pluck('id')->all();
+        $serviceIds = Service::where('active', true)->pluck('id')->all();
         
         return [
-            'status' => $this->faker->randomElement(['pending', 'in-progress', 'cancelled', 'completed']),
-            'service_id' => Service::inRandomOrder()->first()->id,
-            'client_id' => $client->id,
-            'provider_id' => $provider->id,
+            'client_id' => $clientIds[rand(0, count($clientIds) - 1)],
+            'provider_id' => $providerIds[rand(0, count($providerIds) - 1)],
+            'service_id' => $serviceIds[rand(0, count($serviceIds) - 1)],
+            'booking_number' => $this->generateUniqueBookingNumber(),
+            'price' => [1000, 10000][rand(0, 1)],
+            'meeting_url' => uniqid(true),
+            'start_date' => now(),
+            'end_date' => now()->addHour(),
+            'status' => 'Pending',
         ];
+    }
+
+    private function generateUniqueBookingNumber()
+    {
+        do {
+            $number = 'BOOK-' . strtoupper(uniqid());
+        } while (Booking::where('booking_number', $number)->exists());
+
+        return $number;
     }
 }

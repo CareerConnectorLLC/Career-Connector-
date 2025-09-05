@@ -35,7 +35,7 @@ const selectDay = (param) => {
         <div class="login-form">
             <div class="login-head">
                 <h1 v-text="`Set availability`"></h1>
-                <p v-text="`Lorem ipsum dolor, sit amet consectetur adipisicing.`"></p>
+                <p v-text="`Let clients know when you're available by setting your weekly schedule.`"></p>
             </div>
             <form @submit.prevent="form.post(`/onboard/provider/availability`, { preserveState: true, replace: true })">
                 <h2>Select your available dates &amp; time</h2>

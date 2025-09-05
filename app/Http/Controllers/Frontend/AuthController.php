@@ -15,7 +15,9 @@ class AuthController extends Controller
     public function index()
     {
         try {
-            return Inertia::render('Frontend/Login');
+            return Inertia::render('Frontend/Login', [
+                'pageTitle' => env('APP_NAME') . ' | Login'
+            ]);
         } catch (Exception $e) {
             Log::error($e);
             return $e->getMessage();

@@ -53,7 +53,7 @@ class UserManagementController extends Controller
                 ->through(function ($user) {
                     return [
                         'id' => $user->id,
-                        'full_name' => $user->full_name,
+                        'name' => $user->name,
                         'email' => $user->email,
                         'phone' => $user->phone,
                         'profile_photo_url' => $user->profile_photo_url,
@@ -106,9 +106,7 @@ class UserManagementController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name'            => 'required|string',
-            'middle_name'           => 'nullable',
-            'last_name'             => 'required',
+            'name'                  => 'required|string',
             'email'                 => 'required|email:rfc,dns|unique:users',
             'password'              => ['required',  Password::min(8)
                                     ->letters()
@@ -128,16 +126,13 @@ class UserManagementController extends Controller
         DB::beginTransaction();
         try {
             $user = new User();
-            $user->first_name = $request->first_name;
-            $user->middle_name = $request->middle_name;
-            $user->last_name = $request->last_name;
+            $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->phone;
             $user->password = $request->password;
             $user->gender = $request->gender;
             $user->active = $request->active;
             if($request->file('profile_photo')){
-                File::delete(storage_path('app/'.$user->profile_photo_path));
                 $user->profile_photo_path = request()->file('profile_photo')->store('profile_image');
               }
             $user->save();
@@ -166,14 +161,12 @@ class UserManagementController extends Controller
     }
 
     public function update(Request $request, string $id)
-    {   
+    {
         $user = User::find($id);
 
         $request->validate([
-            'first_name'            => 'required|string',
-            'middle_name'           => 'nullable',
-            'last_name'             => 'required',
-            'email'                 => 'required|email:rfc,dns|unique:users,email,'.$id,
+            'name'                  => 'required|string',
+            'email'                 => 'required|email|unique:users,email,'.$id,
             'phone'                 => 'required|digits_between:10,15|unique:users,phone,'.$id,
             'profile_photo'         => 'nullable|max:2048',
             'gender'                => 'required|in:male,female,others',
@@ -183,20 +176,18 @@ class UserManagementController extends Controller
         ]);
         DB::beginTransaction();
         try {
-            $user->first_name = $request->first_name;
-            $user->middle_name = $request->middle_name;
-            $user->last_name = $request->last_name;
+            $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->phone;
             $user->gender = $request->gender;
             $user->active = $request->active;
 
-            if($request->file('profile_photo')){
-                $user->profile_photo_path = request()->file('profile_photo')->store('profile_image');
-            }
-            if(!$request->file('profile_photo')){
-                Storage::disk('public')->delete($user->profile_photo_path);
-                $user->profile_photo_path = null;
+            if ($request->hasFile('profile_photo')) {
+                Log::info('UserManagementController: Updating profile photo. Current path: ' . ($user->profile_photo_path ?? 'null'));
+                if ($user->profile_photo_path) {
+                    Storage::disk('public')->delete($user->profile_photo_path);
+                }
+                $user->profile_photo_path = $request->file('profile_photo')->store('profile_image');
             }
             $user->update();
             DB::commit();

@@ -17,7 +17,8 @@ class CompletedJobsController extends Controller
                                 ->get();
         
         return Inertia::render('Frontend/provider/JobCompletion', [
-            'completedTasks' => $completedTasks
+            'completedTasks' => $completedTasks,
+            'pageTitle' => env('APP_NAME') . ' | Provider Completed Jobs'
         ]);
     }
 }

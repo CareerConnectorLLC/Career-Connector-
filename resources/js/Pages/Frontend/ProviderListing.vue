@@ -50,8 +50,8 @@ const handleFilter = (param) => {
                 <div class="banner-inner-cont-wrap">
                     <h1>Find service provider</h1>
                     <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.
+                        Discover professionals who've walked the career path you're curious about. Each conversation
+                        brings you closer to making confident decisions about your future.
                     </p>
                     <div class="banner-image-1">
                         <img src="/public/frontend_assets/images/banner-image01.png" alt="banner-image-1">
@@ -93,7 +93,8 @@ const handleFilter = (param) => {
                                     <div class="card-head">
                                         <div class="card-profile">
                                             <div class="card-profile-img-wrap">
-                                                <img :src="provider.provider.profile_photo_url" v-bind:alt="provider.provider.name">
+                                                <img :src="provider.provider.profile_photo_url"
+                                                    v-bind:alt="provider.provider.name">
                                                 <figure style="display: none;">
                                                     <img src="/public/frontend_assets/images/profile-star.svg"
                                                         alt="profile-star">
@@ -117,7 +118,8 @@ const handleFilter = (param) => {
                                     </div>
                                     <div class="provider-card-details">
                                         <p v-text="provider.description"></p>
-                                        <Link class="booknow" :href="`/provider/${provider.id}`" @click.prevent="">Book now</Link>
+                                        <Link class="booknow" :href="`/provider/${provider.id}`" @click.prevent="">Book
+                                        now</Link>
                                     </div>
                                 </div>
                             </div>

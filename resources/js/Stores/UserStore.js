@@ -5,9 +5,7 @@ import { router } from '@inertiajs/vue3';
 
 const FormModel = {
     errors: {},
-    first_name: '',
-    middle_name: '',
-    last_name: '',
+    name: '',
     email: '',
     phone: '',
     password: '',
@@ -191,9 +189,7 @@ export const useUserStore = defineStore('userStore', {
             if(this.user)
             {
                 this.form = {
-                    first_name: this.user.first_name || '',
-                    middle_name: this.user.middle_name || '',
-                    last_name: this.user.last_name || '',
+                    name: this.user.name || '',
                     email: this.user.email || '',
                     phone: this.user.phone || '',
                     profile_photo: null,

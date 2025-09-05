@@ -28,8 +28,8 @@ useHead({
                 <div class="banner-inner-cont-wrap">
                     <h1>Our blogs</h1>
                     <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.
+                        Get inspired by real career journeys and professional insights that you won't find anywhere
+                        else. The career clarity you're looking for might be just one story away.
                     </p>
                     <div class="banner-image-1">
                         <img src="/public/frontend_assets/images/banner-image01.png" alt="banner-image-1">
@@ -40,13 +40,16 @@ useHead({
                 </div>
 
                 <img class="top-shape" src="/public/frontend_assets/images/banner-top-shape.png" alt="banner-top-shape">
-                <img class="bottom-shape" src="/public/frontend_assets/images/inner-banner-right-shape.svg" alt="banner-bottom-shape">
-                <img class="left-blur-shape" src="/public/frontend_assets/images/banner-left-blur-shape.png" alt="banner-left-blur-shape">
-                <img class="right-blur-shape" src="/public/frontend_assets/images/banner-top-blur-shape.png" alt="banner-top-blur-shape">
+                <img class="bottom-shape" src="/public/frontend_assets/images/inner-banner-right-shape.svg"
+                    alt="banner-bottom-shape">
+                <img class="left-blur-shape" src="/public/frontend_assets/images/banner-left-blur-shape.png"
+                    alt="banner-left-blur-shape">
+                <img class="right-blur-shape" src="/public/frontend_assets/images/banner-top-blur-shape.png"
+                    alt="banner-top-blur-shape">
             </div>
         </div>
     </section>
-    
+
     <div class="blog-list-sec">
         <img src="/public/frontend_assets/images/blog-list-left-glow.svg" alt="" class="blog-list-left-glow">
         <img src="/public/frontend_assets/images/blog-list-right-glow.svg" alt="" class="blog-list-right-glow">

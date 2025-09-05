@@ -37,7 +37,7 @@ services.value.forEach(service => {
         <div class="login-form">
             <div class="login-head">
                 <h1 v-text="`Services details`"></h1>
-                <p v-text="`Lorem ipsum dolor sit amet, consectetur adipisicing.`"></p>
+                <p v-text="`Provide the details for each of your services.`"></p>
             </div>
             <form @submit.prevent="form.post(`/onboard/provider/service-details`, { replace: true })">
                 <template v-for="(service, index) in services" :key="service.id">

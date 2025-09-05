@@ -51,6 +51,7 @@ class ProviderDashboard extends Controller
             'totalEarnings' => $totalEarnings,
             'pendingPayments' => $pendingPayments,
             'completedPayments' => $completedPayments,
+            'pageTitle' => env('APP_NAME') . ' | Provider Dashboard'
         ]);
     }
 }

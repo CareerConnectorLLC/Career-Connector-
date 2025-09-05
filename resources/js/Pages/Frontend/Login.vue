@@ -1,22 +1,29 @@
 <script setup>
 import { ref } from "vue";
 import { Alert } from "bootstrap"
-import { Link, useForm } from '@inertiajs/vue3'
+import { useHead } from "@vueuse/head";
+import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AuthBaseLayout from "../../components/frontend/auth/BaseLayout.vue"
 import PasswordVisibility from '../../components/frontend/PasswordVisibility.vue'
 
 const showPassword = ref(false)
+
+const page = usePage()
 
 const form = useForm({
   email: null,
   password: null,
   remember: false,
 })
+
+useHead({
+    title: page.props.pageTitle
+})
 </script>
 
 <template>
     <AuthBaseLayout heading="Login in to your account"
-        caption="Lorem ipsum dolor sit amet, consectetur adipiscing elit">
+        caption="Welcome back! Please log in to continue.">
 
         <template v-if="$page.props.flash.error">
             <div class="alert alert-warning alert-dismissible fade show" role="alert">

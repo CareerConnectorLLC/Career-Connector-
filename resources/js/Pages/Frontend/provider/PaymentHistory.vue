@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, onUnmounted } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { FormatMoney } from "format-money-js";
+import { useHead } from "@vueuse/head";
 import dayjs from 'dayjs';
 
 import ProfileDropdown from "../../../components/frontend/customer/ProfileDropdown.vue";
@@ -36,6 +37,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
 });
+
+useHead({
+    title: page.props.pageTitle,
+})
 
 function handleScroll() {
     scrollY.value = window.scrollY;

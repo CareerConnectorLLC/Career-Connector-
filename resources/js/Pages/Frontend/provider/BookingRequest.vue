@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, onUnmounted } from "vue";
 import { Link, usePage, router } from "@inertiajs/vue3";
+import { useHead } from "@vueuse/head";
 import dayjs from 'dayjs';
 
 import { useGlobalMessageNotifier } from "../../../composables/useGlobalMessageNotifier";
@@ -29,6 +30,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
 });
+
+useHead({
+    title: page.props.pageTitle
+})
 
 function handleScroll() {
     scrollY.value = window.scrollY;

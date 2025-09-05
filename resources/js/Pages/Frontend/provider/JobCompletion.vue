@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { useHead } from '@vueuse/head';
 
 import { useGlobalMessageNotifier } from '../../../composables/useGlobalMessageNotifier';
 import { usePresenceChannel } from '../../../composables/usePresenceChannel';
@@ -25,6 +26,10 @@ onMounted(() => {
 
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
+})
+
+useHead({
+    title: page.props.pageTitle,
 })
 
 const toggleDashboard = () => {

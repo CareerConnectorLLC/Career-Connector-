@@ -31,8 +31,8 @@ const handleSubmit = () => {
                 <div class="banner-inner-cont-wrap">
                     <h1>Contact with us</h1>
                     <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.
+                        We're here to help you connect with the right professionals and make the most of your Career
+                        Connector experience. Reach out anytime - we'd love to hear from you.
                     </p>
                     <div class="banner-image-1">
                         <img src="/public/frontend_assets/images/banner-image01.png" alt="banner-image-1">
@@ -62,11 +62,11 @@ const handleSubmit = () => {
                             <div class="contact-sec-head">
                                 <h2>Get in touch</h2>
                                 <p>
-                                    Pellentesque interdum felis quis dui euismod, dignissim fermentum elit elementum.
-                                    Mauris malesuada eu mauris vel feugiat. Mauris vel fermentum purus
+                                    We're here to make your Career Connector experience amazing. Reach out anytime - no
+                                    question is too small, no idea too big.
                                 </p>
                             </div>
-                            
+
                             <div class="contact-info-inner">
                                 <ul>
                                     <li>
@@ -113,7 +113,7 @@ const handleSubmit = () => {
                     </div>
                     <div class="col-lg-6 contct-col-right">
                         <div class="contact-form-card">
-                            
+
                             <!-- Session flash message section start -->
                             <template v-if="$page.props.flash.success">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">

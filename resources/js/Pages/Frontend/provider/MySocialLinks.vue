@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref, onUnmounted } from "vue";
 import { Link, useForm, usePage } from "@inertiajs/vue3";
+import { useHead } from "@vueuse/head";
 
 import ProviderSidebar from '../../../components/frontend/provider/SideNavigation.vue';
 import ProfileDropdown from '../../../components/frontend/provider/ProfileDropdown.vue';
@@ -27,6 +28,10 @@ const form = useForm({
 const user = page.props.auth.user
 
 const socialLinks = ['Facebook', 'Instagram', 'LinkedIn', 'X', 'Youtube']
+
+useHead({
+    title: page.props.pageTitle
+})
 
 function toggleDashboard() {
     isOpen.value = !isOpen.value;

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { usePage, useForm } from '@inertiajs/vue3'
+import { useHead } from '@vueuse/head'
 import ProviderSidebar from '../../../components/frontend/provider/SideNavigation.vue'
 import ProfileDropdown from '../../../components/frontend/provider/ProfileDropdown.vue'
 import Calendar from 'primevue/calendar'; // Import PrimeVue Calendar
@@ -18,6 +19,10 @@ const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 const scrollY = ref(0);
 const isFixed = ref(false);
+
+useHead({
+    title: page.props.pageTitle,
+})
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll); 

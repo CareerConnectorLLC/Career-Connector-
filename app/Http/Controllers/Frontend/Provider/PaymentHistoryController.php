@@ -43,6 +43,7 @@ class PaymentHistoryController extends Controller
             'payments' => $displayPayments,
             'totalEarnings' => $netEarnings / 100, // Pass net earnings in dollars
             'commissionPercentage' => $commissionPercentage, // Add this line
+            'pageTitle' => env('APP_NAME') . ' | Provider Payment History'
         ]);
     }
 

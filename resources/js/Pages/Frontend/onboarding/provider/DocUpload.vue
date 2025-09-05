@@ -66,7 +66,7 @@ const urlToFile = async (url, key) => {
         <div class="login-form">
             <div class="login-head">
                 <h1 v-text="`Upload documents`"></h1>
-                <p v-text="`Lorem ipsum dolor, sit amet consectetur adipisicing.`"></p>
+                <p v-text="`Please upload the required documents for each of your services.`"></p>
             </div>
             <form @submit.prevent="form.post(`/onboard/provider/document-upload`, { replace: true })">
                 <h2>Certifications &amp; documentation</h2>

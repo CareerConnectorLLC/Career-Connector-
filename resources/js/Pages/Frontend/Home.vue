@@ -25,10 +25,11 @@ useHead({
             <div class="banner-inner">
                 <div class="banner-inner-cont-wrap">
                     <span class="tag">Welcome to Career connector</span>
-                    <h1>One stop solution to make your life super easy</h1>
+                    <h1>Stop Guessing About Your Career. Start Talking To Professionals.</h1>
                     <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.
+                        Make informed career decisions with authentic insights from people doing the work you're curious
+                        about. Career Connector connects you directly with experienced professionals ready to share the
+                        real story.
                     </p>
                     <div class="banner-serach-wrap">
                         <BannerSearch :serviceCategories="services" />
@@ -74,21 +75,20 @@ useHead({
                 </div>
                 <div class="col-md-6 solution-col-right">
                     <div class="solution-cont">
-                        <h2>One stop solution to make your life super easy</h2>
+                        <h2>Get Career Answers From People Who Actually Do The Work</h2>
                         <p>
-                            Pellentesque interdum felis quis dui euismod, dignissim fermentum elit elementum. Mauris
-                            malesuada eu mauris vel feugiat. Mauris vel fermentum purus. Aliquam vitae nibh pulvinar dui
-                            faucibus tempus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-                            ac turpis egestas.
+                            Stop making career decisions based on job descriptions and company websites. Get the real
+                            story from professionals who actually do the work you're curious about.
                         </p>
                         <p>
-                            Cras rhoncus risus id nisi posuere fermentum. Ut scelerisque lectus quam, sit amet vehicula
-                            leo lacinia non. Ut molestie semper velit, in posuere massa. Aliquam augue sapien, ultrices
-                            eget tempor in, rutrum non mi. Morbi ornare a sapien in semper. Donec pellentesque ut eros
-                            at laoreet. Donec venenatis nisi eget felis auctor ornare. Maecenas blandit orci metus,
-                            vitae viverra arcu scelerisque quis. In tristique elementum consectetur. Proin rutrum
-                            pharetra ante, et sodales mi venenatis non. Donec at ullamcorper felis. Aenean ex tellus,
-                            consequat vitae blandit quis, laoreet et tellus.
+                            Career Connector bridges the gap between career curiosity and career clarity through
+                            authentic conversations with experienced professionals. Whether you're a student choosing a
+                            major, a professional considering a career change, or someone exploring advancement
+                            opportunities, our platform connects you directly with people who can share what their jobs
+                            are really like. From daily responsibilities and salary realities to industry challenges and
+                            growth opportunities, get the unfiltered insights you need to make confident career
+                            decisions. For professionals, it's an opportunity to monetize your expertise while making a
+                            meaningful impact on someone's career journey. Real careers, real people, real answers.
                         </p>
                         <a class="primary-btn d-none" href="">Read more</a>
                     </div>
@@ -109,15 +109,16 @@ useHead({
                                     alt="service-image-shape">
 
                                 <Link class="signup-arrow" href="/register?user_role=USER">
-                                    <img src="/public/frontend_assets/images/right-arrow.svg" alt="right-arrow">
+                                <img src="/public/frontend_assets/images/right-arrow.svg" alt="right-arrow">
                                 </Link>
 
                             </div>
                             <div class="sign-up-cont">
-                                <h2>Sign up as a customer</h2>
+                                <h2>For Career Explorers</h2>
                                 <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.
+                                    Get authentic career insights from experienced professionals. Book conversations
+                                    with people doing the work you're curious about and make informed career decisions
+                                    based on real experiences, not job descriptions.
                                 </p>
                             </div>
                         </div>
@@ -130,14 +131,15 @@ useHead({
                                 <img class="signup-shape" src="/public/frontend_assets/images/service-image-shape.svg"
                                     alt="service-image-shape">
                                 <Link class="signup-arrow" href="/register?user_role=SERVICE-PROVIDER">
-                                    <img src="/public/frontend_assets/images/right-arrow.svg" alt="right-arrow">
+                                <img src="/public/frontend_assets/images/right-arrow.svg" alt="right-arrow">
                                 </Link>
                             </div>
                             <div class="sign-up-cont">
-                                <h2>Sign up as a service provider</h2>
+                                <h2>For Professionals</h2>
                                 <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.
+                                    Share your career expertise and earn flexible income. Help others navigate their
+                                    career journeys while building your professional brand and making a meaningful
+                                    impact on someone's future.
                                 </p>
                             </div>
                         </div>

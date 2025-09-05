@@ -15,7 +15,8 @@ class MyBookingController extends Controller
                         ->get();
 
         return Inertia::render('Frontend/provider/MyBookings', [
-            'bookings' => $bookings
+            'bookings' => $bookings,
+            'pageTitle' => env('APP_NAME') . ' | Provider Bookings'
         ]);
     }
 }

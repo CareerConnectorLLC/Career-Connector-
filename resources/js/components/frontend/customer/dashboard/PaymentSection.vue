@@ -43,7 +43,7 @@ function formatDateTime(dateTimeString) {
                         <th>Amount</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody v-if="payments.length">
                     <tr v-for="payment in payments" :key="payment.id">
                         <td>{{ payment.booking_number }}</td>
                         <td>{{ isCustomer ? payment.provider.name : payment.client.name }}</td>
@@ -52,6 +52,11 @@ function formatDateTime(dateTimeString) {
                         </td>
                         <td>{{ formatDateTime(payment.updated_at) }}</td>
                         <td>{{ fm.from(payment.price/100) }}</td>
+                    </tr>
+                </tbody>
+                <tbody v-else>
+                    <tr>
+                        <td colspan="5" class="text-center fw-semibold">No payments found.</td>
                     </tr>
                 </tbody>
             </table>

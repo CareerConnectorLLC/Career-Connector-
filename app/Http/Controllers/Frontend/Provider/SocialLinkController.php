@@ -15,6 +15,7 @@ class SocialLinkController extends Controller
         
         return Inertia::render('Frontend/provider/MySocialLinks', [
             'social_links' => $socialLinks,
+            'pageTitle' => env('APP_NAME') . ' | Provider Social Links'
         ]);
     }
 

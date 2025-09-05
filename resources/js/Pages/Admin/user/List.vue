@@ -46,12 +46,12 @@
                     </div>
                 </template>
 
-                <Column field="full_name" header="Name" sortable>
+                <Column field="name" header="Name" sortable>
                     <template #body="slotData">
                         <div class="d-flex flex-wrap">
                             <div class="avatar me-3">
                                 <template v-if="slotData.data.profile_photo_url">
-                                    <img :alt="slotData.data.full_name" :src="slotData.data.profile_photo_url"
+                                    <img :alt="slotData.data.name" :src="slotData.data.profile_photo_url"
                                         class="rounded-circle">
                                 </template>
                                 <img v-else src="/public/admin_assets/assets/img/avatars/16.png" alt="" class="rounded-circle">
@@ -59,7 +59,7 @@
                             <div>
                                 <h6 class="mb-0">
                                     <Link :href="'#'">
-                                    {{ slotData.data.full_name }}
+                                    {{ slotData.data.name }}
                                     </Link>
                                 </h6>
                                 <small>Member since {{ dayjs(slotData.data.created_at).format('MMM D, YYYY') }} </small>

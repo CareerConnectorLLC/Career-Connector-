@@ -35,7 +35,7 @@ class ServiceProviderManagementController extends Controller
     }
 
     public function show(Request $request, string $id)
-    {   
+    {
         try {
             $bookings = $this->getBookings($id);
             // dd('testing');
@@ -83,7 +83,7 @@ class ServiceProviderManagementController extends Controller
                     ->through(function ($user) {
                         return [
                             'id' => $user->id,
-                            'full_name' => $user->name,
+                            'name' => $user->name,
                             'email' => $user->email,
                             'phone' => $user->phone,
                             'profile_photo_url' => $user->profile_photo_url,
@@ -114,9 +114,7 @@ class ServiceProviderManagementController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name'            => 'required',
-            'middle_name'           => 'nullable',
-            'last_name'             => 'required',
+            'name'                  => 'required|string',
             'email'                 => 'required|email:rfc,dns|unique:users',
             'password'              => ['required',  Password::min(8)
                                     ->letters()
@@ -136,16 +134,13 @@ class ServiceProviderManagementController extends Controller
         DB::beginTransaction();
         try {
             $service_provider = new User();
-            $service_provider->first_name = $request->first_name;
-            $service_provider->middle_name = $request->middle_name;
-            $service_provider->last_name = $request->last_name;
+            $service_provider->name = $request->name;
             $service_provider->email = $request->email;
             $service_provider->phone = $request->phone;
             $service_provider->password = $request->password;
             $service_provider->gender = $request->gender;
             $service_provider->active = $request->active;
             if($request->file('profile_photo')){
-                File::delete(storage_path('app/'.$service_provider->profile_photo_path));
                 $service_provider->profile_photo_path = request()->file('profile_photo')->store('profile_image');
               }
             $service_provider->assignRole('SERVICE-PROVIDER');
@@ -178,9 +173,7 @@ class ServiceProviderManagementController extends Controller
         $service_provider = User::find($id);
 
         $request->validate([
-            'first_name'            => 'required',
-            'middle_name'           => 'nullable',
-            'last_name'             => 'required',
+            'name'                  => 'required|string',
             'email'                 => 'required|email:rfc,dns|unique:users,email,'.$id,
             'phone'                 => 'required|digits_between:10,15|unique:users,phone,'.$id,
             'profile_photo'         => 'nullable|max:2048',
@@ -191,21 +184,17 @@ class ServiceProviderManagementController extends Controller
         ]);
         DB::beginTransaction();
         try {
-            $service_provider->first_name = $request->first_name;
-            $service_provider->middle_name = $request->middle_name;
-            $service_provider->last_name = $request->last_name;
+            $service_provider->name = $request->name;
             $service_provider->email = $request->email;
             $service_provider->phone = $request->phone;
             $service_provider->gender = $request->gender;
             $service_provider->active = $request->active;
 
-            if($request->file('profile_photo')){
-                $service_provider->profile_photo_path = request()->file('profile_photo')->store('profile_image');
-            }
-
-            if(!$request->file('profile_photo')){
-                Storage::disk('public')->delete($service_provider->profile_photo_path);
-                $service_provider->profile_photo_path = null;
+            if ($request->hasFile('profile_photo')) {
+                if ($service_provider->profile_photo_path) {
+                    Storage::disk('public')->delete($service_provider->profile_photo_path);
+                }
+                $service_provider->profile_photo_path = $request->file('profile_photo')->store('profile_image');
             }
 
             $service_provider->update();

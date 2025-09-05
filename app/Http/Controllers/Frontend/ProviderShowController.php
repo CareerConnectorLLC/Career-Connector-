@@ -21,7 +21,7 @@ class ProviderShowController extends Controller
             'service:id,name'
         ])->find($id);
 
-        $timings = $providerData->provider->availability->timings;
+        $timings = optional($providerData->provider->availability)->timings;
 
         return Inertia::render('Frontend/ProviderShow', [
             'provider' => $providerData,
